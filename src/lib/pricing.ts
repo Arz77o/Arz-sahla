@@ -1,9 +1,14 @@
 export function calculatePriceDZD(
   price_usd: number,
-  rate: number = 260,
-  commission: number = 0.20
+  rate: number = 250,
+  commission: number = 1.20
 ): number {
-  return Math.round(Math.round(price_usd * rate) * (1 + commission));
+  // Price = (USD * Rate) * Commission Multiplier (e.g. 1.2 for 20% profit)
+  const basePrice = price_usd * rate;
+  const totalPrice = basePrice * commission;
+  
+  // Round to nearest 10 for cleaner display (e.g. 3120 -> 3120, but maybe 3004 -> 3000)
+  return Math.ceil(totalPrice / 10) * 10;
 }
 
 export function formatDZD(amount: number): string {
@@ -12,8 +17,8 @@ export function formatDZD(amount: number): string {
 
 export function formatAdminPreview(
   price_usd: number,
-  rate = 260,
-  commission = 0.20
+  rate = 250,
+  commission = 1.2
 ): string {
   if (!price_usd || price_usd <= 0) return '—';
   return `سيظهر للعميل بـ: ${formatDZD(

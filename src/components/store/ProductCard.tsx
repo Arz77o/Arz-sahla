@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { formatDZD, calculatePriceDZD } from '../../lib/pricing';
 import { useTranslation } from 'react-i18next';
+import { useSettingsStore } from '../../store/settingsStore';
 
 interface ProductCardProps {
   product: {
@@ -18,9 +19,10 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { i18n } = useTranslation();
+  const { usd_to_dzd_rate, commission_rate } = useSettingsStore();
   const isAr = i18n.language === 'ar';
   const name = isAr ? product.name_ar : product.name_en;
-  const priceDZD = calculatePriceDZD(product.price_usd);
+  const priceDZD = calculatePriceDZD(product.price_usd, usd_to_dzd_rate, commission_rate);
 
   return (
     <Link to={`/products/${product.id}`} className="group block bg-white rounded-xl border hover:shadow-md transition-shadow overflow-hidden">

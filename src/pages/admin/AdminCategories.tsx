@@ -4,9 +4,12 @@ import { toast } from 'sonner';
 import { SEOMeta } from '../../components/shared/SEOMeta';
 import { supabaseAdmin } from '../../lib/supabase';
 import { Button } from '../../components/ui/button';
+import type { Database } from '../../types/database.types';
+
+type Category = Database['public']['Tables']['categories']['Row'];
 
 export default function AdminCategories() {
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Form state
@@ -35,7 +38,7 @@ export default function AdminCategories() {
     fetchCategories();
   }, []);
 
-  const handleEdit = (cat: any) => {
+  const handleEdit = (cat: Category) => {
     setIsEditing(true);
     setEditId(cat.id);
     setNameAr(cat.name_ar);
@@ -85,14 +88,14 @@ export default function AdminCategories() {
       if (editId) {
         const { error } = await supabaseAdmin
           .from('categories')
-          .update(categoryData)
+          .update(categoryData as any)
           .eq('id', editId);
         if (error) throw error;
         toast.success('تم تحديث الفئة بنجاح');
       } else {
         const { error } = await supabaseAdmin
           .from('categories')
-          .insert(categoryData);
+          .insert(categoryData as any);
         if (error) throw error;
         toast.success('تم إضافة الفئة بنجاح');
       }

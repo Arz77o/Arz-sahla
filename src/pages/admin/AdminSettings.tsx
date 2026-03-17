@@ -23,9 +23,9 @@ export default function AdminSettings() {
         .single();
 
       if (!error && data) {
-        setExchangeRate(data.exchange_rate);
-        setProfitMargin(data.profit_margin);
-        setShippingCost(data.shipping_cost_dzd);
+        setExchangeRate(data.usd_to_dzd_rate || 240);
+        setProfitMargin(data.commission_rate || 1.2);
+        setShippingCost(data.shipping_cost_dzd || 500);
       }
       setLoading(false);
     };
@@ -49,8 +49,8 @@ export default function AdminSettings() {
       const { error } = await supabaseAdmin
         .from('settings')
         .update({
-          exchange_rate: exchangeRate,
-          profit_margin: profitMargin,
+          usd_to_dzd_rate: exchangeRate,
+          commission_rate: profitMargin,
           shipping_cost_dzd: shippingCost,
           updated_at: new Date().toISOString()
         })

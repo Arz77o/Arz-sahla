@@ -74,6 +74,7 @@ export interface Database {
           name_en: string
           slug: string
           parent_id: string | null
+          icon: string | null
           created_at: string
         }
         Insert: {
@@ -82,6 +83,7 @@ export interface Database {
           name_en: string
           slug: string
           parent_id?: string | null
+          icon?: string | null
           created_at?: string
         }
         Update: {
@@ -90,6 +92,7 @@ export interface Database {
           name_en?: string
           slug?: string
           parent_id?: string | null
+          icon?: string | null
           created_at?: string
         }
       }

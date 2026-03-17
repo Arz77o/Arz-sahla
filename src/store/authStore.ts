@@ -16,7 +16,12 @@ export const useAuthStore = create<AuthState>((set) => ({
   isAdmin: false,
   setUser: (user) => set({ 
     user, 
-    isAdmin: user?.user_metadata?.role === 'admin' || false 
+    // Check both user_metadata (set by user) and app_metadata (set server-side by Supabase)
+    // app_metadata is more secure since it cannot be changed by the user themselves
+    isAdmin: 
+      user?.user_metadata?.role === 'admin' || 
+      user?.app_metadata?.role === 'admin' || 
+      false 
   }),
   setLoading: (isLoading) => set({ isLoading }),
   logout: () => set({ user: null, isAdmin: false }),

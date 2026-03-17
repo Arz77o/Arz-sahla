@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Star, Check, AlertCircle, Loader2 } from 'lucide-react';
+import { ShoppingCart, Star, Check, AlertCircle, Loader2, ExternalLink } from 'lucide-react';
 import { SEOMeta } from '../components/shared/SEOMeta';
 import { supabase } from '../lib/supabase';
 import { formatDZD, calculatePriceDZD } from '../lib/pricing';
 import { useCartStore } from '../store/cartStore';
+import { useSettingsStore } from '../store/settingsStore';
 import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
 
@@ -13,6 +14,7 @@ export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const { usd_to_dzd_rate, commission_rate } = useSettingsStore();
   const isAr = i18n.language === 'ar';
   
   const [product, setProduct] = useState<any>(null);
@@ -37,10 +39,11 @@ export default function ProductDetail() {
         return;
       }
 
-      setProduct(data);
-      setSelectedImage(data.images?.[0] || '');
-      if (data.variants && data.variants.length > 0) {
-        setSelectedVariant({ group: data.variants[0].group, option: data.variants[0].options[0] });
+      const productData = data as any;
+      setProduct(productData);
+      setSelectedImage(productData.images?.[0] || '');
+      if (productData.variants && productData.variants.length > 0) {
+        setSelectedVariant({ group: productData.variants[0].group, option: productData.variants[0].options[0] });
       }
       setLoading(false);
     };
@@ -60,7 +63,7 @@ export default function ProductDetail() {
 
   const name = isAr ? product.name_ar : product.name_en;
   const description = isAr ? product.description_ar : product.description_en;
-  const priceDZD = calculatePriceDZD(product.price_usd);
+  const priceDZD = calculatePriceDZD(product.price_usd, usd_to_dzd_rate, commission_rate);
   const inCart = isInCart(product.id);
 
   const handleAddToCart = () => {
@@ -173,12 +176,32 @@ export default function ProductDetail() {
               )}
 
               {/* Shipping Notice */}
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-8 flex gap-3 text-amber-800">
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 flex gap-3 text-amber-800">
                 <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                 <div className="text-sm leading-relaxed whitespace-pre-line">
                   {t('product.shippingNotice')}
                 </div>
               </div>
+
+              {/* AliExpress Link for User */}
+              {product.aliexpress_url && (
+                <a 
+                  href={product.aliexpress_url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-4 mb-8 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                      <ExternalLink className="w-5 h-5 text-red-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-gray-900">مشاهدة المنتج على AliExpress</p>
+                      <p className="text-xs text-gray-500">للاطلاع على المزيد من الصور والآراء</p>
+                    </div>
+                  </div>
+                </a>
+              )}
 
               {/* Add to Cart */}
               <div className="mt-auto pt-6 border-t border-gray-100">

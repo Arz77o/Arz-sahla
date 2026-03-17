@@ -84,10 +84,11 @@ export default function Checkout() {
         .single();
 
       if (orderError) throw orderError;
+      const order = orderData as any;
 
       // 2. Create Order Items
       const orderItems = items.map(item => ({
-        order_id: orderData.id,
+        order_id: order.id,
         product_id: item.product_id,
         quantity: 1,
         unit_price_dzd: item.price_dzd,
@@ -103,7 +104,7 @@ export default function Checkout() {
       // 3. Call Edge Function to get Chargily checkout URL
       const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
         body: {
-          order_id: orderData.id,
+          order_id: order.id,
           total_dzd: getTotal(),
           customer_name: data.fullName,
           customer_email: user.email,

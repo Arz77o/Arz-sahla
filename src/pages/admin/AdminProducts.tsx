@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Edit, Trash2, Loader2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { SEOMeta } from '../../components/shared/SEOMeta';
 import { supabaseAdmin } from '../../lib/supabase';
 import { formatDZD, calculatePriceDZD } from '../../lib/pricing';
 import { Button } from '../../components/ui/button';
+import { useSettingsStore } from '../../store/settingsStore';
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { usd_to_dzd_rate, commission_rate } = useSettingsStore();
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -69,6 +71,7 @@ export default function AdminProducts() {
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">الفئة</th>
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">السعر (USD)</th>
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">السعر (DZD)</th>
+                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">التقييم</th>
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">الشارة</th>
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">الحالة</th>
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">إجراء</th>
@@ -107,7 +110,13 @@ export default function AdminProducts() {
                       ${product.price_usd.toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-600">
-                      {formatDZD(calculatePriceDZD(product.price_usd))}
+                      {formatDZD(calculatePriceDZD(product.price_usd, usd_to_dzd_rate, commission_rate))}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-1 text-sm text-gray-600">
+                        <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                        <span>{(Number(product.avg_rating) || 0).toFixed(1)}</span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {product.product_badge ? (

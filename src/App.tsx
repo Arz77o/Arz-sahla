@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'sonner';
+import { useAuthInit } from './hooks/useAuthInit';
 
 // Store Components
 import { Header } from './components/store/Header';
@@ -58,6 +59,9 @@ const AdminLayout = () => (
 );
 
 function App() {
+  // Bootstrap auth: reads existing session + listens for auth changes
+  useAuthInit();
+
   return (
     <HelmetProvider>
       <BrowserRouter>

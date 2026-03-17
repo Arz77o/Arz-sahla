@@ -69,7 +69,7 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ checkoutUrl: chargilyData.checkout_url }),
+      JSON.stringify({ checkout_url: chargilyData.checkout_url }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
