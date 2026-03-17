@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "track": "Track Order",
+    "faq": "FAQ",
+    "account": "My Account",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register"
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "empty": "Your cart is empty",
+    "alreadyInCart": "Product is already in your cart",
+    "quantity": "Quantity: 1",
+    "remove": "Remove",
+    "total": "Total",
+    "checkout": "Proceed to Checkout",
+    "secure": "Secure payment via Chargily"
+  },
+  "product": {
+    "available": "Available",
+    "addToCart": "Add to Cart",
+    "inCart": "✓ In Cart",
+    "brand": "Brand",
+    "choice": "Choice",
+    "shippingNotice": "Product ships directly from China — delivery time 15-45 business days. Customs fees are the customer's responsibility."
+  },
+  "order": {
+    "pending": "Pending",
+    "paid": "Paid",
+    "processing": "Processing",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "rejected": "Rejected"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "fullName": "Real Full Name",
+    "address": "Detailed Address",
+    "wilaya": "Wilaya",
+    "commune": "Commune",
+    "communePlaceholder": "Type your commune name...",
+    "zipCode": "Zip Code",
+    "phone": "Phone Number",
+    "terms": "I agree to the Terms and Conditions",
+    "pay": "Pay Now"
+  }
+}
