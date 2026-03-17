@@ -274,7 +274,11 @@ export default function Checkout() {
                 {items.map(item => (
                   <div key={item.product_id} className="flex gap-3 items-center">
                     <div className="w-16 h-16 rounded-md overflow-hidden bg-gray-50 border border-gray-100 flex-shrink-0">
-                      <img src={item.image || 'https://picsum.photos/seed/sahla/100/100'} alt="" className="w-full h-full object-cover" />
+                      <img 
+                        src={item.image || (item as any).images?.[0] || 'https://picsum.photos/seed/sahla/100/100'} 
+                        alt="" 
+                        className="w-full h-full object-cover" 
+                      />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-medium text-gray-900 line-clamp-1">{isAr ? item.name_ar : item.name_en}</h4>

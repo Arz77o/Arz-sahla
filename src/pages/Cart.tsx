@@ -55,7 +55,11 @@ export default function Cart() {
             {items.map((item) => (
               <div key={item.product_id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex gap-4 items-center">
                 <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-50 flex-shrink-0 border border-gray-100">
-                  <img src={item.image || 'https://picsum.photos/seed/sahla/200/200'} alt="" className="w-full h-full object-cover" />
+                  <img 
+                    src={item.image || (item as any).images?.[0] || 'https://picsum.photos/seed/sahla/200/200'} 
+                    alt={isAr ? item.name_ar : item.name_en} 
+                    className="w-full h-full object-cover" 
+                  />
                 </div>
                 
                 <div className="flex-1 min-w-0">

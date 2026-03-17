@@ -23,33 +23,46 @@ serve(async (req) => {
       throw new Error('Chargily Secret Key not configured')
     }
 
-    const appUrl = Deno.env.get('APP_URL') || 'http://localhost:3000'
+    const appUrl = Deno.env.get('APP_URL') || 'http://localhost:5173'
+    const isLive = Deno.env.get('CHARGILY_MODE') === 'live'
+    const chargilyUrl = isLive 
+      ? 'https://pay.chargily.net/api/v2/checkouts' 
+      : 'https://pay.chargily.net/test/api/v2/checkouts'
+
+    console.log(`Creating checkout in ${isLive ? 'LIVE' : 'TEST'} mode...`)
 
     // Create checkout in Chargily
-    const chargilyResponse = await fetch('https://pay.chargily.net/test/api/v2/checkouts', {
+    const payload: any = {
+      amount: total_dzd,
+      currency: 'dzd',
+      success_url: `${appUrl}/order/success?order_id=${order_id}`,
+      failure_url: `${appUrl}/checkout?error=payment_failed`,
+      description: `Order ${order_id} from Sahla`,
+      metadata: {
+        order_id: order_id,
+      },
+    }
+
+    // Only add webhook if it's a valid remote URL
+    const webhookUrl = Deno.env.get('CHARGILY_WEBHOOK_URL')
+    if (webhookUrl && !webhookUrl.includes('localhost')) {
+      payload.webhook_endpoint = webhookUrl
+    }
+
+    const chargilyResponse = await fetch(chargilyUrl, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${chargilySecretKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        amount: total_dzd,
-        currency: 'dzd',
-        success_url: `${appUrl}/order-success?order_id=${order_id}`,
-        failure_url: `${appUrl}/checkout?error=payment_failed`,
-        webhook_endpoint: `${appUrl}/api/webhooks/chargily`, // Or your supabase edge function URL
-        description: `Order ${order_id} from Sahla`,
-        metadata: {
-          order_id: order_id,
-        },
-      }),
+      body: JSON.stringify(payload),
     })
 
     const chargilyData = await chargilyResponse.json()
 
     if (!chargilyResponse.ok) {
-      console.error('Chargily Error:', chargilyData)
-      throw new Error(chargilyData.message || 'Failed to create checkout with Chargily')
+      console.error('Chargily API Error:', chargilyData)
+      throw new Error(chargilyData.message || `Chargily Error: ${chargilyResponse.statusText}`)
     }
 
     // Update order with chargily reference

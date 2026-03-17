@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { Copy, ExternalLink, Save, Loader2, AlertCircle } from 'lucide-react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+import { Copy, ExternalLink, Save, Loader2, AlertCircle, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { SEOMeta } from '../../components/shared/SEOMeta';
 import { supabaseAdmin } from '../../lib/supabase';
@@ -9,6 +9,7 @@ import { Button } from '../../components/ui/button';
 
 export default function AdminOrderDetail() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   
@@ -17,21 +18,30 @@ export default function AdminOrderDetail() {
   const [trackingNumber, setTrackingNumber] = useState('');
   const [adminNote, setAdminNote] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [settings, setSettings] = useState<any>(null);
 
   useEffect(() => {
     const fetchOrder = async () => {
       setLoading(true);
       const { data, error } = await supabaseAdmin
         .from('orders')
-        .select('*, users(email), order_items(*, products(name_ar, name_en, aliexpress_url, images))')
+        .select('*, users(email), order_items(*, products(name_ar, name_en, aliexpress_url, images, price_usd))')
         .eq('id', id)
         .single();
+      
+      const { data: settingsData } = await supabaseAdmin
+        .from('settings')
+        .select('*')
+        .single();
+
+      if (settingsData) setSettings(settingsData);
 
       if (!error && data) {
-        setOrder(data);
-        setStatus(data.status);
-        setTrackingNumber(data.tracking_number || '');
-        setAdminNote(data.admin_note || '');
+        const orderData = data as any;
+        setOrder(orderData);
+        setStatus(orderData.status);
+        setTrackingNumber(orderData.tracking_number || '');
+        setAdminNote(orderData.admin_note || '');
       }
       setLoading(false);
     };
@@ -61,21 +71,43 @@ export default function AdminOrderDetail() {
         admin_note: adminNote || null,
       };
 
-      const { error } = await supabaseAdmin
+      const { error } = await (supabaseAdmin as any)
         .from('orders')
         .update(updates)
         .eq('id', id);
 
       if (error) throw error;
 
-      // If tracking number was added and status changed to shipped, we should ideally trigger an email
-      // For now, we just update the DB. The edge function could listen to DB changes or we can call it here.
-      
       toast.success('تم حفظ التغييرات بنجاح');
       setOrder({ ...order, ...updates });
     } catch (error: any) {
       toast.error(error.message || 'فشل حفظ التغييرات');
     } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm('هل أنت متأكد من حذف هذا الطلب نهائياً؟ لا يمكن التراجع عن هذا الإجراء.')) {
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      // Supabase should handle order_items via CASCADE if configured, 
+      // but we use select('*') in fetch so we know the project structure.
+      const { error } = await supabaseAdmin
+        .from('orders')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success('تم حذف الطلب بنجاح');
+      navigate('/admin/orders');
+    } catch (error: any) {
+      console.error('Delete error:', error);
+      toast.error('فشل حذف الطلب: ' + error.message);
       setIsSaving(false);
     }
   };
@@ -181,9 +213,24 @@ export default function AdminOrderDetail() {
                         {item.variant.group}: {item.variant.option}
                       </p>
                     )}
-                    <div className="flex items-center gap-4 text-sm">
-                      <span className="text-gray-500">الكمية: {item.quantity}</span>
-                      <span className="font-bold text-gray-900">{formatDZD(item.unit_price_dzd)}</span>
+                    <div className="flex items-center gap-4 text-sm mt-1">
+                      <span className="text-gray-500">سعر البيع: <span className="font-bold text-gray-900">{formatDZD(item.unit_price_dzd)}</span></span>
+                      {settings && (
+                        <>
+                          <div className="flex items-center gap-2 bg-amber-50 px-2 py-0.5 rounded border border-amber-100">
+                            <span className="text-amber-700 text-xs">سأدفعه (AliExpress):</span>
+                            <span className="font-mono font-bold text-amber-800">
+                              {formatDZD(item.products?.price_usd * settings.usd_to_dzd_rate)}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 bg-green-50 px-2 py-0.5 rounded border border-green-100">
+                            <span className="text-green-700 text-xs">ربحي الصافي:</span>
+                            <span className="font-mono font-bold text-green-800">
+                              {formatDZD(item.products?.price_usd * settings.profit_per_usd)}
+                            </span>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                   {item.products?.aliexpress_url && (
@@ -201,9 +248,27 @@ export default function AdminOrderDetail() {
               ))}
             </div>
 
-            <div className="mt-6 pt-6 border-t border-gray-100 flex justify-between items-center">
-              <span className="text-lg font-bold text-gray-900">الإجمالي المدفوع</span>
-              <span className="text-2xl font-black text-blue-600">{formatDZD(order.total_dzd)}</span>
+            <div className="mt-6 pt-6 border-t border-gray-100 space-y-2">
+              {settings && (
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-500">إجمالي ما سأدفعه (تكلفة المنتجات):</span>
+                  <span className="font-mono font-bold text-amber-600">
+                    {formatDZD(order.order_items.reduce((sum: number, item: any) => sum + (item.products?.price_usd * settings.usd_to_dzd_rate), 0))}
+                  </span>
+                </div>
+              )}
+              {settings && (
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-500">إجمالي الربح الصافي لهذا الطلب:</span>
+                  <span className="font-mono font-bold text-green-600">
+                    {formatDZD(order.order_items.reduce((sum: number, item: any) => sum + (item.products?.price_usd * settings.profit_per_usd), 0))}
+                  </span>
+                </div>
+              )}
+              <div className="flex justify-between items-center pt-2 border-t border-gray-50">
+                <span className="text-lg font-bold text-gray-900">الإجمالي المدفوع (من العميل)</span>
+                <span className="text-2xl font-black text-blue-600">{formatDZD(order.total_dzd)}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -273,6 +338,18 @@ export default function AdminOrderDetail() {
                   </>
                 )}
               </Button>
+
+              <div className="pt-4 border-t border-gray-100">
+                <Button 
+                  variant="outline"
+                  onClick={handleDelete}
+                  disabled={isSaving}
+                  className="w-full h-11 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 font-medium"
+                >
+                  <Trash2 className="w-4 h-4 ml-2" />
+                  حذف الطلب نهائياً
+                </Button>
+              </div>
             </div>
           </div>
         </div>

@@ -25,7 +25,13 @@
     "inCart": "✓ In Cart",
     "brand": "Brand",
     "choice": "Choice",
-    "shippingNotice": "Product ships directly from China — delivery time 15-45 business days. Customs fees are the customer's responsibility."
+    "shippingNotice": "Product ships directly from China — delivery time 15-45 business days. Customs fees are the customer's responsibility.",
+    "whyChoose": "Why choose Sahla DZ?",
+    "guaranteed": "Guaranteed products from top sellers",
+    "securePay": "Secure payment via Baridimob or Edahabia",
+    "fastDelivery": "Fast and reliable delivery to all wilayas",
+    "description": "Product Description",
+    "buyerReviews": "Buyer Reviews"
   },
   "order": {
     "pending": "Pending",

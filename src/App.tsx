@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'sonner';
 import { useAuthInit } from './hooks/useAuthInit';
+import { PageLoader } from './components/shared/PageLoader';
 
 // Store Components
 import { Header } from './components/store/Header';
@@ -15,35 +16,38 @@ import { AdminSidebar } from './components/admin/AdminSidebar';
 import { ProtectedRoute } from './components/shared/ProtectedRoute';
 import { AdminRoute } from './components/shared/AdminRoute';
 
-// Pages
-import Home from './pages/Home';
-import Products from './pages/Products';
-import ProductDetail from './pages/ProductDetail';
-import Cart from './pages/Cart';
-import Checkout from './pages/Checkout';
-import OrderSuccess from './pages/OrderSuccess';
-import OrderTracking from './pages/OrderTracking';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Account from './pages/Account';
-import FAQ from './pages/FAQ';
-import Terms from './pages/Terms';
+// Lazy Loaded Pages
+const Home = lazy(() => import('./pages/Home'));
+const Products = lazy(() => import('./pages/Products'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const Cart = lazy(() => import('./pages/Cart'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+const OrderSuccess = lazy(() => import('./pages/OrderSuccess'));
+const OrderTracking = lazy(() => import('./pages/OrderTracking'));
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
+const Account = lazy(() => import('./pages/Account'));
+const FAQ = lazy(() => import('./pages/FAQ'));
+const Terms = lazy(() => import('./pages/Terms'));
 
 // Admin Pages
-import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminOrders from './pages/admin/AdminOrders';
-import AdminOrderDetail from './pages/admin/AdminOrderDetail';
-import AdminProducts from './pages/admin/AdminProducts';
-import AdminProductForm from './pages/admin/AdminProductForm';
-import AdminCategories from './pages/admin/AdminCategories';
-import AdminCustomers from './pages/admin/AdminCustomers';
-import AdminSettings from './pages/admin/AdminSettings';
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'));
+const AdminOrderDetail = lazy(() => import('./pages/admin/AdminOrderDetail'));
+const AdminProducts = lazy(() => import('./pages/admin/AdminProducts'));
+const AdminProductForm = lazy(() => import('./pages/admin/AdminProductForm'));
+const AdminCategories = lazy(() => import('./pages/admin/AdminCategories'));
+const AdminCustomers = lazy(() => import('./pages/admin/AdminCustomers'));
+const AdminCustomerDetail = lazy(() => import('./pages/admin/AdminCustomerDetail'));
+const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
 
 const StoreLayout = () => (
   <div className="min-h-screen flex flex-col font-sans bg-gray-50">
     <Header />
     <main className="flex-grow">
-      <Outlet />
+      <Suspense fallback={<PageLoader />}>
+        <Outlet />
+      </Suspense>
     </main>
     <Footer />
   </div>
@@ -53,7 +57,9 @@ const AdminLayout = () => (
   <div className="min-h-screen flex font-sans bg-gray-100" dir="rtl">
     <AdminSidebar />
     <main className="flex-grow overflow-auto p-8">
-      <Outlet />
+      <Suspense fallback={<PageLoader />}>
+        <Outlet />
+      </Suspense>
     </main>
   </div>
 );
@@ -94,6 +100,7 @@ function App() {
             <Route path="products/:id/edit" element={<AdminProductForm />} />
             <Route path="categories" element={<AdminCategories />} />
             <Route path="customers" element={<AdminCustomers />} />
+            <Route path="customers/:id" element={<AdminCustomerDetail />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
         </Routes>

@@ -17,7 +17,7 @@ interface ProductCardProps {
   };
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+export const ProductCard = React.memo<ProductCardProps>(({ product }) => {
   const { i18n } = useTranslation();
   const { usd_to_dzd_rate, commission_rate } = useSettingsStore();
   const isAr = i18n.language === 'ar';
@@ -30,6 +30,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <img 
           src={product.images?.[0] || 'https://picsum.photos/seed/sahla/400/400'} 
           alt={name}
+          loading="lazy"
+          decoding="async"
           className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
         />
         {product.product_badge && (
@@ -52,4 +54,4 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </div>
     </Link>
   );
-};
+});

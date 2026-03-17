@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Eye, Search, Loader2 } from 'lucide-react';
+import { Eye, Search, Loader2, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { SEOMeta } from '../../components/shared/SEOMeta';
 import { supabaseAdmin } from '../../lib/supabase';
 import { formatDZD } from '../../lib/pricing';
@@ -42,6 +43,27 @@ export default function AdminOrders() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     fetchOrders();
+  };
+
+  const handleDeleteOrder = async (orderId: string) => {
+    if (!window.confirm('هل أنت متأكد من حذف هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء.')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabaseAdmin
+        .from('orders')
+        .delete()
+        .eq('id', orderId);
+
+      if (error) throw error;
+
+      setOrders(orders.filter(o => o.id !== orderId));
+      toast.success('تم حذف الطلب بنجاح');
+    } catch (error: any) {
+      console.error('Delete error:', error);
+      toast.error('فشل حذف الطلب: ' + error.message);
+    }
   };
 
   const tabs = [
@@ -154,13 +176,22 @@ export default function AdminOrders() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {new Date(order.created_at).toLocaleDateString('ar-DZ')}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
                       <Link to={`/admin/orders/${order.id}`}>
-                        <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-900">
-                          <Eye className="w-4 h-4 ml-1" />
-                          عرض
+                        <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-900 px-2">
+                          <Eye className="w-4 h-4" />
+                          <span className="mr-1">عرض</span>
                         </Button>
                       </Link>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleDeleteOrder(order.id)}
+                        className="text-red-600 hover:text-red-900 hover:bg-red-50 px-2"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        <span className="mr-1">حذف</span>
+                      </Button>
                     </td>
                   </tr>
                 ))

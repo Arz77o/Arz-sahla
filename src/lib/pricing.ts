@@ -7,12 +7,16 @@ export function calculatePriceDZD(
   const basePrice = price_usd * rate;
   const totalPrice = basePrice * commission;
   
-  // Round to nearest 10 for cleaner display (e.g. 3120 -> 3120, but maybe 3004 -> 3000)
-  return Math.ceil(totalPrice / 10) * 10;
+  // Round to nearest 10 for cleaner display (e.g. 3004 -> 3000, 3124 -> 3120)
+  // If the user wants 3000 exactly, it will be 3000.
+  return Math.round(totalPrice / 10) * 10;
 }
 
 export function formatDZD(amount: number): string {
-  return amount.toLocaleString('ar-DZ') + ' دج';
+  const isAr = document.documentElement.lang === 'ar';
+  const currency = isAr ? ' دج' : ' DZ';
+  // Use space as separator
+  return amount.toLocaleString('fr-FR').replace(',', '.') + currency;
 }
 
 export function formatAdminPreview(

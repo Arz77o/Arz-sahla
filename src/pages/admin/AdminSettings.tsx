@@ -13,6 +13,7 @@ export default function AdminSettings() {
   const [exchangeRate, setExchangeRate] = useState<number>(240);
   const [profitMargin, setProfitMargin] = useState<number>(1.2);
   const [shippingCost, setShippingCost] = useState<number>(500);
+  const [profitPerUsd, setProfitPerUsd] = useState<number>(50);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -23,9 +24,11 @@ export default function AdminSettings() {
         .single();
 
       if (!error && data) {
-        setExchangeRate(data.usd_to_dzd_rate || 240);
-        setProfitMargin(data.commission_rate || 1.2);
-        setShippingCost(data.shipping_cost_dzd || 500);
+        const settings = data as any;
+        setExchangeRate(settings.usd_to_dzd_rate || 240);
+        setProfitMargin(settings.commission_rate || 1.2);
+        setShippingCost(settings.shipping_cost_dzd || 500);
+        setProfitPerUsd(settings.profit_per_usd || 50);
       }
       setLoading(false);
     };
@@ -35,7 +38,7 @@ export default function AdminSettings() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (exchangeRate <= 0 || profitMargin <= 0 || shippingCost < 0) {
+    if (exchangeRate <= 0 || profitMargin <= 0 || shippingCost < 0 || profitPerUsd < 0) {
       toast.error('يرجى إدخال قيم صحيحة وموجبة');
       return;
     }
@@ -46,12 +49,13 @@ export default function AdminSettings() {
 
     setIsSaving(true);
     try {
-      const { error } = await supabaseAdmin
+      const { error } = await (supabaseAdmin as any)
         .from('settings')
         .update({
           usd_to_dzd_rate: exchangeRate,
           commission_rate: profitMargin,
           shipping_cost_dzd: shippingCost,
+          profit_per_usd: profitPerUsd,
           updated_at: new Date().toISOString()
         })
         .eq('id', 1); // Assuming single row with id 1
@@ -151,6 +155,23 @@ export default function AdminSettings() {
                 <p className="text-sm text-gray-500">تكلفة الشحن الداخلي في الجزائر (تضاف على إجمالي الطلب).</p>
               </div>
 
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-gray-900">الربح الافتراضي لكل 1 دولار (DZD)</label>
+                <div className="relative">
+                  <input 
+                    type="number"
+                    step="1"
+                    value={profitPerUsd}
+                    onChange={(e) => setProfitPerUsd(parseFloat(e.target.value))}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-lg"
+                    dir="ltr"
+                    required
+                  />
+                  <span className="absolute right-4 top-3.5 text-gray-500 font-bold">DZD</span>
+                </div>
+                <p className="text-sm text-gray-500">معدل الربح الصافي المحتسب لكل دولار واحد من تكلفة المنتج (يستخدم في الإحصائيات فقط).</p>
+              </div>
+
               <div className="pt-4 border-t border-gray-100">
                 <Button 
                   type="submit" 
@@ -189,6 +210,13 @@ export default function AdminSettings() {
                 <span className="text-sm font-bold text-blue-900">سعر البيع للعميل</span>
                 <span className="font-mono font-black text-blue-700 text-lg" dir="ltr">
                   {Math.ceil((10 * exchangeRate * profitMargin) / 10) * 10} DZD
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg border border-green-100">
+                <span className="text-sm font-bold text-green-900">الربح المتوقع ($10)</span>
+                <span className="font-mono font-black text-green-700 text-lg" dir="ltr">
+                  {10 * profitPerUsd} DZD
                 </span>
               </div>
               

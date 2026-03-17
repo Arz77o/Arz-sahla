@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Star, Check, AlertCircle, Loader2, ExternalLink } from 'lucide-react';
+import { ShoppingCart, Star, Check, AlertCircle, Loader2, ExternalLink, X } from 'lucide-react';
 import { SEOMeta } from '../components/shared/SEOMeta';
 import { supabase } from '../lib/supabase';
 import { formatDZD, calculatePriceDZD } from '../lib/pricing';
@@ -21,6 +21,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [selectedVariant, setSelectedVariant] = useState<{group: string, option: string} | null>(null);
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
 
   const { addItem, isInCart } = useCartStore();
 
@@ -29,8 +30,8 @@ export default function ProductDetail() {
       setLoading(true);
       const { data, error } = await supabase
         .from('products')
-        .select('*')
-        .eq('id', slug) // Assuming slug is ID for now, or we need to query by slug if added
+        .select('*, reviews(*)')
+        .eq('id', slug) 
         .single();
         
       if (error || !data) {
@@ -72,12 +73,17 @@ export default function ProductDetail() {
       return;
     }
     
+    const imageUrl = product.images?.[0] || '';
+    const absoluteImageUrl = imageUrl.startsWith('http') 
+      ? imageUrl 
+      : `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/products/${imageUrl}`;
+
     addItem({
       product_id: product.id,
       name_ar: product.name_ar,
       name_en: product.name_en,
       price_dzd: priceDZD,
-      image: product.images?.[0] || '',
+      image: absoluteImageUrl,
       variant: selectedVariant
     });
   };
@@ -183,25 +189,7 @@ export default function ProductDetail() {
                 </div>
               </div>
 
-              {/* AliExpress Link for User */}
-              {product.aliexpress_url && (
-                <a 
-                  href={product.aliexpress_url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-4 mb-8 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                      <ExternalLink className="w-5 h-5 text-red-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-gray-900">مشاهدة المنتج على AliExpress</p>
-                      <p className="text-xs text-gray-500">للاطلاع على المزيد من الصور والآراء</p>
-                    </div>
-                  </div>
-                </a>
-              )}
+
 
               {/* Add to Cart */}
               <div className="mt-auto pt-6 border-t border-gray-100">
@@ -222,12 +210,120 @@ export default function ProductDetail() {
         </div>
 
         {/* Description */}
-        <div className="mt-8 bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-10">
-          <h2 className="text-xl font-bold mb-6">وصف المنتج</h2>
-          <div className="prose max-w-none text-gray-600 whitespace-pre-line">
-            {description || 'لا يوجد وصف متاح.'}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+          <div className="lg:col-span-2 space-y-8">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-10">
+              <h2 className="text-xl font-bold mb-6">{t('product.description')}</h2>
+              <div className="prose max-w-none text-gray-600 whitespace-pre-line leading-relaxed">
+                {description || 'لا يوجد وصف متاح.'}
+              </div>
+            </div>
+
+            {/* Reviews Section */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-10">
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-xl font-bold">{t('product.buyerReviews')}</h2>
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-0.5">
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <Star key={star} className={`w-4 h-4 ${star <= Math.round(product.avg_rating) ? 'fill-amber-400 text-amber-400' : 'text-gray-200'}`} />
+                    ))}
+                  </div>
+                  <span className="font-bold text-gray-900">{product.avg_rating.toFixed(1)}</span>
+                  <span className="text-gray-400 text-sm">({product.reviews?.length || 0})</span>
+                </div>
+              </div>
+
+              <div className="space-y-8">
+                {product.reviews && product.reviews.length > 0 ? (
+                  product.reviews.map((review: any) => (
+                    <div key={review.id} className="border-b border-gray-100 pb-8 last:border-0 last:pb-0">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center font-bold text-blue-600">
+                            {review.full_name?.[0] || 'A'}
+                          </div>
+                          <div>
+                            <div className="font-bold text-gray-900 text-sm">{review.full_name || 'عميل مجهول'}</div>
+                            <div className="flex gap-0.5 mt-0.5">
+                              {[...Array(5)].map((_, i) => (
+                                <Star key={i} className={`w-3 h-3 ${i < review.rating ? 'fill-amber-400 text-amber-400' : 'text-gray-200'}`} />
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <span className="text-xs text-gray-400">{new Date(review.created_at).toLocaleDateString('ar-DZ')}</span>
+                      </div>
+                      <p className="text-gray-600 text-sm leading-relaxed mb-4">{review.comment}</p>
+                      
+                      {review.images && review.images.length > 0 && (
+                        <div className="flex gap-2 overflow-x-auto pb-2">
+                          {review.images.map((img: string, i: number) => (
+                            <div 
+                              key={i} 
+                              className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 cursor-zoom-in hover:opacity-80 transition-opacity"
+                              onClick={() => setZoomedImage(img)}
+                            >
+                              <img src={img} alt="" className="w-full h-full object-cover" />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-10">
+                    <p className="text-gray-400">لا توجد تقييمات لهذا المنتج بعد.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-1">
+            <div className="bg-blue-600 rounded-2xl p-8 text-white sticky top-24 overflow-hidden">
+              <div className="relative z-10">
+                <h3 className="text-xl font-bold mb-4">{t('product.whyChoose')}</h3>
+                <ul className="space-y-4">
+                  <li className="flex gap-3 text-sm">
+                    <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">✓</div>
+                    <span>{t('product.guaranteed')}</span>
+                  </li>
+                  <li className="flex gap-3 text-sm">
+                    <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">✓</div>
+                    <span>{t('product.securePay')}</span>
+                  </li>
+                  <li className="flex gap-3 text-sm">
+                    <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">✓</div>
+                    <span>{t('product.fastDelivery')}</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+            </div>
           </div>
         </div>
+
+        {/* Image Zoom Lightbox */}
+        {zoomedImage && (
+          <div 
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm p-4 md:p-12 animate-in fade-in duration-200"
+            onClick={() => setZoomedImage(null)}
+          >
+            <button 
+              className="absolute top-6 right-6 text-white bg-white/10 p-2 rounded-full hover:bg-white/20 transition-colors"
+              onClick={() => setZoomedImage(null)}
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <img 
+              src={zoomedImage} 
+              className="max-w-full max-h-full rounded-xl shadow-2xl animate-in zoom-in-95 duration-200"
+              alt="Zoomed Review" 
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        )}
       </div>
     </>
   );
