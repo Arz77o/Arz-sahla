@@ -54,9 +54,9 @@ const StoreLayout = () => (
 );
 
 const AdminLayout = () => (
-  <div className="min-h-screen flex font-sans bg-gray-100" dir="rtl">
+  <div className="min-h-screen flex flex-col lg:flex-row font-sans bg-gray-100" dir="rtl">
     <AdminSidebar />
-    <main className="flex-grow overflow-auto p-8">
+    <main className="flex-grow overflow-x-hidden p-4 md:p-8">
       <Suspense fallback={<PageLoader />}>
         <Outlet />
       </Suspense>

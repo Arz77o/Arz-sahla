@@ -4,6 +4,7 @@ import { SEOMeta } from '../components/shared/SEOMeta';
 import { supabase } from '../lib/supabase';
 import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
+import { Copy, Globe, ExternalLink } from 'lucide-react';
 
 export default function OrderTracking() {
   const [orderId, setOrderId] = useState('');
@@ -20,16 +21,45 @@ export default function OrderTracking() {
     setOrder(null);
 
     try {
-      const { data, error: fetchError } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('id', orderId.trim())
-        .single();
+      const searchVal = orderId.trim();
+      let foundOrder = null;
 
-      if (fetchError || !data) {
+      // 1. Try exact UUID match
+      if (searchVal.length === 36) {
+        const { data } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('id', searchVal)
+          .maybeSingle();
+        foundOrder = data;
+      }
+
+      // 2. Try Global Tracking Number match
+      if (!foundOrder) {
+        const { data } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('tracking_number', searchVal)
+          .maybeSingle();
+        foundOrder = data;
+      }
+
+      // 3. Try partial ID match (prefix)
+      // We use a broader approach for partials to overcome UUID casting issues
+      if (!foundOrder && searchVal.length >= 4) {
+        const { data } = await supabase
+          .from('orders')
+          .select('*')
+          .filter('id', 'ilike', `${searchVal}%`)
+          .limit(1)
+          .maybeSingle();
+        foundOrder = data;
+      }
+
+      if (!foundOrder) {
         setError('لم يتم العثور على طلب بهذا الرقم. يرجى التأكد من الرقم والمحاولة مرة أخرى.');
       } else {
-        setOrder(data);
+        setOrder(foundOrder);
       }
     } catch (err) {
       setError('حدث خطأ أثناء البحث. يرجى المحاولة لاحقاً.');
@@ -75,7 +105,7 @@ export default function OrderTracking() {
                 value={orderId}
                 onChange={(e) => setOrderId(e.target.value)}
                 className="block w-full pl-4 pr-12 py-4 border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm text-lg"
-                placeholder="رقم الطلب (مثال: 123e4567-e89b-12d3-a456-426614174000)"
+                placeholder="رقم الطلب (مثال: 123e4567)"
                 dir="ltr"
               />
             </div>
@@ -98,23 +128,75 @@ export default function OrderTracking() {
 
         {order && currentStep >= 0 && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-10">
-            <div className="flex justify-between items-center mb-8 pb-6 border-b border-gray-100">
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">حالة الطلب</h3>
-                <p className="text-sm text-gray-500 font-mono mt-1">{order.id}</p>
+            <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 pb-6 border-b border-gray-100 gap-6">
+              <div className="flex flex-col">
+                <h3 className="text-lg font-bold text-gray-900 tracking-tight">تفاصيل حالة الطلب</h3>
+                <span className="text-[10px] text-gray-400 mt-1 font-mono uppercase">ID: {order.id}</span>
               </div>
-              <div className="text-left">
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                  order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                  order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
+              <div className="flex flex-col items-end">
+                <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-base font-black shadow-sm ${
+                  order.status === 'delivered' ? 'bg-green-500 text-white' :
+                  order.status === 'shipped' ? 'bg-blue-600 text-white' :
+                  order.status === 'rejected' ? 'bg-red-500 text-white' :
                   'bg-amber-100 text-amber-800'
                 }`}>
-                  {order.status === 'paid' && 'تم الدفع'}
-                  {order.status === 'processing' && 'قيد التنفيذ'}
-                  {order.status === 'shipped' && 'تم الشحن'}
-                  {order.status === 'delivered' && 'تم التسليم'}
-                  {order.status === 'pending' && 'في الانتظار'}
+                  {order.status === 'paid' && 'تَمَّ الدَّفْعُ'}
+                  {order.status === 'processing' && 'جَارِي التَّنْفِيذُ'}
+                  {order.status === 'shipped' && 'تَمَّ الشَّحْنُ'}
+                  {order.status === 'delivered' && 'تَمَّ التَّسْلِيمُ'}
+                  {order.status === 'pending' && 'فِي الاِنْتِظَارِ'}
+                  {order.status === 'rejected' && 'مَرْفُوضٌ'}
                 </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 mb-10">
+              {/* Global Tracking Number Box */}
+              <div className={`p-6 rounded-2xl border flex flex-col justify-between group transition-all text-center ${
+                order.tracking_number 
+                  ? 'bg-amber-50/50 border-amber-100 hover:border-amber-300' 
+                  : 'bg-gray-50 border-gray-100 italic'
+              }`}>
+                <div className="flex items-center justify-between mb-3 border-b border-amber-100/50 pb-3">
+                  <span className={`text-xs font-black uppercase tracking-widest ${order.tracking_number ? 'text-amber-600' : 'text-gray-400'}`}>
+                    رقم تتبع الشحنة (AliExpress Global)
+                  </span>
+                  <Globe className={`w-5 h-5 ${order.tracking_number ? 'text-amber-400' : 'text-gray-300'}`} />
+                </div>
+                <div className="flex items-center justify-center gap-4 mt-2">
+                  <code className={`text-3xl font-black font-mono tracking-tighter ${order.tracking_number ? 'text-amber-900' : 'text-gray-400'}`}>
+                    {order.tracking_number || 'بانتظار رقم الشحن الدولي...'}
+                  </code>
+                  {order.tracking_number && (
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => {
+                          navigator.clipboard.writeText(order.tracking_number);
+                          toast.success('تم نسخ رقم التتبع العالمي');
+                        }}
+                        className="p-3 bg-white shadow-sm border border-amber-100 hover:bg-amber-100 rounded-xl text-amber-500 transition-all hover:scale-105 active:scale-95"
+                        title="نسخ الرقم"
+                      >
+                        <Copy className="w-5 h-5" />
+                      </button>
+                      <a 
+                        href={`https://t.17track.net/ar#nums=${order.tracking_number}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-3 bg-amber-600 text-white rounded-xl font-bold shadow-md hover:bg-amber-700 transition-all hover:scale-105 active:scale-95"
+                      >
+                        <ExternalLink className="w-5 h-5" />
+                        تتبع الآن (17Track)
+                      </a>
+                    </div>
+                  )}
+                </div>
+                {order.tracking_number && (
+                  <p className="text-xs text-amber-600 mt-4 font-bold flex items-center justify-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    يمكن استخدام هذا الرقم لتتبع الشحنة دولياً
+                  </p>
+                )}
               </div>
             </div>
 

@@ -28,7 +28,7 @@ export default function FAQ() {
               </div>
               <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                 <h3 className="font-bold text-lg mb-2 text-blue-600">أين أستلم طردي؟</h3>
-                <p className="text-gray-600 leading-relaxed">يتم تسليم الطرود عادة إلى أقرب مركز بريد (Algérie Poste) لعنوانك، أو عبر شركات التوصيل الخاصة إذا كانت متوفرة.</p>
+                <p className="text-gray-600 leading-relaxed">يتم تسليم الطرود عادة إلى أقرب مركز بريد (Algérie Poste) لعنوانك، أو عبر شركة التوصيل (EMS) إذا كانت متوفرة.</p>
               </div>
               <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                 <h3 className="font-bold text-lg mb-2 text-blue-600">هل أدفع رسوم جمركية؟</h3>
@@ -66,7 +66,7 @@ export default function FAQ() {
               </div>
               <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                 <h3 className="font-bold text-lg mb-2 text-blue-600">كيف أعرف أن الطرد في مركز البريد؟</h3>
-                <p className="text-gray-600 leading-relaxed">ستتلقى إشعاراً ورقياً من ساعي البريد، أو يمكنك تتبع الرقم محلياً عبر موقع بريد الجزائر إذا كان مدعوماً.</p>
+                <p className="text-gray-600 leading-relaxed">ستتلقى إشعاراً في هاتفك يأكد أن طردك وصل إلى عنوانك و يرجى أخذه من المركز حاملا معك بطاقة التعريف و رقم  التتبع المرسل إليك في البريد الإلكتروني، أو يمكنك تتبع الرقم محلياً عبر موقع بريد الجزائر إذا كان مدعوماً.</p>
               </div>
               <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                 <h3 className="font-bold text-lg mb-2 text-blue-600">هل يمكن تتبع جميع الطرود؟</h3>
