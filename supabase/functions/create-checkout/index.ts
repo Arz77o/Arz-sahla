@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { order_id, total_dzd, customer_name, customer_email } = await req.json()
+    const { order_id, total_dzd, customer_name, customer_email, site_url } = await req.json()
 
     if (!order_id || !total_dzd) {
       throw new Error('Missing required parameters')
@@ -23,7 +23,8 @@ serve(async (req) => {
       throw new Error('Chargily Secret Key not configured')
     }
 
-    const appUrl = Deno.env.get('APP_URL') || 'http://localhost:5173'
+    // Use site_url from body if provided, otherwise fallback to environment variable
+    const appUrl = site_url || Deno.env.get('APP_URL') || 'http://localhost:5173'
     const isLive = Deno.env.get('CHARGILY_MODE') === 'live'
     const chargilyUrl = isLive 
       ? 'https://pay.chargily.net/api/v2/checkouts' 
@@ -88,7 +89,7 @@ serve(async (req) => {
         status: 200,
       }
     )
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating checkout:', error)
     return new Response(
       JSON.stringify({ error: error.message }),

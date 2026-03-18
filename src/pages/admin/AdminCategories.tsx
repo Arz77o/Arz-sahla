@@ -86,15 +86,15 @@ export default function AdminCategories() {
       };
 
       if (editId) {
-        const { error } = await supabaseAdmin
-          .from('categories')
+        const { error } = await (supabaseAdmin
+          .from('categories' as any) as any)
           .update(categoryData as any)
           .eq('id', editId);
         if (error) throw error;
         toast.success('تم تحديث الفئة بنجاح');
       } else {
-        const { error } = await supabaseAdmin
-          .from('categories')
+        const { error } = await (supabaseAdmin
+          .from('categories' as any) as any)
           .insert(categoryData as any);
         if (error) throw error;
         toast.success('تم إضافة الفئة بنجاح');

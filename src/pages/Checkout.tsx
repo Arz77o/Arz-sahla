@@ -11,6 +11,7 @@ import { SEOMeta } from '../components/shared/SEOMeta';
 import { useCartStore } from '../store/cartStore';
 import { useAuthStore } from '../store/authStore';
 import { supabase } from '../lib/supabase';
+import type { Database } from '../types/database.types';
 import { WILAYAS } from '../lib/algeria';
 import { formatDZD } from '../lib/pricing';
 import { Button } from '../components/ui/button';
@@ -67,8 +68,8 @@ export default function Checkout() {
     setIsSubmitting(true);
     try {
       // 1. Create Order
-      const { data: orderData, error: orderError } = await supabase
-        .from('orders')
+      const { data: orderData, error: orderError } = await (supabase
+        .from('orders' as any) as any)
         .insert({
           user_id: user.id,
           total_dzd: getTotal(),
@@ -79,7 +80,7 @@ export default function Checkout() {
           zip_code: data.zipCode,
           phone: data.phone,
           terms_accepted: data.termsAccepted,
-        })
+        } as Database['public']['Tables']['orders']['Insert'])
         .select()
         .single();
 
@@ -95,9 +96,9 @@ export default function Checkout() {
         variant: item.variant || {},
       }));
 
-      const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
+      const { error: itemsError } = await (supabase
+        .from('order_items' as any) as any)
+        .insert(orderItems as any);
 
       if (itemsError) throw itemsError;
 
@@ -109,6 +110,7 @@ export default function Checkout() {
           customer_name: data.fullName,
           customer_email: user.email,
           locale: i18n.language,
+          site_url: window.location.origin,
         }
       });
 
