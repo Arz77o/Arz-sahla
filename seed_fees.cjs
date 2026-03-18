@@ -1,4 +1,12 @@
-export const WILAYAS = [
+require('dotenv').config();
+const { createClient } = require('@supabase/supabase-js');
+
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.VITE_SUPABASE_SERVICE_ROLE_KEY
+);
+
+const WILAYAS = [
   { code: 1, name_ar: "أدرار", name_en: "Adrar" },
   { code: 2, name_ar: "الشلف", name_en: "Chlef" },
   { code: 3, name_ar: "الأغواط", name_en: "Laghouat" },
@@ -58,3 +66,24 @@ export const WILAYAS = [
   { code: 57, name_ar: "المغير", name_en: "El M'Ghair" },
   { code: 58, name_ar: "المنيعة", name_en: "El Meniaa" }
 ];
+
+async function seed() {
+  const fees = WILAYAS.map(w => ({
+    wilaya_name: w.name_ar,
+    wilaya_code: w.code,
+    home_fee: 500,
+    desk_fee: 400,
+  }));
+
+  // Set Algiers fee explicitly
+  const algiers = fees.find(f => f.wilaya_code === 16);
+  if (algiers) {
+    algiers.desk_fee = 200;
+  }
+
+  const { data, error } = await supabase.from('shipping_fees').upsert(fees, { onConflict: 'wilaya_name' });
+  if (error) console.error('Error seeding data:', error);
+  else console.log('58 Wilayas shipping fees seeded successfully!');
+}
+
+seed();

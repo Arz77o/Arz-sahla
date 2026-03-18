@@ -20,26 +20,27 @@
     "secure": "Secure payment via Chargily"
   },
   "product": {
-    "available": "Available",
+    "available": "In Stock",
+    "outOfStock": "Out of Stock",
     "addToCart": "Add to Cart",
     "inCart": "✓ In Cart",
-    "brand": "Brand",
-    "choice": "Choice",
-    "shippingNotice": "Product ships directly from China — delivery time 15-45 business days. Customs fees are the customer's responsibility.",
+    "brand": "Authentic",
+    "choice": "Our Choice",
+    "shippingNotice": "Fast delivery to all Algerian Wilayas (2-7 days). Cash on Delivery available.",
     "whyChoose": "Why choose Sahla DZ?",
-    "guaranteed": "Guaranteed products from top sellers",
-    "securePay": "Secure payment via Baridimob or Edahabia",
-    "fastDelivery": "Easy product ordering and tracking",
+    "guaranteed": "High quality products carefully selected",
+    "securePay": "Secure payment on delivery or via Edahabia / CIB",
+    "fastDelivery": "Reliable and fast delivery to your door",
     "description": "Product Description",
-    "buyerReviews": "Buyer Reviews"
+    "buyerReviews": "Customer Reviews"
   },
   "order": {
     "pending": "Pending",
     "paid": "Paid",
-    "processing": "Processing",
+    "processing": "Preparing",
     "shipped": "Shipped",
     "delivered": "Delivered",
-    "rejected": "Rejected"
+    "rejected": "Cancelled"
   },
   "checkout": {
     "title": "Checkout",
@@ -50,7 +51,13 @@
     "communePlaceholder": "Type your commune name...",
     "zipCode": "Zip Code",
     "phone": "Phone Number",
+    "paymentMethod": "Payment Method",
+    "cod": "Cash on Delivery (COD)",
+    "online": "Online Payment (Edahabia / CIB)",
+    "shippingType": "Shipping Type",
+    "home": "Home Delivery",
+    "desk": "Shipping Office (Stop Desk)",
     "terms": "I agree to the Terms and Conditions",
-    "pay": "Pay Now"
+    "pay": "Confirm Order"
   }
 }

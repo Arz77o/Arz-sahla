@@ -37,10 +37,10 @@ export default function Home() {
       <section className="bg-blue-600 text-white py-20">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            تسوق من AliExpress بكل سهولة
+            مرحباً بك في متجرنا
           </h1>
           <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-2xl mx-auto">
-            منصة الشراء بالوكالة — ندفع بالنيابة عنك وتستلم في بيتك بالجزائر. ادفع بالدينار الجزائري بكل أمان.
+            تسوق أفضل المنتجات مع توفر الشحن لجميع مكاتب Yalidine في الجزائر. ادفع بالدينار الجزائري بكل أمان.
           </p>
           <Link to="/products">
             <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 text-lg font-bold px-8 py-6 rounded-full">
@@ -105,8 +105,8 @@ export default function Home() {
               <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Truck className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold mb-2">شحن مباشر إليك</h3>
-              <p className="text-gray-600">نشحن طلبك مباشرة من الصين إلى عنوانك في الجزائر.</p>
+              <h3 className="text-xl font-bold mb-2">توصيل سريع لمكاتب Yalidine</h3>
+              <p className="text-gray-600">نشحن طلبك إلى أقرب مكتب Yalidine Stop Desk في ولايتك للتوصيل السريع والمضمون.</p>
             </div>
             <div className="p-6">
               <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">

@@ -11,9 +11,11 @@ interface ProductCardProps {
     name_ar: string;
     name_en: string;
     price_usd: number;
+    price_dzd: number;
     images: string[];
     product_badge: 'brand' | 'choice' | null;
     avg_rating: number;
+    stock_quantity: number;
   };
 }
 
@@ -22,7 +24,7 @@ export const ProductCard = React.memo<ProductCardProps>(({ product }) => {
   const { usd_to_dzd_rate, commission_rate } = useSettingsStore();
   const isAr = i18n.language === 'ar';
   const name = isAr ? product.name_ar : product.name_en;
-  const priceDZD = calculatePriceDZD(product.price_usd, usd_to_dzd_rate, commission_rate);
+  const priceDZD = calculatePriceDZD(product.price_usd, usd_to_dzd_rate, commission_rate, product.price_dzd);
 
   return (
     <Link to={`/products/${product.id}`} className="group block bg-white rounded-xl border hover:shadow-md transition-shadow overflow-hidden">
@@ -34,11 +36,12 @@ export const ProductCard = React.memo<ProductCardProps>(({ product }) => {
           decoding="async"
           className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
         />
-        {product.product_badge && (
-          <div className={`absolute top-2 ${isAr ? 'right-2' : 'left-2'} px-2 py-1 text-xs font-bold text-white rounded-md ${
-            product.product_badge === 'brand' ? 'bg-blue-600' : 'bg-emerald-500'
-          }`}>
-            {product.product_badge === 'brand' ? 'Brand' : 'Choice'}
+        {/* Removed AliExpress product badge */}
+        {product.stock_quantity <= 0 && (
+          <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] flex items-center justify-center">
+            <span className="bg-red-600 text-white px-4 py-1.5 rounded-full font-bold shadow-lg transform -rotate-12 pointer-events-none">
+              نفدت الكمية
+            </span>
           </div>
         )}
       </div>

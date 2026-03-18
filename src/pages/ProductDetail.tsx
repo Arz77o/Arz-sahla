@@ -64,8 +64,9 @@ export default function ProductDetail() {
 
   const name = isAr ? product.name_ar : product.name_en;
   const description = isAr ? product.description_ar : product.description_en;
-  const priceDZD = calculatePriceDZD(product.price_usd, usd_to_dzd_rate, commission_rate);
+  const priceDZD = calculatePriceDZD(product.price_usd, usd_to_dzd_rate, commission_rate, product.price_dzd);
   const inCart = isInCart(product.id);
+  const outOfStock = product.stock_quantity <= 0;
 
   const handleAddToCart = () => {
     if (inCart) {
@@ -126,10 +127,17 @@ export default function ProductDetail() {
             <div className="flex flex-col">
               <div className="mb-6">
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    <Check className="w-3 h-3" />
-                    {t('product.available')}
+                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${
+                    outOfStock ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                  }`}>
+                    {outOfStock ? <X className="w-3 h-3" /> : <Check className="w-3 h-3" />}
+                    {outOfStock ? t('product.outOfStock') : t('product.available')}
                   </span>
+                  {!outOfStock && product.stock_quantity < 10 && (
+                    <span className="text-xs text-amber-600 font-medium">
+                      بقي {product.stock_quantity} فقط!
+                    </span>
+                  )}
                   {product.product_badge && (
                     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold text-white ${
                       product.product_badge === 'brand' ? 'bg-blue-600' : 'bg-emerald-500'
@@ -181,13 +189,6 @@ export default function ProductDetail() {
                 </div>
               )}
 
-              {/* Shipping Notice */}
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 flex gap-3 text-amber-800">
-                <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                <div className="text-sm leading-relaxed whitespace-pre-line">
-                  {t('product.shippingNotice')}
-                </div>
-              </div>
 
 
 
@@ -198,11 +199,11 @@ export default function ProductDetail() {
                   className={`w-full h-14 text-lg font-bold rounded-xl ${
                     inCart ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'
                   }`}
-                  onClick={handleAddToCart}
-                  disabled={inCart}
+                   onClick={handleAddToCart}
+                  disabled={inCart || outOfStock}
                 >
                   <ShoppingCart className="w-5 h-5 mr-2" />
-                  {inCart ? t('product.inCart') : t('product.addToCart')}
+                  {outOfStock ? t('product.outOfStock') : inCart ? t('product.inCart') : t('product.addToCart')}
                 </Button>
               </div>
             </div>

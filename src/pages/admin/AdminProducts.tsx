@@ -69,10 +69,10 @@ export default function AdminProducts() {
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">الصورة</th>
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">الاسم</th>
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">الفئة</th>
-                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">السعر (USD)</th>
-                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">السعر (DZD)</th>
+                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-nowrap">سعر الشراء</th>
+                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-nowrap">سعر البيع</th>
+                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">المخزون</th>
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">التقييم</th>
-                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">الشارة</th>
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">الحالة</th>
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">إجراء</th>
               </tr>
@@ -107,27 +107,25 @@ export default function AdminProducts() {
                       {product.categories?.name_ar || '—'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500" dir="ltr">
-                      ${product.price_usd.toFixed(2)}
+                      {formatDZD(product.price_usd)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-600">
-                      {formatDZD(calculatePriceDZD(product.price_usd, usd_to_dzd_rate, commission_rate))}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-600" dir="ltr">
+                      {formatDZD(product.price_dzd || calculatePriceDZD(product.price_usd, usd_to_dzd_rate, commission_rate))}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
+                        (product.stock_quantity ?? 0) <= 0 ? 'bg-red-100 text-red-800' :
+                        (product.stock_quantity ?? 0) < 5 ? 'bg-amber-100 text-amber-800' :
+                        'bg-blue-100 text-blue-800'
+                      }`}>
+                        {product.stock_quantity ?? 0}
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-1 text-sm text-gray-600">
                         <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
                         <span>{(Number(product.avg_rating) || 0).toFixed(1)}</span>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {product.product_badge ? (
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          product.product_badge === 'brand' ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800'
-                        }`}>
-                          {product.product_badge}
-                        </span>
-                      ) : (
-                        <span className="text-gray-400">—</span>
-                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${

@@ -20,26 +20,27 @@
     "secure": "دفع آمن عبر Chargily"
   },
   "product": {
-    "available": "متوفر",
+    "available": "متوفر في المخزون",
+    "outOfStock": "نفد من المخزون",
     "addToCart": "إضافة للسلة",
     "inCart": "✓ في سلتك",
-    "brand": "Brand",
-    "choice": "Choice",
-    "shippingNotice": "المنتج يُشحن مباشرة من الصين — مدة التوصيل 15-45 يوم عمل. رسوم الجمارك على عاتق العميل.",
+    "brand": "أصلي",
+    "choice": "مختاراتنا",
+    "shippingNotice": "توصيل سريع لكل الولايات الجزائري (من 2 إلى 7 أيام). الدفع عند الاستلام متوفر.",
     "whyChoose": "لماذا تختار Sahla DZ؟",
-    "guaranteed": "منتجات مضمونة من أفضل البائعين",
-    "securePay": "دفع آمن عبر بريدي موب أو البطاقة الذهبية",
-    "fastDelivery": "سهولة طلب المنتجات و تتبعها",
+    "guaranteed": "منتجات بجودة عالية ومختارة بعناية",
+    "securePay": "دفع آمن عند الاستلام أو عبر البطاقة الذهبية / CIB",
+    "fastDelivery": "توصيل سريع وموثوق إلى باب منزلك",
     "description": "وصف المنتج",
-    "buyerReviews": "تقييم المشتريين"
+    "buyerReviews": "آراء الزبائن"
   },
   "order": {
     "pending": "في الانتظار",
-    "paid": "مدفوع",
-    "processing": "قيد التنفيذ",
+    "paid": "تم الدفع",
+    "processing": "قيد التحضير",
     "shipped": "تم الشحن",
     "delivered": "تم التسليم",
-    "rejected": "مرفوض"
+    "rejected": "ملغى"
   },
   "checkout": {
     "title": "إتمام الطلب",
@@ -50,7 +51,13 @@
     "communePlaceholder": "اكتب اسم بلديتك...",
     "zipCode": "الرمز البريدي",
     "phone": "رقم الهاتف",
+    "paymentMethod": "طريقة الدفع",
+    "cod": "الدفع عند الاستلام (COD)",
+    "online": "دفع إلكتروني (Edahabia / CIB)",
+    "shippingType": "نوع التوصيل",
+    "home": "توصيل للمنزل",
+    "desk": "توصيل لمكتب الشحن (Stop Desk)",
     "terms": "أوافق على الشروط والأحكام",
-    "pay": "ادفع الآن"
+    "pay": "تأكيد الطلب"
   }
 }

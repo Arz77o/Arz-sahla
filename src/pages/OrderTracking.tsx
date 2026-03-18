@@ -4,7 +4,7 @@ import { SEOMeta } from '../components/shared/SEOMeta';
 import { supabase } from '../lib/supabase';
 import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
-import { Copy, Globe, ExternalLink } from 'lucide-react';
+import { Copy, ExternalLink } from 'lucide-react';
 
 export default function OrderTracking() {
   const [orderId, setOrderId] = useState('');
@@ -151,50 +151,50 @@ export default function OrderTracking() {
             </div>
 
             <div className="grid grid-cols-1 gap-4 mb-10">
-              {/* Global Tracking Number Box */}
+              {/* Yalidine Tracking Number Box */}
               <div className={`p-6 rounded-2xl border flex flex-col justify-between group transition-all text-center ${
                 order.tracking_number 
-                  ? 'bg-amber-50/50 border-amber-100 hover:border-amber-300' 
+                  ? 'bg-blue-50/50 border-blue-100 hover:border-blue-300' 
                   : 'bg-gray-50 border-gray-100 italic'
               }`}>
-                <div className="flex items-center justify-between mb-3 border-b border-amber-100/50 pb-3">
-                  <span className={`text-xs font-black uppercase tracking-widest ${order.tracking_number ? 'text-amber-600' : 'text-gray-400'}`}>
-                    رقم تتبع الشحنة (AliExpress Global)
+                <div className="flex items-center justify-between mb-3 border-b border-blue-100/50 pb-3">
+                  <span className={`text-xs font-black uppercase tracking-widest ${order.tracking_number ? 'text-blue-600' : 'text-gray-400'}`}>
+                    🚚 رقم تتبع الطرد - Yalidine
                   </span>
-                  <Globe className={`w-5 h-5 ${order.tracking_number ? 'text-amber-400' : 'text-gray-300'}`} />
+                  <Truck className={`w-5 h-5 ${order.tracking_number ? 'text-blue-400' : 'text-gray-300'}`} />
                 </div>
                 <div className="flex items-center justify-center gap-4 mt-2">
-                  <code className={`text-3xl font-black font-mono tracking-tighter ${order.tracking_number ? 'text-amber-900' : 'text-gray-400'}`}>
-                    {order.tracking_number || 'بانتظار رقم الشحن الدولي...'}
+                  <code className={`text-3xl font-black font-mono tracking-tighter ${order.tracking_number ? 'text-blue-900' : 'text-gray-400'}`}>
+                    {order.tracking_number || 'بانتظار رقم الشحن...'}
                   </code>
                   {order.tracking_number && (
                     <div className="flex items-center gap-2">
                       <button 
                         onClick={() => {
                           navigator.clipboard.writeText(order.tracking_number);
-                          toast.success('تم نسخ رقم التتبع العالمي');
+                          toast.success('تم نسخ رقم التتبع');
                         }}
-                        className="p-3 bg-white shadow-sm border border-amber-100 hover:bg-amber-100 rounded-xl text-amber-500 transition-all hover:scale-105 active:scale-95"
+                        className="p-3 bg-white shadow-sm border border-blue-100 hover:bg-blue-100 rounded-xl text-blue-500 transition-all hover:scale-105 active:scale-95"
                         title="نسخ الرقم"
                       >
                         <Copy className="w-5 h-5" />
                       </button>
                       <a 
-                        href={`https://t.17track.net/ar#nums=${order.tracking_number}`}
+                        href="https://yalidine-express.com.dz/suivre-un-colis/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-4 py-3 bg-amber-600 text-white rounded-xl font-bold shadow-md hover:bg-amber-700 transition-all hover:scale-105 active:scale-95"
+                        className="flex items-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-md hover:bg-blue-700 transition-all hover:scale-105 active:scale-95"
                       >
                         <ExternalLink className="w-5 h-5" />
-                        تتبع الآن (17Track)
+                        تتبع على Yalidine
                       </a>
                     </div>
                   )}
                 </div>
                 {order.tracking_number && (
-                  <p className="text-xs text-amber-600 mt-4 font-bold flex items-center justify-center gap-1">
+                  <p className="text-xs text-blue-600 mt-4 font-bold flex items-center justify-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    يمكن استخدام هذا الرقم لتتبع الشحنة دولياً
+                    ادخل هذا الرقم في موقع Yalidine لتتبع طردك
                   </p>
                 )}
               </div>
@@ -230,7 +230,7 @@ export default function OrderTracking() {
                   <h4 className={`text-lg font-bold ${currentStep >= 2 ? 'text-gray-900' : 'text-gray-400'}`}>
                     قيد التنفيذ
                   </h4>
-                  <p className="text-sm text-gray-500 mt-1">جاري شراء المنتجات من AliExpress وتجهيزها للشحن.</p>
+                  <p className="text-sm text-gray-500 mt-1">جاري تجهيز طلبك وتغليفه للشحن.</p>
                 </div>
               </div>
 
@@ -245,19 +245,19 @@ export default function OrderTracking() {
                   <h4 className={`text-lg font-bold ${currentStep >= 3 ? 'text-gray-900' : 'text-gray-400'}`}>
                     تم الشحن
                   </h4>
-                  <p className="text-sm text-gray-500 mt-1 mb-3">تم شحن طلبك من الصين وهو في طريقه إلى الجزائر.</p>
+                  <p className="text-sm text-gray-500 mt-1 mb-3">تم تسليم طلبك لشركة Yalidine وهو في طريقه إليك.</p>
                   
                   {order.tracking_number && currentStep >= 3 && (
                     <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 inline-block">
-                      <div className="text-xs text-blue-600 font-medium mb-1">رقم التتبع الدولي:</div>
+                      <div className="text-xs text-blue-600 font-medium mb-1">🚚 رقم تتبع Yalidine:</div>
                       <div className="font-mono font-bold text-gray-900 text-lg mb-3">{order.tracking_number}</div>
                       <a 
-                        href={`https://t.17track.net/en#nums=${order.tracking_number}`}
+                        href="https://yalidine-express.com.dz/suivre-un-colis/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm text-blue-600 hover:text-blue-800 font-medium underline"
                       >
-                        تتبع الشحنة على 17Track &rarr;
+                        تتبع طردك على Yalidine &rarr;
                       </a>
                     </div>
                   )}

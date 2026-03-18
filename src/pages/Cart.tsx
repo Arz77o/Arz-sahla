@@ -104,7 +104,7 @@ export default function Cart() {
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>الشحن</span>
-                  <span className="text-green-600 font-medium">مجاني</span>
+                  <span className="text-gray-400 font-medium">يُحسب عند الدفع</span>
                 </div>
                 <div className="pt-4 border-t border-gray-100 flex justify-between items-center">
                   <span className="text-lg font-bold text-gray-900">{t('cart.total')}</span>

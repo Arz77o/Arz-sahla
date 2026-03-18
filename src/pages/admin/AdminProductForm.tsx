@@ -16,6 +16,8 @@ interface ProductFormValues {
   description_ar: string;
   description_en: string;
   price_usd: number;
+  price_dzd: number;
+  stock_quantity: number;
   aliexpress_url: string;
   category_id: string;
   product_badge: string;
@@ -59,6 +61,8 @@ export default function AdminProductForm() {
       description_ar: '',
       description_en: '',
       price_usd: 0,
+      price_dzd: 0,
+      stock_quantity: 0,
       category_id: '',
       product_badge: '',
       aliexpress_url: '',
@@ -95,6 +99,8 @@ export default function AdminProductForm() {
             description_ar: productData.description_ar || '',
             description_en: productData.description_en || '',
             price_usd: productData.price_usd || 0,
+            price_dzd: productData.price_dzd || 0,
+            stock_quantity: productData.stock_quantity || 0,
             aliexpress_url: productData.aliexpress_url || '',
             category_id: productData.category_id || '',
             product_badge: productData.product_badge || '',
@@ -189,6 +195,8 @@ export default function AdminProductForm() {
         description_ar: data.description_ar?.trim() || null,
         description_en: data.description_en?.trim() || null,
         price_usd: Number(data.price_usd),
+        price_dzd: Number(data.price_dzd),
+        stock_quantity: Number(data.stock_quantity),
         aliexpress_url: data.aliexpress_url?.trim() || null,
         category_id: data.category_id || null,
         product_badge: (data.product_badge as 'brand' | 'choice') || null,
@@ -361,6 +369,21 @@ export default function AdminProductForm() {
                 dir="ltr"
               />
             </div>
+
+            {/* Category */}
+            <div className="space-y-2 pt-4 border-t border-gray-100">
+              <label className="text-sm font-medium text-gray-700">الفئة *</label>
+              <select
+                {...register('category_id')}
+                className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${errors.category_id ? 'border-red-500' : 'border-gray-200'}`}
+              >
+                <option value="">اختر الفئة...</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.name_ar}</option>
+                ))}
+              </select>
+              {errors.category_id && <p className="text-red-500 text-xs">{errors.category_id.message}</p>}
+            </div>
           </div>
 
           {/* Images */}
@@ -425,6 +448,56 @@ export default function AdminProductForm() {
               )}
             </div>
           </div>
+
+          {/* Pricing & Stock */}
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-6">
+            <h2 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2">التسعير والمخزون</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Price DZD */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">سعر البيع (DZD) *</label>
+                <div dir="ltr" className={`flex rounded-lg border overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 ${errors.price_dzd ? 'border-red-500' : 'border-gray-200'}`}>
+                  <span className="flex items-center px-3 bg-gray-100 text-gray-500 text-sm font-bold border-l">DZD</span>
+                  <input
+                    type="number"
+                    {...register('price_dzd', { valueAsNumber: true })}
+                    className="flex-1 px-3 py-2.5 outline-none font-bold text-lg text-blue-600 bg-white"
+                    dir="ltr"
+                  />
+                </div>
+                {errors.price_dzd && <p className="text-red-500 text-xs">{errors.price_dzd.message}</p>}
+              </div>
+
+              {/* Price USD / Purchase Price */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">سعر الشراء (DZD)</label>
+                <div dir="ltr" className={`flex rounded-lg border overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 ${errors.price_usd ? 'border-red-500' : 'border-gray-200'}`}>
+                  <span className="flex items-center px-3 bg-gray-100 text-gray-500 text-sm font-bold border-l">DZD</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    {...register('price_usd', { valueAsNumber: true })}
+                    className="flex-1 px-3 py-2.5 outline-none bg-white"
+                    dir="ltr"
+                  />
+                </div>
+                {errors.price_usd && <p className="text-red-500 text-xs">{errors.price_usd.message}</p>}
+              </div>
+
+              {/* Stock Quantity */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">الكمية المتوفرة *</label>
+                <input
+                  type="number"
+                  {...register('stock_quantity', { valueAsNumber: true })}
+                  className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${errors.stock_quantity ? 'border-red-500' : 'border-gray-200'}`}
+                  dir="ltr"
+                />
+                {errors.stock_quantity && <p className="text-red-500 text-xs">{errors.stock_quantity.message}</p>}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* ── Sidebar Column ── */}
@@ -432,66 +505,19 @@ export default function AdminProductForm() {
           <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-6 sticky top-24">
 
             {/* Publish toggle */}
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-gray-900">النشر والتسعير</h2>
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between pb-6 border-b border-gray-100">
+              <h2 className="text-lg font-bold text-gray-900">حالة النشر</h2>
+              <div className="flex items-center gap-3">
                 <label className="text-sm font-medium text-gray-700 cursor-pointer" htmlFor="is_published">
-                  منشور
+                  مرئي للزبائن
                 </label>
                 <input
                   type="checkbox"
                   id="is_published"
                   {...register('is_published')}
-                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="w-5 h-5 rounded border-gray-300 text-green-600 focus:ring-green-500 cursor-pointer"
                 />
               </div>
-            </div>
-
-            {/* Price */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">السعر (USD) *</label>
-              <div className="relative">
-                <span className="absolute left-4 top-2.5 text-gray-500 font-mono">$</span>
-                <input
-                  type="number"
-                  step="0.01"
-                  {...register('price_usd', { valueAsNumber: true })}
-                  className={`w-full pl-8 pr-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none font-mono ${errors.price_usd ? 'border-red-500' : 'border-gray-200'}`}
-                  dir="ltr"
-                />
-              </div>
-              {errors.price_usd && <p className="text-red-500 text-xs">{errors.price_usd.message}</p>}
-              <p className="text-sm font-bold text-blue-600 mt-2 bg-blue-50 p-2 rounded-lg text-center">
-                {formatAdminPreview(priceUsd)}
-              </p>
-            </div>
-
-            {/* Category */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">الفئة *</label>
-              <select
-                {...register('category_id')}
-                className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${errors.category_id ? 'border-red-500' : 'border-gray-200'}`}
-              >
-                <option value="">اختر الفئة...</option>
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.name_ar}</option>
-                ))}
-              </select>
-              {errors.category_id && <p className="text-red-500 text-xs">{errors.category_id.message}</p>}
-            </div>
-
-            {/* Badge */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">شارة المنتج</label>
-              <select
-                {...register('product_badge')}
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
-              >
-                <option value="">بدون شارة</option>
-                <option value="brand">Brand (أزرق)</option>
-                <option value="choice">Choice (أخضر)</option>
-              </select>
             </div>
 
             {/* Rating ⭐ */}
@@ -509,20 +535,6 @@ export default function AdminProductForm() {
               {errors.avg_rating && <p className="text-red-500 text-xs">{errors.avg_rating.message}</p>}
               <p className="text-xs text-gray-400">ادخل قيمة من 0 إلى 5، مثال: 4.7</p>
             </div>
-
-            {/* AliExpress URL */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">رابط AliExpress</label>
-              <input
-                type="url"
-                {...register('aliexpress_url')}
-                className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${errors.aliexpress_url ? 'border-red-500' : 'border-gray-200'}`}
-                placeholder="https://aliexpress.com/item/..."
-                dir="ltr"
-              />
-              {errors.aliexpress_url && <p className="text-red-500 text-xs">{errors.aliexpress_url.message}</p>}
-            </div>
-
             {/* Submit */}
             <Button
               type="submit"
@@ -561,7 +573,7 @@ export default function AdminProductForm() {
               <div className="bg-white p-6 rounded-xl border border-blue-100 shadow-sm space-y-4 sticky top-24">
                 <h3 className="font-bold text-gray-900 border-b pb-2 flex items-center gap-2">
                   <Star className="w-5 h-5 text-blue-600" />
-                  إضافة تقييم جديد (من AliExpress)
+                  إضافة تقييم جديد
                 </h3>
                 
                 <div className="space-y-4">

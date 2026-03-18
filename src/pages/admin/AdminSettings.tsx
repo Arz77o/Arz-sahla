@@ -9,66 +9,77 @@ export default function AdminSettings() {
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   
-  // Settings state
-  const [exchangeRate, setExchangeRate] = useState<number>(240);
-  const [profitMargin, setProfitMargin] = useState<number>(1.2);
-  const [shippingCost, setShippingCost] = useState<number>(500);
-  const [profitPerUsd, setProfitPerUsd] = useState<number>(50);
+  const [siteActive, setSiteActive] = useState(true);
+  const [paymentMethods, setPaymentMethods] = useState({ cod: true, online: true });
+  const [shippingFees, setShippingFees] = useState<any[]>([]);
+  const [isFeesLoading, setIsFeesLoading] = useState(false);
+  const [feesError, setFeesError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchSettings = async () => {
-      setLoading(true);
-      const { data, error } = await supabaseAdmin
-        .from('settings')
-        .select('*')
-        .single();
-
-      if (!error && data) {
-        const settings = data as any;
-        setExchangeRate(settings.usd_to_dzd_rate || 240);
-        setProfitMargin(settings.commission_rate || 1.2);
-        setShippingCost(settings.shipping_cost_dzd || 500);
-        setProfitPerUsd(settings.profit_per_usd || 50);
-      }
-      setLoading(false);
-    };
-
     fetchSettings();
+    fetchShippingFees();
   }, []);
 
-  const handleSave = async (e: React.FormEvent) => {
+  const fetchSettings = async () => {
+    setLoading(true);
+    const { data, error } = await supabaseAdmin
+      .from('settings')
+      .select('*')
+      .single();
+
+    if (!error && data) {
+      const s = data as any;
+      setSiteActive(s.site_active);
+      setPaymentMethods(s.payment_methods || { cod: true, online: true });
+    }
+    setLoading(false);
+  };
+
+  const fetchShippingFees = async () => {
+    setIsFeesLoading(true);
+    const { data, error } = await supabaseAdmin
+      .from('shipping_fees')
+      .select('*')
+      .order('wilaya_code', { ascending: true });
+    
+    if (error) setFeesError(error.message);
+    if (data) setShippingFees(data);
+    setIsFeesLoading(false);
+  };
+
+  const handleSaveGeneral = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (exchangeRate <= 0 || profitMargin <= 0 || shippingCost < 0 || profitPerUsd < 0) {
-      toast.error('يرجى إدخال قيم صحيحة وموجبة');
-      return;
-    }
-
-    if (!window.confirm('تحذير: تغيير هذه الإعدادات سيؤثر فوراً على أسعار جميع المنتجات في المتجر. هل أنت متأكد؟')) {
-      return;
-    }
-
     setIsSaving(true);
     try {
       const { error } = await (supabaseAdmin as any)
         .from('settings')
         .update({
-          usd_to_dzd_rate: exchangeRate,
-          commission_rate: profitMargin,
-          shipping_cost_dzd: shippingCost,
-          profit_per_usd: profitPerUsd,
+          site_active: siteActive,
+          payment_methods: paymentMethods,
+          inventory_mode: 'strict',
           updated_at: new Date().toISOString()
         })
-        .eq('id', 1); // Assuming single row with id 1
+        .eq('id', 1);
 
       if (error) throw error;
       toast.success('تم حفظ الإعدادات بنجاح');
-      
-      // Note: In a real app, you might want to trigger a revalidation of cached prices
-      // or notify the frontend to refresh.
     } catch (error: any) {
       toast.error(error.message || 'فشل حفظ الإعدادات');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleUpdateFee = async (id: number, field: string, value: number) => {
+    const { error } = await (supabaseAdmin as any)
+      .from('shipping_fees')
+      .update({ [field]: value })
+      .eq('id', id);
+
+    if (error) {
+      toast.error('فشل تحديث رسوم الشحن');
+    } else {
+      setShippingFees(prev => prev.map(f => f.id === id ? { ...f, [field]: value } : f));
     }
   };
 
@@ -82,150 +93,114 @@ export default function AdminSettings() {
 
   return (
     <>
-      <SEOMeta title="الإعدادات | الإدارة" />
+      <SEOMeta title="إعدادات المتجر | الإدارة" />
       
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">إعدادات المتجر</h1>
-        <p className="text-gray-500 mt-1">إدارة التسعير والشحن</p>
+      <div className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">إعدادات المتجر</h1>
+          <p className="text-gray-500 mt-1">إدارة الشحن، الدفع، وقواعد التسعير</p>
+        </div>
+        <Button 
+          onClick={handleSaveGeneral} 
+          disabled={isSaving}
+          className="bg-blue-600 hover:bg-blue-700 h-11 px-8 rounded-xl font-bold"
+        >
+          {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : 'حفظ جميع الإعدادات'}
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <form onSubmit={handleSave} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="p-6 border-b border-gray-200 bg-amber-50">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h3 className="text-lg font-bold text-amber-900">تأثير فوري على الأسعار</h3>
-                  <p className="text-sm text-amber-800 mt-1">
-                    أي تغيير في سعر الصرف أو هامش الربح سيتم تطبيقه فوراً على جميع المنتجات المعروضة في المتجر. يرجى المراجعة بعناية قبل الحفظ.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-6 space-y-6">
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-gray-900">سعر الصرف (1 USD = ? DZD)</label>
-                <div className="relative">
-                  <input 
-                    type="number"
-                    step="0.01"
-                    value={exchangeRate}
-                    onChange={(e) => setExchangeRate(parseFloat(e.target.value))}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-lg"
-                    dir="ltr"
-                    required
-                  />
-                  <span className="absolute right-4 top-3.5 text-gray-500 font-bold">DZD</span>
-                </div>
-                <p className="text-sm text-gray-500">سعر صرف الدولار مقابل الدينار الجزائري (السوق الموازي).</p>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-gray-900">هامش الربح (المضاعف)</label>
-                <input 
-                  type="number"
-                  step="0.01"
-                  value={profitMargin}
-                  onChange={(e) => setProfitMargin(parseFloat(e.target.value))}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-lg"
-                  dir="ltr"
-                  required
-                />
-                <p className="text-sm text-gray-500">
-                  مثال: 1.2 يعني ربح 20%. السعر النهائي = (سعر المنتج بالدولار × سعر الصرف) × هامش الربح.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-gray-900">تكلفة الشحن الثابتة (DZD)</label>
-                <div className="relative">
-                  <input 
-                    type="number"
-                    step="10"
-                    value={shippingCost}
-                    onChange={(e) => setShippingCost(parseFloat(e.target.value))}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-lg"
-                    dir="ltr"
-                    required
-                  />
-                  <span className="absolute right-4 top-3.5 text-gray-500 font-bold">DZD</span>
-                </div>
-                <p className="text-sm text-gray-500">تكلفة الشحن الداخلي في الجزائر (تضاف على إجمالي الطلب).</p>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-gray-900">الربح الافتراضي لكل 1 دولار (DZD)</label>
-                <div className="relative">
-                  <input 
-                    type="number"
-                    step="1"
-                    value={profitPerUsd}
-                    onChange={(e) => setProfitPerUsd(parseFloat(e.target.value))}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-lg"
-                    dir="ltr"
-                    required
-                  />
-                  <span className="absolute right-4 top-3.5 text-gray-500 font-bold">DZD</span>
-                </div>
-                <p className="text-sm text-gray-500">معدل الربح الصافي المحتسب لكل دولار واحد من تكلفة المنتج (يستخدم في الإحصائيات فقط).</p>
-              </div>
-
-              <div className="pt-4 border-t border-gray-100">
-                <Button 
-                  type="submit" 
-                  disabled={isSaving}
-                  className="w-full h-14 text-lg font-bold rounded-xl bg-blue-600 hover:bg-blue-700"
-                >
-                  {isSaving ? <Loader2 className="w-6 h-6 animate-spin" /> : (
-                    <>
-                      <Save className="w-6 h-6 ml-2" />
-                      حفظ الإعدادات وتحديث الأسعار
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-          </form>
-        </div>
-
-        {/* Preview Calculator */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 sticky top-24">
-            <h2 className="text-lg font-bold text-gray-900 mb-6 border-b pb-2">حاسبة تجريبية</h2>
-            
+      <div className="max-w-4xl space-y-8 pb-12">
+          
+          {/* General */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+            <h2 className="text-lg font-bold text-gray-900 mb-6">الإعدادات العامة</h2>
             <div className="space-y-4">
-              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <span className="text-sm text-gray-600">سعر منتج افتراضي</span>
-                <span className="font-mono font-bold text-gray-900" dir="ltr">$10.00</span>
-              </div>
-              
-              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <span className="text-sm text-gray-600">بعد الصرف ({exchangeRate})</span>
-                <span className="font-mono font-bold text-gray-900" dir="ltr">{(10 * exchangeRate).toFixed(0)} DZD</span>
-              </div>
-
-              <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg border border-blue-100">
-                <span className="text-sm font-bold text-blue-900">سعر البيع للعميل</span>
-                <span className="font-mono font-black text-blue-700 text-lg" dir="ltr">
-                  {Math.ceil((10 * exchangeRate * profitMargin) / 10) * 10} DZD
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg border border-green-100">
-                <span className="text-sm font-bold text-green-900">الربح المتوقع ($10)</span>
-                <span className="font-mono font-black text-green-700 text-lg" dir="ltr">
-                  {10 * profitPerUsd} DZD
-                </span>
-              </div>
-              
-              <p className="text-xs text-center text-gray-500 mt-4">
-                يتم تقريب السعر النهائي لأقرب 10 دينار.
-              </p>
+              <label className="flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all border-gray-100 hover:border-gray-200">
+                <input 
+                  type="checkbox" 
+                  checked={siteActive}
+                  onChange={(e) => setSiteActive(e.target.checked)}
+                  className="w-5 h-5 text-blue-600 rounded"
+                />
+                <div>
+                  <div className="font-bold text-gray-900">المتجر نشط</div>
+                  <div className="text-xs text-gray-500">تعطيل المتجر يمنع الزبائن من تصفح المنتجات</div>
+                </div>
+              </label>
             </div>
           </div>
-        </div>
+
+          {/* Payment Methods */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+            <h2 className="text-lg font-bold text-gray-900 mb-6">طرق الدفع المفعلة</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label className="flex items-center gap-4 p-4 rounded-xl border-2 border-gray-100 hover:border-gray-200 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={paymentMethods.cod}
+                  onChange={(e) => setPaymentMethods({...paymentMethods, cod: e.target.checked})}
+                  className="w-6 h-6 text-blue-600"
+                />
+                <div className="flex-1">
+                  <div className="font-bold text-gray-900">الدفع عند الاستلام (COD)</div>
+                  <div className="text-xs text-gray-500">تفعيل خيار الدفع كاش عند استلام الطرد</div>
+                </div>
+              </label>
+              <label className="flex items-center gap-4 p-4 rounded-xl border-2 border-gray-100 hover:border-gray-200 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={paymentMethods.online}
+                  onChange={(e) => setPaymentMethods({...paymentMethods, online: e.target.checked})}
+                  className="w-6 h-6 text-blue-600"
+                />
+                <div className="flex-1">
+                  <div className="font-bold text-gray-900">دفع إلكتروني (Chargily)</div>
+                  <div className="text-xs text-gray-500">تفعيل الدفع بالبطاقة الذهبية أو CIB</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          {/* Shipping Fees Table */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+              <h2 className="text-lg font-bold text-gray-900">مصاريف الشحن لكل ولاية (DZD)</h2>
+              <div className="text-xs text-gray-500">يتم الحفظ تلقائياً عند تغيير السعر</div>
+            </div>
+            <div className="overflow-x-auto">
+              {feesError && <div className="p-4 text-red-600 bg-red-50 text-center font-bold">{feesError}</div>}
+              {isFeesLoading ? (
+                <div className="p-12 text-center"><Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-600" /></div>
+              ) : (
+                <table className="w-full text-right border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50 text-gray-600 text-sm">
+                      <th className="px-6 py-4 font-bold">الولاية</th>
+                      <th className="px-6 py-4 font-bold">مكتب (Stop Desk)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {shippingFees.map((fee) => (
+                      <tr key={fee.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4">
+                          <span className="text-gray-400 text-xs font-mono ml-2">#{String(fee.wilaya_code).padStart(2, '0')}</span>
+                          <span className="font-bold text-gray-900">{fee.wilaya_name}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <input 
+                            type="number" 
+                            defaultValue={fee.desk_fee}
+                            onBlur={(e) => handleUpdateFee(fee.id, 'desk_fee', parseInt(e.target.value))}
+                            className="w-32 px-3 py-1.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-mono"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
       </div>
     </>
   );

@@ -23,6 +23,8 @@ const checkoutSchema = z.object({
   commune: z.string().min(2, 'اسم البلدية مطلوب'),
   zipCode: z.string().min(4, 'الرمز البريدي مطلوب'),
   phone: z.string().regex(/^(0)(5|6|7)[0-9]{8}$/, 'رقم هاتف غير صالح (مثال: 0550123456)'),
+  paymentMethod: z.enum(['cod', 'chargily']),
+  yalidineDesk: z.string().min(3, 'يرجى تحديد مكتب Yaldine الخاص بولايتك'),
   termsAccepted: z.boolean().refine((val) => val === true, {
     message: 'يجب الموافقة على الشروط والأحكام',
   }),
@@ -39,6 +41,15 @@ export default function Checkout() {
   const { user } = useAuthStore();
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [shippingFeesConfig, setShippingFeesConfig] = useState<any[]>([]);
+
+  React.useEffect(() => {
+    const fetchFees = async () => {
+      const { data } = await supabase.from('shipping_fees').select('*');
+      if (data) setShippingFeesConfig(data);
+    };
+    fetchFees();
+  }, []);
 
   const {
     register,
@@ -51,6 +62,7 @@ export default function Checkout() {
     defaultValues: {
       fullName: user?.user_metadata?.full_name || '',
       phone: user?.user_metadata?.phone || '',
+      paymentMethod: 'cod',
       termsAccepted: false,
     }
   });
@@ -72,15 +84,20 @@ export default function Checkout() {
         .from('orders' as any) as any)
         .insert({
           user_id: user.id,
-          total_dzd: getTotal(),
+          total_dzd: getTotal() + calculateShippingFee(watch('wilaya')),
           full_name: data.fullName,
           address: data.address,
           wilaya: data.wilaya,
           commune: data.commune,
           zip_code: data.zipCode,
           phone: data.phone,
+          payment_method: data.paymentMethod,
+          shipping_method: 'desk',
+          yalidine_desk: data.yalidineDesk,
+          shipping_fee: calculateShippingFee(data.wilaya),
           terms_accepted: data.termsAccepted,
-        } as Database['public']['Tables']['orders']['Insert'])
+          status: data.paymentMethod === 'cod' ? 'processing' : 'pending',
+        } as any)
         .select()
         .single();
 
@@ -102,25 +119,30 @@ export default function Checkout() {
 
       if (itemsError) throw itemsError;
 
-      // 3. Call Edge Function to get Chargily checkout URL
-      const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          order_id: order.id,
-          total_dzd: getTotal(),
-          customer_name: data.fullName,
-          customer_email: user.email,
-          locale: i18n.language,
-          site_url: window.location.origin,
+      // 3. Handle Payment Method
+      if (data.paymentMethod === 'chargily') {
+        const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
+          body: {
+            order_id: order.id,
+            total_dzd: getTotal() + calculateShippingFee(data.wilaya),
+            customer_name: data.fullName,
+            customer_email: user.email,
+            locale: i18n.language,
+            site_url: window.location.origin,
+          }
+        });
+
+        if (checkoutError) throw checkoutError;
+
+        if (checkoutData?.checkout_url) {
+          window.location.href = checkoutData.checkout_url;
+        } else {
+          throw new Error('لم يتم إرجاع رابط الدفع');
         }
-      });
-
-      if (checkoutError) throw checkoutError;
-
-      if (checkoutData?.checkout_url) {
-        // Redirect to Chargily
-        window.location.href = checkoutData.checkout_url;
       } else {
-        throw new Error('لم يتم إرجاع رابط الدفع');
+        // COD - Direct success
+        clearCart();
+        navigate(`/ordersuccess?order_id=${order.id}`);
       }
 
     } catch (error: any) {
@@ -129,6 +151,22 @@ export default function Checkout() {
       setIsSubmitting(false);
     }
   };
+
+  const calculateShippingFee = (wilayaName: string) => {
+    if (!wilayaName) return 0;
+    
+    // Check dynamic fees from database first
+    const feeConfig = shippingFeesConfig.find(f => f.wilaya_name === wilayaName);
+    if (feeConfig) {
+      return feeConfig.desk_fee;
+    }
+
+    // Default fallback fees
+    return (wilayaName === 'الجزائر' || wilayaName === 'Alger') ? 200 : 400;
+  };
+
+  const shippingFee = calculateShippingFee(watch('wilaya'));
+  const finalTotal = getTotal() + shippingFee;
 
   return (
     <>
@@ -243,22 +281,68 @@ export default function Checkout() {
                   </div>
                 </div>
 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 pt-8 border-t border-gray-100">
+                  {/* Payment Method Selection */}
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-gray-900">{t('checkout.paymentMethod')}</h3>
+                    <div className="space-y-3">
+                      <label 
+                        className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${watch('paymentMethod') === 'cod' ? 'border-blue-600 bg-blue-50' : 'border-gray-100 hover:border-gray-200'}`}
+                      >
+                        <input type="radio" {...register('paymentMethod')} value="cod" className="w-5 h-5 text-blue-600" />
+                        <div className="flex-1">
+                          <div className="font-bold text-gray-900">{t('checkout.cod')}</div>
+                          <div className="text-xs text-gray-500">ادفع عند استلام طلبك</div>
+                        </div>
+                      </label>
+                      <label 
+                        className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${watch('paymentMethod') === 'chargily' ? 'border-blue-600 bg-blue-50' : 'border-gray-100 hover:border-gray-200'}`}
+                      >
+                        <input type="radio" {...register('paymentMethod')} value="chargily" className="w-5 h-5 text-blue-600" />
+                        <div className="flex-1">
+                          <div className="font-bold text-gray-900">{t('checkout.online')}</div>
+                          <div className="text-xs text-gray-500">ادفع الآن عبر البطاقة الذهبية أو CIB</div>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Shipping Method Selection */}
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-gray-900">{t('checkout.shippingType')}</h3>
+                    <div className="space-y-3">
+                      <div className="p-4 bg-amber-50 rounded-xl border border-amber-100 space-y-3">
+                        <label className="text-sm font-bold text-amber-900">الاستلام من أقرب مكتب شحن (Yalidine Stop Desk) *</label>
+                        <input 
+                          {...register('yalidineDesk')}
+                          placeholder="مثال: مكتب بئر توتة، مكتب بابا حسن..."
+                          className="w-full px-4 py-2 rounded-lg border border-amber-200 focus:ring-2 focus:ring-blue-500 outline-none flex-1"
+                        />
+                        {errors.yalidineDesk && <p className="text-red-500 text-xs mt-1">{errors.yalidineDesk.message}</p>}
+                        <p className="text-xs text-amber-700">
+                          ملاحظة: يمكنك إيجاد أسماء المكاتب المتوفرة في ولايتك من خلال صفحة Yaldine الرسمية.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Terms and Conditions Checkbox */}
-                <div className="mt-8 bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+                <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
                   <div className="flex items-center h-5 mt-0.5">
                     <input
                       id="termsAccepted"
                       type="checkbox"
                       {...register('termsAccepted')}
-                      className="w-5 h-5 rounded border-amber-300 text-amber-600 focus:ring-amber-500"
+                      className="w-5 h-5 rounded border-blue-300 text-blue-600 focus:ring-blue-500"
                     />
                   </div>
                   <div className="flex flex-col">
-                    <label htmlFor="termsAccepted" className="text-sm font-medium text-amber-900 cursor-pointer">
-                      أوافق على <Link to="/terms" target="_blank" className="underline hover:text-amber-700">الشروط والأحكام</Link> الخاصة بمنصة Sahla
+                    <label htmlFor="termsAccepted" className="text-sm font-medium text-blue-900 cursor-pointer">
+                      أوافق على <Link to="/terms" target="_blank" className="underline hover:text-blue-700">الشروط والأحكام</Link> الخاصة بمتجر Sahla
                     </label>
-                    <p className="text-xs text-amber-700 mt-1">
-                      أقر بأنني قرأت وفهمت سياسة الشحن والجمارك وأنني أتحمل مسؤولية أي رسوم جمركية قد تفرض على شحنتي.
+                    <p className="text-xs text-blue-700 mt-1">
+                      أؤكد أن معلومات التواصل صحيحة وأنني مستعد لاستقبال المنتج في غضون 2-7 أيام عمل.
                     </p>
                     {errors.termsAccepted && <p className="text-red-500 text-xs mt-1">{errors.termsAccepted.message}</p>}
                   </div>
@@ -297,12 +381,12 @@ export default function Checkout() {
                   <span>{formatDZD(getTotal())}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
-                  <span>الشحن</span>
-                  <span className="text-green-600 font-medium">مجاني</span>
+                  <span>الشحن ({watch('shippingType') === 'home' ? t('checkout.home') : t('checkout.desk')})</span>
+                  <span>{shippingFee === 0 ? t('checkout.calculating') : formatDZD(shippingFee)}</span>
                 </div>
                 <div className="pt-4 border-t border-gray-100 flex justify-between items-center">
                   <span className="text-lg font-bold text-gray-900">الإجمالي</span>
-                  <span className="text-2xl font-black text-blue-600">{formatDZD(getTotal())}</span>
+                  <span className="text-2xl font-black text-blue-600">{formatDZD(finalTotal)}</span>
                 </div>
               </div>
 
@@ -316,13 +400,13 @@ export default function Checkout() {
                 {isSubmitting ? (
                   <Loader2 className="w-6 h-6 animate-spin" />
                 ) : (
-                  `${t('checkout.pay')} — ${formatDZD(getTotal())}`
+                  `${t('checkout.pay')} — ${formatDZD(finalTotal)}`
                 )}
               </Button>
 
               <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
                 <ShieldCheck className="w-4 h-4 text-green-500" />
-                <span>دفع آمن عبر Chargily</span>
+                <span>{watch('paymentMethod') === 'cod' ? 'أتمم الطلب وسنتصل بك لتأكيده' : 'دفع آمن عبر Chargily'}</span>
               </div>
             </div>
           </div>

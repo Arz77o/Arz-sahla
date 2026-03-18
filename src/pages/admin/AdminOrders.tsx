@@ -67,14 +67,25 @@ export default function AdminOrders() {
   };
 
   const tabs = [
-    { id: 'all', label: 'الكل' },
-    { id: 'pending', label: 'في الانتظار' },
-    { id: 'paid', label: 'مدفوع' },
-    { id: 'processing', label: 'قيد التنفيذ' },
-    { id: 'shipped', label: 'تم الشحن' },
-    { id: 'delivered', label: 'تم التسليم' },
-    { id: 'rejected', label: 'مرفوض' },
+    { id: 'all',        label: 'الكل' },
+    { id: 'pending',    label: '⭐ انتظار' },
+    { id: 'paid',       label: '✅ مدفوع' },
+    { id: 'processing', label: '⏳ تنفيذ' },
+    { id: 'shipped',    label: '🚚 شحن' },
+    { id: 'delivered',  label: '🎁 تسليم' },
+    { id: 'rejected',   label: '❌ مرفوض' },
+    { id: 'cancelled',  label: '🚫 ملغي' },
   ];
+
+  const statusColor: Record<string, string> = {
+    pending:    'bg-gray-100 text-gray-700',
+    paid:       'bg-emerald-100 text-emerald-800',
+    processing: 'bg-indigo-100 text-indigo-800',
+    shipped:    'bg-blue-100 text-blue-800',
+    delivered:  'bg-green-100 text-green-800',
+    rejected:   'bg-red-100 text-red-800',
+    cancelled:  'bg-red-50 text-red-500',
+  };
 
   return (
     <>
@@ -122,6 +133,8 @@ export default function AdminOrders() {
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">رقم الطلب</th>
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">العميل</th>
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">المنتجات</th>
+                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">الدفع</th>
+                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">التوصيل</th>
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">الإجمالي</th>
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">الولاية</th>
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">الحالة</th>
@@ -155,6 +168,14 @@ export default function AdminOrders() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {order.order_items[0]?.count || 0} منتج
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${order.payment_method === 'cod' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'}`}>
+                        {order.payment_method === 'cod' ? 'COD' : 'Online'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {order.shipping_method === 'home' ? 'منزل' : 'مكتب'}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
                       {formatDZD(order.total_dzd)}
                     </td>
@@ -162,13 +183,8 @@ export default function AdminOrders() {
                       {order.wilaya}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                        order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                        order.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                        order.status === 'paid' ? 'bg-emerald-100 text-emerald-800' :
-                        order.status === 'processing' ? 'bg-indigo-100 text-indigo-800' :
-                        'bg-gray-100 text-gray-800'
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        statusColor[order.status] || 'bg-gray-100 text-gray-700'
                       }`}>
                         {tabs.find(t => t.id === order.status)?.label || order.status}
                       </span>
