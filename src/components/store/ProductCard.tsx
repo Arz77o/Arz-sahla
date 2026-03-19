@@ -70,7 +70,9 @@ export const ProductCard = React.memo<ProductCardProps>(({ product }) => {
               {product.avg_rating.toFixed(1)}
             </span>
           </div>
-          <span className="text-xs text-gray-500">({product.avg_rating > 0 ? "تقييمات" : "بلا تقييمات"})</span>
+          <span className="text-xs text-gray-500">
+            ({product.avg_rating > 0 ? "تقييمات" : "بلا تقييمات"})
+          </span>
         </div>
 
         {/* Price */}

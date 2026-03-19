@@ -29,7 +29,7 @@ export default function Products() {
         const { data, error: err } = await supabase
           .from("categories")
           .select("*");
-        
+
         if (err) {
           console.error("Categories error:", err);
         } else {
@@ -58,7 +58,7 @@ export default function Products() {
 
         // Apply category filter if set
         if (categoryFilter && categories.length > 0) {
-          const category = categories.find(c => c.slug === categoryFilter);
+          const category = categories.find((c) => c.slug === categoryFilter);
           if (category) {
             query = query.eq("category_id", category.id);
           } else {
@@ -128,8 +128,6 @@ export default function Products() {
                   </li>
                 ))}
               </ul>
-
-
             </div>
           </aside>
 
