@@ -446,7 +446,7 @@ export default function Checkout() {
           </div>
 
           {/* Order Summary */}
-          <div className="w-full lg:w-96 flex-shrink-0">
+          <div className="w-full lg:w-96 shrink-0">
             <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm sticky top-24">
               <h2 className="text-lg font-bold text-gray-900 mb-6">
                 ملخص الطلب
@@ -458,7 +458,7 @@ export default function Checkout() {
                     key={item.product_id}
                     className="flex gap-3 items-center"
                   >
-                    <div className="w-16 h-16 rounded-md overflow-hidden bg-gray-50 border border-gray-100 flex-shrink-0">
+                    <div className="w-16 h-16 rounded-md overflow-hidden bg-gray-50 border border-gray-100 shrink-0">
                       <img
                         src={
                           item.image ||
@@ -492,13 +492,7 @@ export default function Checkout() {
                   <span>{formatDZD(getTotal())}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
-                  <span>
-                    الشحن (
-                    {watch("shippingType") === "home"
-                      ? t("checkout.home")
-                      : t("checkout.desk")}
-                    )
-                  </span>
+                  <span>الشحن ({t("checkout.desk")})</span>
                   <span>
                     {shippingFee === 0
                       ? t("checkout.calculating")

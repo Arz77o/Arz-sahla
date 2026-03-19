@@ -40,7 +40,8 @@
     "processing": "قيد التحضير",
     "shipped": "تم الشحن",
     "delivered": "تم التسليم",
-    "rejected": "ملغى"
+    "not_received": "غير مستلم",
+    "cancelled": "ملغى"
   },
   "checkout": {
     "title": "إتمام الطلب",

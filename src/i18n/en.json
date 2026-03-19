@@ -40,7 +40,8 @@
     "processing": "Preparing",
     "shipped": "Shipped",
     "delivered": "Delivered",
-    "rejected": "Cancelled"
+    "not_received": "Not Received",
+    "cancelled": "Cancelled"
   },
   "checkout": {
     "title": "Checkout",

@@ -49,7 +49,7 @@ export default function Account() {
       <div className="container mx-auto px-4 py-12 max-w-5xl">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar */}
-          <div className="w-full md:w-80 flex-shrink-0">
+          <div className="w-full md:w-80 shrink-0">
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sticky top-24">
               <div className="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl font-bold mb-4 mx-auto">
                 {user?.user_metadata?.full_name?.charAt(0) ||
@@ -163,7 +163,8 @@ export default function Account() {
                               ? "bg-green-100 text-green-800"
                               : order.status === "shipped"
                                 ? "bg-blue-100 text-blue-800"
-                                : order.status === "rejected"
+                                : order.status === "not_received" ||
+                                    order.status === "cancelled"
                                   ? "bg-red-100 text-red-800"
                                   : "bg-amber-100 text-amber-800"
                           }`}

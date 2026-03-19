@@ -1,23 +1,31 @@
-import React, { useState } from 'react';
-import { Search, Package, CheckCircle2, Clock, Truck, Home, AlertCircle } from 'lucide-react';
-import { SEOMeta } from '../components/shared/SEOMeta';
-import { supabase } from '../lib/supabase';
-import { Button } from '../components/ui/button';
-import { toast } from 'sonner';
-import { Copy, ExternalLink } from 'lucide-react';
+import React, { useState } from "react";
+import {
+  Search,
+  Package,
+  CheckCircle2,
+  Clock,
+  Truck,
+  Home,
+  AlertCircle,
+} from "lucide-react";
+import { SEOMeta } from "../components/shared/SEOMeta";
+import { supabase } from "../lib/supabase";
+import { Button } from "../components/ui/button";
+import { toast } from "sonner";
+import { Copy, ExternalLink } from "lucide-react";
 
 export default function OrderTracking() {
-  const [orderId, setOrderId] = useState('');
+  const [orderId, setOrderId] = useState("");
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!orderId.trim()) return;
 
     setLoading(true);
-    setError('');
+    setError("");
     setOrder(null);
 
     try {
@@ -27,9 +35,9 @@ export default function OrderTracking() {
       // 1. Try exact UUID match
       if (searchVal.length === 36) {
         const { data } = await supabase
-          .from('orders')
-          .select('*')
-          .eq('id', searchVal)
+          .from("orders")
+          .select("*")
+          .eq("id", searchVal)
           .maybeSingle();
         foundOrder = data;
       }
@@ -37,9 +45,9 @@ export default function OrderTracking() {
       // 2. Try Global Tracking Number match
       if (!foundOrder) {
         const { data } = await supabase
-          .from('orders')
-          .select('*')
-          .eq('tracking_number', searchVal)
+          .from("orders")
+          .select("*")
+          .eq("tracking_number", searchVal)
           .maybeSingle();
         foundOrder = data;
       }
@@ -48,21 +56,23 @@ export default function OrderTracking() {
       // We use a broader approach for partials to overcome UUID casting issues
       if (!foundOrder && searchVal.length >= 4) {
         const { data } = await supabase
-          .from('orders')
-          .select('*')
-          .filter('id', 'ilike', `${searchVal}%`)
+          .from("orders")
+          .select("*")
+          .filter("id", "ilike", `${searchVal}%`)
           .limit(1)
           .maybeSingle();
         foundOrder = data;
       }
 
       if (!foundOrder) {
-        setError('لم يتم العثور على طلب بهذا الرقم. يرجى التأكد من الرقم والمحاولة مرة أخرى.');
+        setError(
+          "لم يتم العثور على طلب بهذا الرقم. يرجى التأكد من الرقم والمحاولة مرة أخرى.",
+        );
       } else {
         setOrder(foundOrder);
       }
     } catch (err) {
-      setError('حدث خطأ أثناء البحث. يرجى المحاولة لاحقاً.');
+      setError("حدث خطأ أثناء البحث. يرجى المحاولة لاحقاً.");
     } finally {
       setLoading(false);
     }
@@ -70,13 +80,22 @@ export default function OrderTracking() {
 
   const getStatusStep = (status: string) => {
     switch (status) {
-      case 'pending': return 0;
-      case 'paid': return 1;
-      case 'processing': return 2;
-      case 'shipped': return 3;
-      case 'delivered': return 4;
-      case 'rejected': return -1;
-      default: return 0;
+      case "pending":
+        return 0;
+      case "paid":
+        return 1;
+      case "processing":
+        return 2;
+      case "shipped":
+        return 3;
+      case "delivered":
+        return 4;
+      case "not_received":
+        return -1;
+      case "cancelled":
+        return -1;
+      default:
+        return 0;
     }
   };
 
@@ -91,7 +110,9 @@ export default function OrderTracking() {
             <Package className="w-8 h-8" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">تتبع طلبك</h1>
-          <p className="text-gray-600">أدخل رقم الطلب الخاص بك لمعرفة حالة الشحنة ومسارها.</p>
+          <p className="text-gray-600">
+            أدخل رقم الطلب الخاص بك لمعرفة حالة الشحنة ومسارها.
+          </p>
         </div>
 
         <form onSubmit={handleSearch} className="mb-12">
@@ -109,13 +130,13 @@ export default function OrderTracking() {
                 dir="ltr"
               />
             </div>
-            <Button 
-              type="submit" 
-              size="lg" 
+            <Button
+              type="submit"
+              size="lg"
               className="h-16 px-8 rounded-xl text-lg font-bold bg-blue-600 hover:bg-blue-700"
               disabled={loading}
             >
-              {loading ? 'جاري البحث...' : 'تتبع الآن'}
+              {loading ? "جاري البحث..." : "تتبع الآن"}
             </Button>
           </div>
           {error && (
@@ -130,56 +151,75 @@ export default function OrderTracking() {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 pb-6 border-b border-gray-100 gap-6">
               <div className="flex flex-col">
-                <h3 className="text-lg font-bold text-gray-900 tracking-tight">تفاصيل حالة الطلب</h3>
-                <span className="text-[10px] text-gray-400 mt-1 font-mono uppercase">ID: {order.id}</span>
+                <h3 className="text-lg font-bold text-gray-900 tracking-tight">
+                  تفاصيل حالة الطلب
+                </h3>
+                <span className="text-[10px] text-gray-400 mt-1 font-mono uppercase">
+                  ID: {order.id}
+                </span>
               </div>
               <div className="flex flex-col items-end">
-                <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-base font-black shadow-sm ${
-                  order.status === 'delivered' ? 'bg-green-500 text-white' :
-                  order.status === 'shipped' ? 'bg-blue-600 text-white' :
-                  order.status === 'rejected' ? 'bg-red-500 text-white' :
-                  'bg-amber-100 text-amber-800'
-                }`}>
-                  {order.status === 'paid' && 'تَمَّ الدَّفْعُ'}
-                  {order.status === 'processing' && 'جَارِي التَّنْفِيذُ'}
-                  {order.status === 'shipped' && 'تَمَّ الشَّحْنُ'}
-                  {order.status === 'delivered' && 'تَمَّ التَّسْلِيمُ'}
-                  {order.status === 'pending' && 'فِي الاِنْتِظَارِ'}
-                  {order.status === 'rejected' && 'مَرْفُوضٌ'}
+                <span
+                  className={`inline-flex items-center px-4 py-1.5 rounded-full text-base font-black shadow-sm ${
+                    order.status === "delivered"
+                      ? "bg-green-500 text-white"
+                      : order.status === "shipped"
+                        ? "bg-blue-600 text-white"
+                        : order.status === "not_received" ||
+                            order.status === "cancelled"
+                          ? "bg-red-500 text-white"
+                          : "bg-amber-100 text-amber-800"
+                  }`}
+                >
+                  {order.status === "paid" && "تَمَّ الدَّفْعُ"}
+                  {order.status === "processing" && "جَارِي التَّنْفِيذُ"}
+                  {order.status === "shipped" && "تَمَّ الشَّحْنُ"}
+                  {order.status === "delivered" && "تَمَّ التَّسْلِيمُ"}
+                  {order.status === "pending" && "فِي الاِنْتِظَارِ"}
+                  {order.status === "not_received" && "غير مستلم"}
+                  {order.status === "cancelled" && "ملغى"}
                 </span>
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4 mb-10">
               {/* Yalidine Tracking Number Box */}
-              <div className={`p-6 rounded-2xl border flex flex-col justify-between group transition-all text-center ${
-                order.tracking_number 
-                  ? 'bg-blue-50/50 border-blue-100 hover:border-blue-300' 
-                  : 'bg-gray-50 border-gray-100 italic'
-              }`}>
+              <div
+                className={`p-6 rounded-2xl border flex flex-col justify-between group transition-all text-center ${
+                  order.tracking_number
+                    ? "bg-blue-50/50 border-blue-100 hover:border-blue-300"
+                    : "bg-gray-50 border-gray-100 italic"
+                }`}
+              >
                 <div className="flex items-center justify-between mb-3 border-b border-blue-100/50 pb-3">
-                  <span className={`text-xs font-black uppercase tracking-widest ${order.tracking_number ? 'text-blue-600' : 'text-gray-400'}`}>
+                  <span
+                    className={`text-xs font-black uppercase tracking-widest ${order.tracking_number ? "text-blue-600" : "text-gray-400"}`}
+                  >
                     🚚 رقم تتبع الطرد - Yalidine
                   </span>
-                  <Truck className={`w-5 h-5 ${order.tracking_number ? 'text-blue-400' : 'text-gray-300'}`} />
+                  <Truck
+                    className={`w-5 h-5 ${order.tracking_number ? "text-blue-400" : "text-gray-300"}`}
+                  />
                 </div>
                 <div className="flex items-center justify-center gap-4 mt-2">
-                  <code className={`text-3xl font-black font-mono tracking-tighter ${order.tracking_number ? 'text-blue-900' : 'text-gray-400'}`}>
-                    {order.tracking_number || 'بانتظار رقم الشحن...'}
+                  <code
+                    className={`text-3xl font-black font-mono tracking-tighter ${order.tracking_number ? "text-blue-900" : "text-gray-400"}`}
+                  >
+                    {order.tracking_number || "بانتظار رقم الشحن..."}
                   </code>
                   {order.tracking_number && (
                     <div className="flex items-center gap-2">
-                      <button 
+                      <button
                         onClick={() => {
                           navigator.clipboard.writeText(order.tracking_number);
-                          toast.success('تم نسخ رقم التتبع');
+                          toast.success("تم نسخ رقم التتبع");
                         }}
                         className="p-3 bg-white shadow-sm border border-blue-100 hover:bg-blue-100 rounded-xl text-blue-500 transition-all hover:scale-105 active:scale-95"
                         title="نسخ الرقم"
                       >
                         <Copy className="w-5 h-5" />
                       </button>
-                      <a 
+                      <a
                         href="https://yalidine-express.com.dz/suivre-un-colis/"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -206,52 +246,80 @@ export default function OrderTracking() {
 
               {/* Step 1: Paid */}
               <div className="relative flex items-start gap-6 mb-10">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${
-                  currentStep >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-400'
-                }`}>
+                <div
+                  className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${
+                    currentStep >= 1
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-100 text-gray-400"
+                  }`}
+                >
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
                 <div className="pt-3">
-                  <h4 className={`text-lg font-bold ${currentStep >= 1 ? 'text-gray-900' : 'text-gray-400'}`}>
+                  <h4
+                    className={`text-lg font-bold ${currentStep >= 1 ? "text-gray-900" : "text-gray-400"}`}
+                  >
                     تم الدفع بنجاح
                   </h4>
-                  <p className="text-sm text-gray-500 mt-1">تم استلام الدفع وتأكيد الطلب.</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    تم استلام الدفع وتأكيد الطلب.
+                  </p>
                 </div>
               </div>
 
               {/* Step 2: Processing */}
               <div className="relative flex items-start gap-6 mb-10">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${
-                  currentStep >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-400'
-                }`}>
+                <div
+                  className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${
+                    currentStep >= 2
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-100 text-gray-400"
+                  }`}
+                >
                   <Clock className="w-6 h-6" />
                 </div>
                 <div className="pt-3">
-                  <h4 className={`text-lg font-bold ${currentStep >= 2 ? 'text-gray-900' : 'text-gray-400'}`}>
+                  <h4
+                    className={`text-lg font-bold ${currentStep >= 2 ? "text-gray-900" : "text-gray-400"}`}
+                  >
                     قيد التنفيذ
                   </h4>
-                  <p className="text-sm text-gray-500 mt-1">جاري تجهيز طلبك وتغليفه للشحن.</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    جاري تجهيز طلبك وتغليفه للشحن.
+                  </p>
                 </div>
               </div>
 
               {/* Step 3: Shipped */}
               <div className="relative flex items-start gap-6 mb-10">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${
-                  currentStep >= 3 ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-400'
-                }`}>
+                <div
+                  className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${
+                    currentStep >= 3
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-100 text-gray-400"
+                  }`}
+                >
                   <Truck className="w-6 h-6" />
                 </div>
                 <div className="pt-3">
-                  <h4 className={`text-lg font-bold ${currentStep >= 3 ? 'text-gray-900' : 'text-gray-400'}`}>
+                  <h4
+                    className={`text-lg font-bold ${currentStep >= 3 ? "text-gray-900" : "text-gray-400"}`}
+                  >
                     تم الشحن
                   </h4>
-                  <p className="text-sm text-gray-500 mt-1 mb-3">تم تسليم طلبك لشركة Yalidine وهو في طريقه إليك.</p>
-                  
+                  <p className="text-sm text-gray-500 mt-1 mb-3">
+                    تم تسليم طلبك لشركة Yalidine وهو في طريقه إليك.
+                  </p>
+
                   {order.tracking_number && currentStep >= 3 && (
                     <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 inline-block">
-                      <div className="text-xs text-blue-600 font-medium mb-1">🚚 رقم تتبع Yalidine:</div>
-                      <div className="font-mono font-bold text-gray-900 text-lg mb-3">{order.tracking_number}</div>
-                      <a 
+                      <div className="text-xs text-blue-600 font-medium mb-1">
+                        🚚 رقم تتبع Yalidine:
+                      </div>
+                      <div className="font-mono font-bold text-gray-900 text-lg mb-3">
+                        {order.tracking_number}
+                      </div>
+                      <a
                         href="https://yalidine-express.com.dz/suivre-un-colis/"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -266,16 +334,24 @@ export default function OrderTracking() {
 
               {/* Step 4: Delivered */}
               <div className="relative flex items-start gap-6">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${
-                  currentStep >= 4 ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-400'
-                }`}>
+                <div
+                  className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${
+                    currentStep >= 4
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-100 text-gray-400"
+                  }`}
+                >
                   <Home className="w-6 h-6" />
                 </div>
                 <div className="pt-3">
-                  <h4 className={`text-lg font-bold ${currentStep >= 4 ? 'text-gray-900' : 'text-gray-400'}`}>
+                  <h4
+                    className={`text-lg font-bold ${currentStep >= 4 ? "text-gray-900" : "text-gray-400"}`}
+                  >
                     تم التسليم
                   </h4>
-                  <p className="text-sm text-gray-500 mt-1">تم تسليم الطلب بنجاح. شكراً لتسوقك معنا!</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    تم تسليم الطلب بنجاح. شكراً لتسوقك معنا!
+                  </p>
                 </div>
               </div>
             </div>
@@ -285,10 +361,12 @@ export default function OrderTracking() {
         {order && currentStep === -1 && (
           <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
             <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-red-700 mb-2">تم رفض الطلب</h3>
+            <h3 className="text-2xl font-bold text-red-700 mb-2">
+              تم رفض الطلب
+            </h3>
             <p className="text-red-600">
-              عذراً، لم نتمكن من معالجة طلبك. قد يكون ذلك بسبب فشل عملية الدفع أو نفاد الكمية.
-              يرجى التواصل مع الدعم الفني للمزيد من المعلومات.
+              عذراً، لم نتمكن من معالجة طلبك. قد يكون ذلك بسبب فشل عملية الدفع
+              أو نفاد الكمية. يرجى التواصل مع الدعم الفني للمزيد من المعلومات.
             </p>
           </div>
         )}
