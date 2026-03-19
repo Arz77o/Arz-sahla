@@ -104,6 +104,12 @@ export default function Account() {
                         <div className="font-medium text-gray-900">{new Date(order.created_at).toLocaleDateString('ar-DZ')}</div>
                       </div>
                       <div>
+                        <div className="text-sm text-gray-500 mb-1">طريقة الدفع</div>
+                        <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${order.payment_method === 'cod' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'}`}>
+                          {order.payment_method === 'cod' ? 'الدفع عند الاستلام (COD)' : 'دفع إلكتروني (Chargily)'}
+                        </span>
+                      </div>
+                      <div>
                         <div className="text-sm text-gray-500 mb-1">الإجمالي</div>
                         <div className="font-bold text-blue-600">{formatDZD(order.total_dzd)}</div>
                       </div>

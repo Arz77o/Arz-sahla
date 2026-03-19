@@ -284,7 +284,7 @@ export default function Checkout() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 pt-8 border-t border-gray-100">
                   {/* Payment Method Selection */}
                   <div className="space-y-4">
-                    <h3 className="font-bold text-gray-900">{t('checkout.paymentMethod')}</h3>
+                    <h3 className="font-bold text-gray-900 flex items-center gap-2">💳 {t('checkout.paymentMethod')}</h3>
                     <div className="space-y-3">
                       <label 
                         className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${watch('paymentMethod') === 'cod' ? 'border-blue-600 bg-blue-50' : 'border-gray-100 hover:border-gray-200'}`}
@@ -292,7 +292,7 @@ export default function Checkout() {
                         <input type="radio" {...register('paymentMethod')} value="cod" className="w-5 h-5 text-blue-600" />
                         <div className="flex-1">
                           <div className="font-bold text-gray-900">{t('checkout.cod')}</div>
-                          <div className="text-xs text-gray-500">ادفع عند استلام طلبك</div>
+                          <div className="text-xs text-gray-500">{t('checkout.codDescription')}</div>
                         </div>
                       </label>
                       <label 
@@ -301,7 +301,7 @@ export default function Checkout() {
                         <input type="radio" {...register('paymentMethod')} value="chargily" className="w-5 h-5 text-blue-600" />
                         <div className="flex-1">
                           <div className="font-bold text-gray-900">{t('checkout.online')}</div>
-                          <div className="text-xs text-gray-500">ادفع الآن عبر البطاقة الذهبية أو CIB</div>
+                          <div className="text-xs text-gray-500">{t('checkout.onlineDescription')}</div>
                         </div>
                       </label>
                     </div>
