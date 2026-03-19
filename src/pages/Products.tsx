@@ -14,33 +14,80 @@ export default function Products() {
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const hasInitialized = React.useRef(false);
 
   const categoryFilter = searchParams.get("category");
 
+  // Fetch categories once on mount
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
 
-      const { data: catData } = await supabase.from("categories").select("*");
-      if (catData) setCategories(catData);
-
-      let query = supabase
-        .from("products")
-        .select("*, categories!inner(slug)")
-        .eq("is_published", true)
-        .eq("auto_hidden", false);
-
-      if (categoryFilter) {
-        query = query.eq("categories.slug", categoryFilter);
+    const loadCategories = async () => {
+      try {
+        const { data, error: err } = await supabase
+          .from("categories")
+          .select("*");
+        
+        if (err) {
+          console.error("Categories error:", err);
+        } else {
+          setCategories(data || []);
+        }
+      } catch (err) {
+        console.error("Categories exception:", err);
       }
-
-      const { data: prodData } = await query;
-      if (prodData) setProducts(prodData);
-
-      setLoading(false);
     };
-    fetchData();
-  }, [categoryFilter]);
+
+    loadCategories();
+  }, []);
+
+  // Fetch products when filter changes
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        let query = supabase
+          .from("products")
+          .select("*")
+          .eq("is_published", true)
+          .eq("auto_hidden", false);
+
+        // Apply category filter if set
+        if (categoryFilter && categories.length > 0) {
+          const category = categories.find(c => c.slug === categoryFilter);
+          if (category) {
+            query = query.eq("category_id", category.id);
+          } else {
+            setProducts([]);
+            setLoading(false);
+            return;
+          }
+        }
+
+        const { data, error: err } = await query;
+
+        if (err) {
+          console.error("Products error:", err);
+          setError(err.message);
+          setProducts([]);
+        } else {
+          setProducts(data || []);
+        }
+      } catch (err: any) {
+        console.error("Products exception:", err);
+        setError(err?.message || "Unknown error");
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, [categoryFilter, categories]);
 
   const updateFilter = (key: string, value: string | null) => {
     const newParams = new URLSearchParams(searchParams);
@@ -82,33 +129,7 @@ export default function Products() {
                 ))}
               </ul>
 
-              <h3 className="font-bold text-lg mb-4">الشارات</h3>
-              <ul className="space-y-2">
-                <li>
-                  <button
-                    onClick={() => updateFilter("badge", null)}
-                    className={`text-sm ${!badgeFilter ? "font-bold text-blue-600" : "text-gray-600 hover:text-blue-600"}`}
-                  >
-                    الكل
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => updateFilter("badge", "brand")}
-                    className={`text-sm ${badgeFilter === "brand" ? "font-bold text-blue-600" : "text-gray-600 hover:text-blue-600"}`}
-                  >
-                    Brand
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => updateFilter("badge", "choice")}
-                    className={`text-sm ${badgeFilter === "choice" ? "font-bold text-blue-600" : "text-gray-600 hover:text-blue-600"}`}
-                  >
-                    Choice
-                  </button>
-                </li>
-              </ul>
+
             </div>
           </aside>
 
@@ -123,6 +144,13 @@ export default function Products() {
               </span>
             </div>
 
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                <p className="font-semibold">خطأ</p>
+                <p className="text-sm">{error}</p>
+              </div>
+            )}
+
             {loading ? (
               <div className="flex justify-center items-center h-64">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
@@ -135,7 +163,7 @@ export default function Products() {
               </div>
             ) : (
               <div className="text-center py-16 bg-white rounded-xl border border-gray-100">
-                <p className="text-gray-500">لا توجد منتجات تطابق بحثك.</p>
+                <p className="text-gray-500">لا توجد منتجات</p>
                 <button
                   onClick={() => setSearchParams({})}
                   className="mt-4 text-blue-600 font-medium hover:underline"

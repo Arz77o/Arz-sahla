@@ -18,15 +18,12 @@ import { Button } from "../components/ui/button";
 
 const checkoutSchema = z.object({
   fullName: z.string().min(3, "الاسم الكامل مطلوب"),
-  address: z.string().min(10, "العنوان التفصيلي مطلوب"),
   wilaya: z.string().min(1, "يرجى اختيار الولاية"),
   commune: z.string().min(2, "اسم البلدية مطلوب"),
-  zipCode: z.string().min(4, "الرمز البريدي مطلوب"),
   phone: z
     .string()
     .regex(/^(0)(5|6|7)[0-9]{8}$/, "رقم هاتف غير صالح (مثال: 0550123456)"),
   paymentMethod: z.enum(["cod", "chargily"]),
-  yalidineDesk: z.string().min(3, "يرجى تحديد مكتب Yaldine الخاص بولايتك"),
   termsAccepted: z.boolean().refine((val) => val === true, {
     message: "يجب الموافقة على الشروط والأحكام",
   }),
@@ -82,22 +79,23 @@ export default function Checkout() {
     setIsSubmitting(true);
     try {
       // 1. Create Order
+      const shippingFeeForOrder =
+        data.paymentMethod === "chargily"
+          ? 0
+          : calculateShippingFee(data.wilaya);
       const { data: orderData, error: orderError } = await (
         supabase.from("orders" as any) as any
       )
         .insert({
           user_id: user.id,
-          total_dzd: getTotal() + calculateShippingFee(watch("wilaya")),
+          total_dzd: getTotal() + shippingFeeForOrder,
           full_name: data.fullName,
-          address: data.address,
           wilaya: data.wilaya,
           commune: data.commune,
-          zip_code: data.zipCode,
           phone: data.phone,
           payment_method: data.paymentMethod,
           shipping_method: "desk",
-          yalidine_desk: data.yalidineDesk,
-          shipping_fee: calculateShippingFee(data.wilaya),
+          shipping_fee: shippingFeeForOrder,
           terms_accepted: data.termsAccepted,
           status: data.paymentMethod === "cod" ? "processing" : "pending",
         } as any)
@@ -128,7 +126,7 @@ export default function Checkout() {
           await supabase.functions.invoke("create-checkout", {
             body: {
               order_id: order.id,
-              total_dzd: getTotal() + calculateShippingFee(data.wilaya),
+              total_dzd: getTotal(), // Free shipping for Chargily
               customer_name: data.fullName,
               customer_email: user.email,
               locale: i18n.language,
@@ -170,7 +168,10 @@ export default function Checkout() {
     return wilayaName === "الجزائر" || wilayaName === "Alger" ? 200 : 400;
   };
 
-  const shippingFee = calculateShippingFee(watch("wilaya"));
+  const paymentMethod = watch("paymentMethod");
+  const wilayaName = watch("wilaya");
+  const shippingFee =
+    paymentMethod === "chargily" ? 0 : calculateShippingFee(wilayaName);
   const finalTotal = getTotal() + shippingFee;
 
   return (
@@ -254,22 +255,6 @@ export default function Checkout() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    {t("checkout.address")} *
-                  </label>
-                  <input
-                    {...register("address")}
-                    className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.address ? "border-red-500 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"}`}
-                    placeholder="رقم العمارة، الشارع، الحي..."
-                  />
-                  {errors.address && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.address.message}
-                    </p>
-                  )}
-                </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
@@ -311,26 +296,9 @@ export default function Checkout() {
                       </p>
                     )}
                   </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
-                      {t("checkout.zipCode")} *
-                    </label>
-                    <input
-                      {...register("zipCode")}
-                      className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.zipCode ? "border-red-500 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"}`}
-                      placeholder="الرمز البريدي"
-                      dir="ltr"
-                    />
-                    {errors.zipCode && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.zipCode.message}
-                      </p>
-                    )}
-                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 pt-8 border-t border-gray-100">
+                <div className="space-y-6 mt-8 pt-8 border-t border-gray-100">
                   {/* Payment Method Selection */}
                   <div className="space-y-4">
                     <h3 className="font-bold text-gray-900 flex items-center gap-2">
@@ -371,36 +339,17 @@ export default function Checkout() {
                           <div className="text-xs text-gray-500">
                             {t("checkout.onlineDescription")}
                           </div>
+                          <div className="text-xs text-green-600 font-semibold mt-1">
+                              الشحن مجاني!
+                          </div>
                         </div>
                       </label>
-                    </div>
-                  </div>
-
-                  {/* Shipping Method Selection */}
-                  <div className="space-y-4">
-                    <h3 className="font-bold text-gray-900">
-                      {t("checkout.shippingType")}
-                    </h3>
-                    <div className="space-y-3">
-                      <div className="p-4 bg-amber-50 rounded-xl border border-amber-100 space-y-3">
-                        <label className="text-sm font-bold text-amber-900">
-                          الاستلام من أقرب مكتب شحن (Yalidine Stop Desk) *
-                        </label>
-                        <input
-                          {...register("yalidineDesk")}
-                          placeholder="مثال: مكتب بئر توتة، مكتب بابا حسن..."
-                          className="w-full px-4 py-2 rounded-lg border border-amber-200 focus:ring-2 focus:ring-blue-500 outline-none flex-1"
-                        />
-                        {errors.yalidineDesk && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.yalidineDesk.message}
-                          </p>
-                        )}
-                        <p className="text-xs text-amber-700">
-                          ملاحظة: يمكنك إيجاد أسماء المكاتب المتوفرة في ولايتك
-                          من خلال صفحة Yaldine الرسمية.
-                        </p>
-                      </div>
+                      {paymentMethod === "chargily" && (
+                        <div className="text-xs bg-green-50 border border-green-200 text-green-700 p-2 rounded-lg text-center">
+                           توفير {formatDZD(calculateShippingFee(wilayaName))}{" "}
+                          على الشحن!
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -488,17 +437,31 @@ export default function Checkout() {
 
               <div className="space-y-4 mb-6 pt-4 border-t border-gray-100">
                 <div className="flex justify-between text-gray-600">
-                  <span>المجموع الفرعي</span>
+                  <span>السعر الإجمالي</span>
                   <span>{formatDZD(getTotal())}</span>
                 </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>الشحن ({t("checkout.desk")})</span>
+                <div className="flex justify-between items-center text-gray-600">
+                  <span className="flex items-center gap-2">
+                    الشحن
+                    {paymentMethod === "chargily" && (
+                      <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-semibold">
+                        مجاني 
+                      </span>
+                    )}
+                  </span>
                   <span>
-                    {shippingFee === 0
-                      ? t("checkout.calculating")
-                      : formatDZD(shippingFee)}
+                    {shippingFee === 0 && wilayaName
+                      ? "مجاني"
+                      : shippingFee === 0 && !wilayaName
+                        ? t("إختر الولاية لتحديد سعر الشحن")
+                        : formatDZD(shippingFee)}
                   </span>
                 </div>
+                {paymentMethod === "chargily" && (
+                  <div className="text-xs text-green-600 bg-green-50 p-2 rounded text-center">
+                     الشحن مجاني عند الدفع الإلكتروني!
+                  </div>
+                )}
                 <div className="pt-4 border-t border-gray-100 flex justify-between items-center">
                   <span className="text-lg font-bold text-gray-900">
                     الإجمالي

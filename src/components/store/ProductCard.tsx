@@ -33,8 +33,9 @@ export const ProductCard = React.memo<ProductCardProps>(({ product }) => {
   return (
     <Link
       to={`/products/${product.id}`}
-      className="group block bg-white rounded-xl border hover:shadow-md transition-shadow overflow-hidden"
+      className="group block bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-all duration-300 overflow-hidden hover:border-blue-300"
     >
+      {/* Product Image */}
       <div className="relative aspect-square overflow-hidden bg-gray-100">
         <img
           src={
@@ -43,29 +44,45 @@ export const ProductCard = React.memo<ProductCardProps>(({ product }) => {
           alt={name}
           loading="lazy"
           decoding="async"
-          className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+          className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300"
         />
-        {/* Removed AliExpress product badge */}
         {product.stock_quantity <= 0 && (
-          <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] flex items-center justify-center">
-            <span className="bg-red-600 text-white px-4 py-1.5 rounded-full font-bold shadow-lg transform -rotate-12 pointer-events-none">
+          <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+            <span className="bg-red-600 text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg">
               نفدت الكمية
             </span>
           </div>
         )}
       </div>
-      <div className="p-4">
-        <h3 className="font-medium text-gray-900 line-clamp-2 mb-2 h-10">
+
+      {/* Product Info */}
+      <div className="p-4 flex flex-col h-48">
+        {/* Product Name */}
+        <h3 className="font-semibold text-gray-900 line-clamp-2 mb-3 text-base leading-tight flex-grow">
           {name}
         </h3>
-        <div className="flex items-center gap-1 mb-2">
-          <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-          <span className="text-sm text-gray-600">
-            {product.avg_rating.toFixed(1)}
-          </span>
+
+        {/* Rating & Reviews */}
+        <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-100">
+          <div className="flex items-center gap-1">
+            <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+            <span className="text-sm font-medium text-gray-700">
+              {product.avg_rating.toFixed(1)}
+            </span>
+          </div>
+          <span className="text-xs text-gray-500">({product.avg_rating > 0 ? "تقييمات" : "بلا تقييمات"})</span>
         </div>
-        <div className="text-lg font-bold text-blue-600">
-          {formatDZD(priceDZD)}
+
+        {/* Price */}
+        <div className="mt-auto">
+          <p className="text-2xl font-bold text-blue-600">
+            {formatDZD(priceDZD)}
+          </p>
+          {product.price_dzd && product.price_dzd !== priceDZD && (
+            <p className="text-xs text-gray-400 line-through mt-1">
+              {formatDZD(product.price_dzd)}
+            </p>
+          )}
         </div>
       </div>
     </Link>
