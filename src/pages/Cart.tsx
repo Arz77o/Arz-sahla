@@ -13,7 +13,7 @@ export default function Cart() {
   const isAr = i18n.language === 'ar';
   const navigate = useNavigate();
   
-  const { items, removeItem, getTotal } = useCartStore();
+  const { items, removeItem, updateQuantity, getTotal, getItemCount } = useCartStore();
   const { user } = useAuthStore();
 
   const handleCheckout = () => {
@@ -71,8 +71,25 @@ export default function Cart() {
                       {item.variant.group}: {item.variant.option}
                     </p>
                   )}
-                  <div className="text-sm font-medium text-gray-500">
-                    {t('cart.quantity')}
+                  <div className="flex items-center gap-2 mt-2">
+                    <button
+                      onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
+                      className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors"
+                    >
+                      -
+                    </button>
+                    <span className="w-6 text-center font-bold text-gray-900">
+                      {item.quantity}
+                    </span>
+                    <button
+                      onClick={() => updateQuantity(item.product_id, item.quantity + 1)}
+                      className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors"
+                    >
+                      +
+                    </button>
+                    <span className="text-[10px] text-gray-400 mr-2">
+                      (المتوفر: {item.stock_limit})
+                    </span>
                   </div>
                 </div>
 
@@ -99,7 +116,7 @@ export default function Cart() {
               
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between text-gray-600">
-                  <span>المنتجات ({items.length})</span>
+                  <span>المنتجات ({getItemCount()} قطع)</span>
                   <span>{formatDZD(getTotal())}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">

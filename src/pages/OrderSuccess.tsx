@@ -51,8 +51,7 @@ export default function OrderSuccess() {
         </h1>
 
         <p className="text-lg text-gray-600 mb-8 max-w-lg mx-auto">
-          شكراً لتسوقك من Sahla. سنقوم بمعالجة طلبك وشراء المنتجات من AliExpress
-          قريباً.
+          شكراً لتسوقك من Sahla. سنقوم بمعالجة طلبك و نتصل بك للتأكيد ثم نرسل لك طلبك
         </p>
 
         {loading ? (
@@ -66,17 +65,16 @@ export default function OrderSuccess() {
                 رقم الطلب الخاص بك
               </div>
               <div className="text-xl font-mono font-bold text-gray-900">
-                {orderId}
+                {orderId?.substring(0, 8)}
               </div>
             </div>
             <div className="border-t border-gray-100 pt-4">
               <div className="text-sm text-gray-500 mb-1">طريقة الدفع</div>
               <div
-                className={`inline-flex items-center px-3 py-1.5 rounded-lg font-bold text-sm ${
-                  order.payment_method === "cod"
+                className={`inline-flex items-center px-3 py-1.5 rounded-lg font-bold text-sm ${order.payment_method === "cod"
                     ? "bg-amber-100 text-amber-800"
                     : "bg-blue-100 text-blue-800"
-                }`}
+                  }`}
               >
                 {order.payment_method === "cod"
                   ? "💵 الدفع عند الاستلام (COD)"
@@ -102,7 +100,7 @@ export default function OrderSuccess() {
                 رقم الطلب الخاص بك
               </div>
               <div className="text-xl font-mono font-bold text-gray-900">
-                {orderId}
+                {orderId?.substring(0, 8)}
               </div>
             </div>
           )

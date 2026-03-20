@@ -115,6 +115,7 @@ export type Database = {
           wilaya: string;
           yalidine_desk: string | null;
           zip_code: string;
+          contact_preference: string;
         };
         Insert: {
           address: string;
@@ -136,6 +137,7 @@ export type Database = {
           wilaya: string;
           yalidine_desk?: string | null;
           zip_code: string;
+          contact_preference?: string;
         };
         Update: {
           address?: string;
@@ -157,6 +159,7 @@ export type Database = {
           wilaya?: string;
           yalidine_desk?: string | null;
           zip_code?: string;
+          contact_preference?: string;
         };
         Relationships: [
           {

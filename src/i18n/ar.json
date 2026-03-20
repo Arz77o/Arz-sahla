@@ -35,7 +35,7 @@
     "buyerReviews": "آراء الزبائن"
   },
   "order": {
-    "pending": "في الانتظار",
+    "pending": "إنتظار التأكيد (confirmation)",
     "paid": "تم الدفع",
     "processing": "قيد التحضير",
     "shipped": "تم الشحن",
@@ -61,6 +61,10 @@
     "home": "توصيل للمنزل",
     "desk": "توصيل لمكتب الشحن (Stop Desk)",
     "terms": "أوافق على الشروط والأحكام",
+    "contactPreference": "كيف نؤكد طلبك؟",
+    "phoneCall": "إتصال هاتفي",
+    "whatsapp": "رسالة واتساب",
+    "email": "رسالة إيميل",
     "pay": "تأكيد الطلب"
   }
 }

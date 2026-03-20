@@ -74,7 +74,7 @@ export default function AdminOrders() {
 
   const tabs = [
     { id: "all", label: "الكل" },
-    { id: "pending", label: "⏳ انتظار" },
+    { id: "pending", label: "⏳ إنتظار التأكيد" },
     { id: "paid", label: "💳 مدفوع" },
     { id: "processing", label: "📦 تنفيذ" },
     { id: "shipped", label: "🚚 شحن" },

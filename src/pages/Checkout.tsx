@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, AlertCircle, CheckCircle2, ShieldCheck } from "lucide-react";
+import { Loader2, AlertCircle, CheckCircle2, ShieldCheck, Phone, MessageSquare, Mail } from "lucide-react";
 import { toast } from "sonner";
 
 import { SEOMeta } from "../components/shared/SEOMeta";
@@ -23,7 +23,13 @@ const checkoutSchema = z.object({
   phone: z
     .string()
     .regex(/^(0)(5|6|7)[0-9]{8}$/, "رقم هاتف غير صالح (مثال: 0550123456)"),
-  paymentMethod: z.enum(["cod", "chargily"]),
+  address: z.string().optional(),
+  paymentMethod: z.enum(["cod", "chargily"], {
+    message: "يرجى اختيار طريقة الدفع",
+  }),
+  contactPreference: z.enum(["phone", "whatsapp", "email"], {
+    message: "يرجى اختيار طريقة التواصل المفضلة",
+  }),
   termsAccepted: z.boolean().refine((val) => val === true, {
     message: "يجب الموافقة على الشروط والأحكام",
   }),
@@ -36,7 +42,7 @@ export default function Checkout() {
   const isAr = i18n.language === "ar";
   const navigate = useNavigate();
 
-  const { items, getTotal, clearCart } = useCartStore();
+  const { items, getTotal, getItemCount, clearCart } = useCartStore();
   const { user } = useAuthStore();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,19 +67,28 @@ export default function Checkout() {
     defaultValues: {
       fullName: user?.user_metadata?.full_name || "",
       phone: user?.user_metadata?.phone || "",
+      address: "",
       paymentMethod: "cod",
+      contactPreference: "phone",
       termsAccepted: false,
+      wilaya: "",
+      commune: "",
     },
   });
 
   const termsAccepted = watch("termsAccepted");
 
+  React.useEffect(() => {
+    if (items.length === 0) {
+      navigate("/cart");
+    }
+  }, [items.length, navigate]);
+
   if (items.length === 0) {
-    navigate("/cart");
     return null;
   }
 
-  const onSubmit = async (data: CheckoutFormValues) => {
+  const onSubmit: SubmitHandler<CheckoutFormValues> = async (data) => {
     if (!user) return;
 
     setIsSubmitting(true);
@@ -90,10 +105,12 @@ export default function Checkout() {
           user_id: user.id,
           total_dzd: getTotal() + shippingFeeForOrder,
           full_name: data.fullName,
+          address: data.address || "",
           wilaya: data.wilaya,
           commune: data.commune,
           phone: data.phone,
           payment_method: data.paymentMethod,
+          contact_preference: data.contactPreference,
           shipping_method: "desk",
           shipping_fee: shippingFeeForOrder,
           terms_accepted: data.termsAccepted,
@@ -109,7 +126,7 @@ export default function Checkout() {
       const orderItems = items.map((item) => ({
         order_id: order.id,
         product_id: item.product_id,
-        quantity: 1,
+        quantity: item.quantity,
         unit_price_dzd: item.price_dzd,
         variant: item.variant || {},
       }));
@@ -134,17 +151,21 @@ export default function Checkout() {
             },
           });
 
-        if (checkoutError) throw checkoutError;
+        if (checkoutError) {
+          console.error("Function error details:", checkoutError);
+          throw new Error(`Payment error: ${checkoutError.message}`);
+        }
 
         if (checkoutData?.checkout_url) {
           window.location.href = checkoutData.checkout_url;
         } else {
+          console.error("No checkout URL returned:", checkoutData);
           throw new Error("لم يتم إرجاع رابط الدفع");
         }
       } else {
         // COD - Direct success
-        clearCart();
-        navigate(`/ordersuccess?order_id=${order.id}`);
+        // Note: clearCart() is called in OrderSuccess component to prevent unwanted early redirects
+        navigate(`/order/success?order_id=${order.id}`);
       }
     } catch (error: any) {
       console.error("Checkout error:", error);
@@ -153,7 +174,7 @@ export default function Checkout() {
     }
   };
 
-  const calculateShippingFee = (wilayaName: string) => {
+  const calculateShippingFee = (wilayaName?: string) => {
     if (!wilayaName) return 0;
 
     // Check dynamic fees from database first
@@ -296,6 +317,18 @@ export default function Checkout() {
                       </p>
                     )}
                   </div>
+
+                  <div className="md:col-span-3 space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      العنوان التفصيلي (اختياري)
+                    </label>
+                    <textarea
+                      {...register("address")}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none"
+                      placeholder="رقم المنزل، اسم الشارع، أو أي تفاصيل إضافية عن العنوان..."
+                      rows={2}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-6 mt-8 pt-8 border-t border-gray-100">
@@ -350,6 +383,59 @@ export default function Checkout() {
                           على الشحن!
                         </div>
                       )}
+                    </div>
+                  </div>
+
+                  {/* Contact Preference */}
+                  <div className="space-y-4 pt-6 border-t border-gray-100">
+                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                       {t("checkout.contactPreference")} *
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <label
+                        className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${watch("contactPreference") === "phone" ? "border-blue-600 bg-blue-50" : "border-gray-100 hover:border-gray-200"}`}
+                      >
+                        <input
+                          type="radio"
+                          {...register("contactPreference")}
+                          value="phone"
+                          className="w-4 h-4 text-blue-600"
+                        />
+                        <div className="flex items-center gap-2">
+                          <Phone className="w-4 h-4 text-gray-500" />
+                          <span className="text-sm font-medium">{t("checkout.phoneCall")}</span>
+                        </div>
+                      </label>
+
+                      <label
+                        className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${watch("contactPreference") === "whatsapp" ? "border-blue-600 bg-blue-50" : "border-gray-100 hover:border-gray-200"}`}
+                      >
+                        <input
+                          type="radio"
+                          {...register("contactPreference")}
+                          value="whatsapp"
+                          className="w-4 h-4 text-blue-600"
+                        />
+                        <div className="flex items-center gap-2">
+                          <MessageSquare className="w-4 h-4 text-green-500" />
+                          <span className="text-sm font-medium">{t("checkout.whatsapp")}</span>
+                        </div>
+                      </label>
+
+                      <label
+                        className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${watch("contactPreference") === "email" ? "border-blue-600 bg-blue-50" : "border-gray-100 hover:border-gray-200"}`}
+                      >
+                        <input
+                          type="radio"
+                          {...register("contactPreference")}
+                          value="email"
+                          className="w-4 h-4 text-blue-600"
+                        />
+                        <div className="flex items-center gap-2">
+                          <Mail className="w-4 h-4 text-red-500" />
+                          <span className="text-sm font-medium">{t("checkout.email")}</span>
+                        </div>
+                      </label>
                     </div>
                   </div>
                 </div>
@@ -428,7 +514,7 @@ export default function Checkout() {
                           : ""}
                       </p>
                       <div className="text-sm font-bold text-blue-600 mt-1">
-                        {formatDZD(item.price_dzd)}
+                        {item.quantity} × {formatDZD(item.price_dzd)}
                       </div>
                     </div>
                   </div>
@@ -437,7 +523,7 @@ export default function Checkout() {
 
               <div className="space-y-4 mb-6 pt-4 border-t border-gray-100">
                 <div className="flex justify-between text-gray-600">
-                  <span>السعر الإجمالي</span>
+                  <span>المنتجات ({getItemCount()} قطع)</span>
                   <span>{formatDZD(getTotal())}</span>
                 </div>
                 <div className="flex justify-between items-center text-gray-600">

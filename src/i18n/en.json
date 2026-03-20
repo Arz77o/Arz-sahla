@@ -61,6 +61,10 @@
     "home": "Home Delivery",
     "desk": "Shipping Office (Stop Desk)",
     "terms": "I agree to the Terms and Conditions",
+    "contactPreference": "How should we confirm your order?",
+    "phoneCall": "Phone Call",
+    "whatsapp": "WhatsApp Message",
+    "email": "Email Message",
     "pay": "Confirm Order"
   }
 }

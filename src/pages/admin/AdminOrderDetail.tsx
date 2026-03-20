@@ -63,6 +63,7 @@ export default function AdminOrderDetail() {
 
     const addressText = `الاسم: ${order.full_name}
 الهاتف: ${order.phone}
+طريقة التواصل: ${order.contact_preference === "whatsapp" ? "واتساب" : order.contact_preference === "email" ? "إيميل" : "إتصال هاتف"}
 العنوان: ${order.address}، ${order.commune}، ${order.wilaya}
 الرمز البريدي: ${order.zip_code}
 ${order.yalidine_desk ? `مكتب ياليدين: ${order.yalidine_desk}` : ""}`;
@@ -175,23 +176,22 @@ ${order.yalidine_desk ? `مكتب ياليدين: ${order.yalidine_desk}` : ""}`
 
         <div className="flex items-center gap-2">
           <div
-            className={`px-4 py-2 rounded-full text-sm font-bold ${
-              order.status === "delivered"
+            className={`px-4 py-2 rounded-full text-sm font-bold ${order.status === "delivered"
                 ? "bg-green-100 text-green-800"
                 : order.status === "shipped"
                   ? "bg-blue-100 text-blue-800"
                   : order.status === "not_received" ||
-                      order.status === "cancelled"
+                    order.status === "cancelled"
                     ? "bg-red-100 text-red-800"
                     : order.status === "paid"
                       ? "bg-emerald-100 text-emerald-800"
                       : order.status === "processing"
                         ? "bg-indigo-100 text-indigo-800"
                         : "bg-gray-100 text-gray-800"
-            }`}
+              }`}
           >
             {order.status === "pending"
-              ? "⭐ في الانتظار"
+              ? "⭐ إنتظار التأكيد"
               : order.status === "paid"
                 ? "✅ مدفوع"
                 : order.status === "processing"
@@ -207,11 +207,10 @@ ${order.yalidine_desk ? `مكتب ياليدين: ${order.yalidine_desk}` : ""}`
                           : order.status}
           </div>
           <div
-            className={`px-4 py-2 rounded-full text-sm font-bold ${
-              order.payment_method === "cod"
+            className={`px-4 py-2 rounded-full text-sm font-bold ${order.payment_method === "cod"
                 ? "bg-amber-100 text-amber-800"
                 : "bg-blue-100 text-blue-800"
-            }`}
+              }`}
           >
             {order.payment_method === "cod"
               ? "الدفع عند الاستلام (COD)"
@@ -261,14 +260,25 @@ ${order.yalidine_desk ? `مكتب ياليدين: ${order.yalidine_desk}` : ""}`
                   {order.users?.email}
                 </div>
               </div>
+              <div>
+                <div className="text-sm text-gray-500 mb-1">طريقة التأكيد المفضلة</div>
+                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-sm font-bold ${order.contact_preference === 'whatsapp' ? 'bg-green-100 text-green-800' :
+                    order.contact_preference === 'email' ? 'bg-red-100 text-red-800' :
+                      'bg-blue-100 text-blue-800'
+                  }`}>
+                  {order.contact_preference === 'whatsapp' ? '✅ واتساب (WhatsApp)' :
+                    order.contact_preference === 'email' ? '✉️ إيميل (Email)' :
+                      '📞 إتصال هاتفي (Phone Call)'}
+                </div>
+              </div>
               <div className="md:col-span-2">
                 <div className="text-sm text-gray-500 mb-1">
                   العنوان التفصيلي
                 </div>
                 <div className="font-medium text-gray-900 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                  {order.address}، {order.commune}، {order.wilaya}
+                  {order.address ? `${order.address}، ` : ""}{order.commune}، {order.wilaya}
                   <br />
-                  الرمز البريدي: {order.zip_code}
+                  {order.zip_code && `الرمز البريدي: ${order.zip_code}`}
                 </div>
               </div>
               <div>
@@ -441,7 +451,7 @@ ${order.yalidine_desk ? `مكتب ياليدين: ${order.yalidine_desk}` : ""}`
                   onChange={(e) => setStatus(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
                 >
-                  <option value="pending">في الانتظار (Pending)</option>
+                  <option value="pending">إنتظار التأكيد (confirmation)</option>
                   <option value="paid">مدفوع (Paid)</option>
                   <option value="processing">قيد التنفيذ (Processing)</option>
                   <option value="shipped">تم الشحن (Shipped)</option>

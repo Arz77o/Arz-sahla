@@ -9,12 +9,15 @@ export interface CartItem {
   price_dzd: number;
   image: string;
   variant: { group: string; option: string } | null;
+  quantity: number;
+  stock_limit: number;
 }
 
 interface CartState {
   items: CartItem[];
   hydrated: boolean;
   addItem: (item: CartItem) => void;
+  updateQuantity: (product_id: string, quantity: number) => void;
   removeItem: (product_id: string) => void;
   clearCart: () => void;
   getTotal: () => number;
@@ -30,19 +33,52 @@ export const useCartStore = create<CartState>()(
       hydrated: false,
       addItem: (item) => {
         const { items } = get();
-        if (items.some((i) => i.product_id === item.product_id)) {
-          toast.error("المنتج موجود في سلتك مسبقاً");
+        const existingItem = items.find((i) => i.product_id === item.product_id);
+        
+        if (existingItem) {
+          const newQuantity = existingItem.quantity + item.quantity;
+          if (newQuantity > item.stock_limit) {
+            toast.error(`عذراً، الكمية المطلوبة تتجاوز المتوفر في المخزون (${item.stock_limit})`);
+            return;
+          }
+          
+          set({
+            items: items.map((i) =>
+              i.product_id === item.product_id
+                ? { ...i, quantity: newQuantity }
+                : i
+            ),
+          });
+          toast.success("تم تحديث الكمية في السلة");
+        } else {
+          set({ items: [...items, item] });
+          toast.success("تمت الإضافة إلى السلة");
+        }
+      },
+      updateQuantity: (product_id, quantity) => {
+        const { items } = get();
+        const item = items.find(i => i.product_id === product_id);
+        if (!item) return;
+
+        if (quantity > item.stock_limit) {
+          toast.error(`عذراً، المتوفر في المخزون هو ${item.stock_limit} قطع فقط`);
           return;
         }
-        set({ items: [...items, item] });
-        toast.success("تمت الإضافة إلى السلة");
+
+        if (quantity < 1) return;
+
+        set({
+          items: items.map((i) =>
+            i.product_id === product_id ? { ...i, quantity } : i
+          ),
+        });
       },
       removeItem: (product_id) => {
         set({ items: get().items.filter((i) => i.product_id !== product_id) });
       },
       clearCart: () => set({ items: [] }),
-      getTotal: () => get().items.reduce((total, item) => total + item.price_dzd, 0),
-      getItemCount: () => get().items.length,
+      getTotal: () => get().items.reduce((total, item) => total + (item.price_dzd * (item.quantity || 1)), 0),
+      getItemCount: () => get().items.reduce((total, item) => total + (item.quantity || 1), 0),
       isInCart: (product_id) => get().items.some((i) => i.product_id === product_id),
       setHydrated: () => set({ hydrated: true }),
     }),

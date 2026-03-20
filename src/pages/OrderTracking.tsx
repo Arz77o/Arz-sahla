@@ -55,13 +55,13 @@ export default function OrderTracking() {
       // 3. Try partial ID match (prefix)
       // We use a broader approach for partials to overcome UUID casting issues
       if (!foundOrder && searchVal.length >= 4) {
-        const { data } = await supabase
-          .from("orders")
-          .select("*")
-          .filter("id", "ilike", `${searchVal}%`)
-          .limit(1)
-          .maybeSingle();
-        foundOrder = data;
+        const { data: rpcData, error: rpcError } = await (supabase as any).rpc(
+          "search_order_by_short_id",
+          { pref: searchVal },
+        );
+        if (!rpcError && Array.isArray(rpcData) && rpcData.length > 0) {
+          foundOrder = rpcData[0];
+        }
       }
 
       if (!foundOrder) {
@@ -81,7 +81,7 @@ export default function OrderTracking() {
   const getStatusStep = (status: string) => {
     switch (status) {
       case "pending":
-        return 0;
+        return 1;
       case "paid":
         return 1;
       case "processing":
@@ -95,7 +95,7 @@ export default function OrderTracking() {
       case "cancelled":
         return -1;
       default:
-        return 0;
+        return 1;
     }
   };
 
@@ -155,27 +155,26 @@ export default function OrderTracking() {
                   تفاصيل حالة الطلب
                 </h3>
                 <span className="text-[10px] text-gray-400 mt-1 font-mono uppercase">
-                  ID: {order.id}
+                  ID: {order.id.substring(0, 8)}
                 </span>
               </div>
               <div className="flex flex-col items-end">
                 <span
-                  className={`inline-flex items-center px-4 py-1.5 rounded-full text-base font-black shadow-sm ${
-                    order.status === "delivered"
-                      ? "bg-green-500 text-white"
-                      : order.status === "shipped"
-                        ? "bg-blue-600 text-white"
-                        : order.status === "not_received" ||
-                            order.status === "cancelled"
-                          ? "bg-red-500 text-white"
-                          : "bg-amber-100 text-amber-800"
-                  }`}
+                  className={`inline-flex items-center px-4 py-1.5 rounded-full text-base font-black shadow-sm ${order.status === "delivered"
+                    ? "bg-green-500 text-white"
+                    : order.status === "shipped"
+                      ? "bg-blue-600 text-white"
+                      : order.status === "not_received" ||
+                        order.status === "cancelled"
+                        ? "bg-red-500 text-white"
+                        : "bg-amber-100 text-amber-800"
+                    }`}
                 >
                   {order.status === "paid" && "تَمَّ الدَّفْعُ"}
                   {order.status === "processing" && "جَارِي التَّنْفِيذُ"}
                   {order.status === "shipped" && "تَمَّ الشَّحْنُ"}
                   {order.status === "delivered" && "تَمَّ التَّسْلِيمُ"}
-                  {order.status === "pending" && "فِي الاِنْتِظَارِ"}
+                  {order.status === "pending" && "إنتظار التأكيد"}
                   {order.status === "not_received" && "غير مستلم"}
                   {order.status === "cancelled" && "ملغى"}
                 </span>
@@ -185,11 +184,10 @@ export default function OrderTracking() {
             <div className="grid grid-cols-1 gap-4 mb-10">
               {/* Yalidine Tracking Number Box */}
               <div
-                className={`p-6 rounded-2xl border flex flex-col justify-between group transition-all text-center ${
-                  order.tracking_number
-                    ? "bg-blue-50/50 border-blue-100 hover:border-blue-300"
-                    : "bg-gray-50 border-gray-100 italic"
-                }`}
+                className={`p-6 rounded-2xl border flex flex-col justify-between group transition-all text-center ${order.tracking_number
+                  ? "bg-blue-50/50 border-blue-100 hover:border-blue-300"
+                  : "bg-gray-50 border-gray-100 italic"
+                  }`}
               >
                 <div className="flex items-center justify-between mb-3 border-b border-blue-100/50 pb-3">
                   <span
@@ -247,11 +245,10 @@ export default function OrderTracking() {
               {/* Step 1: Paid */}
               <div className="relative flex items-start gap-6 mb-10">
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${
-                    currentStep >= 1
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-400"
-                  }`}
+                  className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${currentStep >= 1
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-400"
+                    }`}
                 >
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
@@ -259,22 +256,21 @@ export default function OrderTracking() {
                   <h4
                     className={`text-lg font-bold ${currentStep >= 1 ? "text-gray-900" : "text-gray-400"}`}
                   >
-                    تم الدفع بنجاح
+                    تم إستلام الطلب
                   </h4>
                   <p className="text-sm text-gray-500 mt-1">
-                    تم استلام الدفع وتأكيد الطلب.
+                    تم إستلام الطلب و سنراسلك للتأكد.
                   </p>
                 </div>
               </div>
 
-              {/* Step 2: Processing */}
+              {/* Step 2: Confirmed */}
               <div className="relative flex items-start gap-6 mb-10">
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${
-                    currentStep >= 2
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-400"
-                  }`}
+                  className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${currentStep >= 2
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-400"
+                    }`}
                 >
                   <Clock className="w-6 h-6" />
                 </div>
@@ -282,22 +278,21 @@ export default function OrderTracking() {
                   <h4
                     className={`text-lg font-bold ${currentStep >= 2 ? "text-gray-900" : "text-gray-400"}`}
                   >
-                    قيد التنفيذ
+                    تأكيد الطلب
                   </h4>
                   <p className="text-sm text-gray-500 mt-1">
-                    جاري تجهيز طلبك وتغليفه للشحن.
+                    تم تأكيد طلبك وجاري تحضيره للشحن.
                   </p>
                 </div>
               </div>
 
-              {/* Step 3: Shipped */}
+              {/* Step 3: Logistics */}
               <div className="relative flex items-start gap-6 mb-10">
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${
-                    currentStep >= 3
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-400"
-                  }`}
+                  className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${currentStep >= 3
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-400"
+                    }`}
                 >
                   <Truck className="w-6 h-6" />
                 </div>
@@ -305,10 +300,10 @@ export default function OrderTracking() {
                   <h4
                     className={`text-lg font-bold ${currentStep >= 3 ? "text-gray-900" : "text-gray-400"}`}
                   >
-                    تم الشحن
+                    شحن المنتج للزبون من شركة الشحن
                   </h4>
                   <p className="text-sm text-gray-500 mt-1 mb-3">
-                    تم تسليم طلبك لشركة Yalidine وهو في طريقه إليك.
+                    تم تسليم الطرد لشركة الشحن وهو في طريقه إليك.
                   </p>
 
                   {order.tracking_number && currentStep >= 3 && (
@@ -335,11 +330,10 @@ export default function OrderTracking() {
               {/* Step 4: Delivered */}
               <div className="relative flex items-start gap-6">
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${
-                    currentStep >= 4
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-100 text-gray-400"
-                  }`}
+                  className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${currentStep >= 4
+                    ? "bg-green-500 text-white"
+                    : "bg-gray-100 text-gray-400"
+                    }`}
                 >
                   <Home className="w-6 h-6" />
                 </div>
@@ -347,10 +341,10 @@ export default function OrderTracking() {
                   <h4
                     className={`text-lg font-bold ${currentStep >= 4 ? "text-gray-900" : "text-gray-400"}`}
                   >
-                    تم التسليم
+                    التسليم
                   </h4>
                   <p className="text-sm text-gray-500 mt-1">
-                    تم تسليم الطلب بنجاح. شكراً لتسوقك معنا!
+                    تأكيد إستلام الطلب من قبل الزبون.
                   </p>
                 </div>
               </div>

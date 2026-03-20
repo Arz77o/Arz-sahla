@@ -33,6 +33,7 @@ export default function ProductDetail() {
     option: string;
   } | null>(null);
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
+  const [quantity, setQuantity] = useState(1);
 
   const { addItem, isInCart } = useCartStore();
 
@@ -88,11 +89,7 @@ export default function ProductDetail() {
   const outOfStock = product.stock_quantity <= 0;
 
   const handleAddToCart = () => {
-    if (inCart) {
-      toast.error(t("cart.alreadyInCart"));
-      return;
-    }
-
+    // We now allow adding more quantity even if already in cart
     const imageUrl = product.images?.[0] || "";
     const absoluteImageUrl = imageUrl.startsWith("http")
       ? imageUrl
@@ -105,6 +102,8 @@ export default function ProductDetail() {
       price_dzd: priceDZD,
       image: absoluteImageUrl,
       variant: selectedVariant,
+      quantity: quantity,
+      stock_limit: product.stock_quantity,
     });
   };
 
@@ -233,6 +232,35 @@ export default function ProductDetail() {
                 </div>
               )}
 
+              {/* Quantity Selector */}
+              {!outOfStock && (
+                <div className="mb-8">
+                  <h3 className="text-sm font-medium text-gray-900 mb-3">
+                    {t("cart.quantity")}
+                  </h3>
+                  <div className="flex items-center gap-4 w-fit bg-gray-50 p-1.5 rounded-xl border border-gray-100">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors shadow-sm"
+                    >
+                      -
+                    </button>
+                    <span className="w-8 text-center font-bold text-gray-900">
+                      {quantity}
+                    </span>
+                    <button
+                      onClick={() => setQuantity(Math.min(product.stock_quantity, quantity + 1))}
+                      className="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors shadow-sm"
+                    >
+                      +
+                    </button>
+                    <span className="text-[10px] text-gray-400 mr-2 px-2 border-r">
+                      المتوفر: {product.stock_quantity}
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {/* Add to Cart */}
               <div className="mt-auto pt-6 border-t border-gray-100">
                 <Button
@@ -243,13 +271,13 @@ export default function ProductDetail() {
                       : "bg-blue-600 hover:bg-blue-700"
                   }`}
                   onClick={handleAddToCart}
-                  disabled={inCart || outOfStock}
+                  disabled={outOfStock}
                 >
                   <ShoppingCart className="w-5 h-5 mr-2" />
                   {outOfStock
                     ? t("product.outOfStock")
                     : inCart
-                      ? t("product.inCart")
+                      ? "تحديث الكمية في السلة"
                       : t("product.addToCart")}
                 </Button>
               </div>
