@@ -177,17 +177,17 @@ ${order.yalidine_desk ? `مكتب ياليدين: ${order.yalidine_desk}` : ""}`
         <div className="flex items-center gap-2">
           <div
             className={`px-4 py-2 rounded-full text-sm font-bold ${order.status === "delivered"
-                ? "bg-green-100 text-green-800"
-                : order.status === "shipped"
-                  ? "bg-blue-100 text-blue-800"
-                  : order.status === "not_received" ||
-                    order.status === "cancelled"
-                    ? "bg-red-100 text-red-800"
-                    : order.status === "paid"
-                      ? "bg-emerald-100 text-emerald-800"
-                      : order.status === "processing"
-                        ? "bg-indigo-100 text-indigo-800"
-                        : "bg-gray-100 text-gray-800"
+              ? "bg-green-100 text-green-800"
+              : order.status === "shipped"
+                ? "bg-blue-100 text-blue-800"
+                : order.status === "not_received" ||
+                  order.status === "cancelled"
+                  ? "bg-red-100 text-red-800"
+                  : order.status === "paid"
+                    ? "bg-emerald-100 text-emerald-800"
+                    : order.status === "processing"
+                      ? "bg-indigo-100 text-indigo-800"
+                      : "bg-gray-100 text-gray-800"
               }`}
           >
             {order.status === "pending"
@@ -208,8 +208,8 @@ ${order.yalidine_desk ? `مكتب ياليدين: ${order.yalidine_desk}` : ""}`
           </div>
           <div
             className={`px-4 py-2 rounded-full text-sm font-bold ${order.payment_method === "cod"
-                ? "bg-amber-100 text-amber-800"
-                : "bg-blue-100 text-blue-800"
+              ? "bg-amber-100 text-amber-800"
+              : "bg-blue-100 text-blue-800"
               }`}
           >
             {order.payment_method === "cod"
@@ -263,8 +263,8 @@ ${order.yalidine_desk ? `مكتب ياليدين: ${order.yalidine_desk}` : ""}`
               <div>
                 <div className="text-sm text-gray-500 mb-1">طريقة التأكيد المفضلة</div>
                 <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-sm font-bold ${order.contact_preference === 'whatsapp' ? 'bg-green-100 text-green-800' :
-                    order.contact_preference === 'email' ? 'bg-red-100 text-red-800' :
-                      'bg-blue-100 text-blue-800'
+                  order.contact_preference === 'email' ? 'bg-red-100 text-red-800' :
+                    'bg-blue-100 text-blue-800'
                   }`}>
                   {order.contact_preference === 'whatsapp' ? '✅ واتساب (WhatsApp)' :
                     order.contact_preference === 'email' ? '✉️ إيميل (Email)' :
@@ -371,7 +371,7 @@ ${order.yalidine_desk ? `مكتب ياليدين: ${order.yalidine_desk}` : ""}`
                       {buyPrice > 0 && (
                         <div className="p-3 text-center">
                           <div className="text-xs text-gray-400 mb-1">
-                            سعر الشراء / وحدة
+                            سعر التكلفة / وحدة
                           </div>
                           <div className="font-bold text-orange-600">
                             {formatDZD(buyPrice)}

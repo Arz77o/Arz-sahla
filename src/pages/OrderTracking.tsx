@@ -335,16 +335,16 @@ export default function OrderTracking() {
                     : "bg-gray-100 text-gray-400"
                     }`}
                 >
-                  <Home className="w-6 h-6" />
+                  <CheckCircle2 className="w-6 h-6" />
                 </div>
                 <div className="pt-3">
                   <h4
                     className={`text-lg font-bold ${currentStep >= 4 ? "text-gray-900" : "text-gray-400"}`}
                   >
-                    التسليم
+                    استلام الطرد
                   </h4>
                   <p className="text-sm text-gray-500 mt-1">
-                    تأكيد إستلام الطلب من قبل الزبون.
+                    تأكيد استلام الطرد من مكتب الشحن.
                   </p>
                 </div>
               </div>

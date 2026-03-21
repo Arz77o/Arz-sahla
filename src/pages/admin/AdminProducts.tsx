@@ -32,7 +32,7 @@ export default function AdminProducts() {
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
-    
+
     try {
       const { error } = await supabaseAdmin.from('products').delete().eq('id', id);
       if (error) throw error;
@@ -46,13 +46,13 @@ export default function AdminProducts() {
   return (
     <>
       <SEOMeta title="إدارة المنتجات | الإدارة" />
-      
+
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">المنتجات</h1>
           <p className="text-gray-500 mt-1">إضافة وتعديل وحذف المنتجات</p>
         </div>
-        
+
         <Link to="/admin/products/new">
           <Button className="bg-blue-600 hover:bg-blue-700 font-bold px-6">
             <Plus className="w-5 h-5 ml-2" />
@@ -69,7 +69,7 @@ export default function AdminProducts() {
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">الصورة</th>
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">الاسم</th>
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">الفئة</th>
-                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-nowrap">سعر الشراء</th>
+                <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-nowrap">سعر التكلفة</th>
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-nowrap">سعر البيع</th>
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">المخزون</th>
                 <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">التقييم</th>
@@ -113,11 +113,10 @@ export default function AdminProducts() {
                       {formatDZD(product.price_dzd || calculatePriceDZD(product.price_usd, usd_to_dzd_rate, commission_rate))}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
-                        (product.stock_quantity ?? 0) <= 0 ? 'bg-red-100 text-red-800' :
-                        (product.stock_quantity ?? 0) < 5 ? 'bg-amber-100 text-amber-800' :
-                        'bg-blue-100 text-blue-800'
-                      }`}>
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${(product.stock_quantity ?? 0) <= 0 ? 'bg-red-100 text-red-800' :
+                          (product.stock_quantity ?? 0) < 5 ? 'bg-amber-100 text-amber-800' :
+                            'bg-blue-100 text-blue-800'
+                        }`}>
                         {product.stock_quantity ?? 0}
                       </span>
                     </td>
@@ -128,9 +127,8 @@ export default function AdminProducts() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        product.is_published ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                      }`}>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.is_published ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        }`}>
                         {product.is_published ? 'منشور' : 'مسودة'}
                       </span>
                     </td>
@@ -141,9 +139,9 @@ export default function AdminProducts() {
                             <Edit className="w-4 h-4" />
                           </Button>
                         </Link>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() => handleDelete(product.id)}
                           className="text-red-600 hover:text-red-900 hover:bg-red-50"
                         >

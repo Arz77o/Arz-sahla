@@ -100,6 +100,7 @@ export default function ProductDetail() {
       name_ar: product.name_ar,
       name_en: product.name_en,
       price_dzd: priceDZD,
+      price_chargily: product.price_chargily,
       image: absoluteImageUrl,
       variant: selectedVariant,
       quantity: quantity,
@@ -187,9 +188,15 @@ export default function ProductDetail() {
                   {name}
                 </h1>
 
-                <div className="text-4xl font-black text-blue-600 mb-6">
+                <div className="text-4xl font-black text-blue-600 mb-2">
                   {formatDZD(priceDZD)}
                 </div>
+
+                {product.price_chargily > 0 && product.price_chargily < priceDZD && (
+                  <div className="flex items-center gap-2 mb-6 text-green-600 font-bold bg-green-50 w-fit px-3 py-1.5 rounded-lg border border-green-100">
+                    <span className="text-sm">أو {formatDZD(product.price_chargily)} عند الدفع بـ Chargily ⚡</span>
+                  </div>
+                )}
               </div>
 
               {/* Variants */}

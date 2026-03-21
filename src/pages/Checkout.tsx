@@ -94,16 +94,16 @@ export default function Checkout() {
     setIsSubmitting(true);
     try {
       // 1. Create Order
-      const shippingFeeForOrder =
-        data.paymentMethod === "chargily"
-          ? 0
-          : calculateShippingFee(data.wilaya);
+      const baseShipping = calculateShippingFee(data.wilaya);
+      const roundedTotal = Math.round((getTotal(data.paymentMethod) + baseShipping) / 10) * 10;
+      const actualShippingForDB = roundedTotal - getTotal(data.paymentMethod);
+
       const { data: orderData, error: orderError } = await (
         supabase.from("orders" as any) as any
       )
         .insert({
           user_id: user.id,
-          total_dzd: getTotal() + shippingFeeForOrder,
+          total_dzd: roundedTotal,
           full_name: data.fullName,
           address: data.address || "",
           wilaya: data.wilaya,
@@ -112,7 +112,7 @@ export default function Checkout() {
           payment_method: data.paymentMethod,
           contact_preference: data.contactPreference,
           shipping_method: "desk",
-          shipping_fee: shippingFeeForOrder,
+          shipping_fee: actualShippingForDB,
           terms_accepted: data.termsAccepted,
           status: data.paymentMethod === "cod" ? "processing" : "pending",
         } as any)
@@ -127,7 +127,9 @@ export default function Checkout() {
         order_id: order.id,
         product_id: item.product_id,
         quantity: item.quantity,
-        unit_price_dzd: item.price_dzd,
+        unit_price_dzd: (data.paymentMethod === 'chargily' && item.price_chargily && item.price_chargily > 0) 
+          ? item.price_chargily 
+          : item.price_dzd,
         variant: item.variant || {},
       }));
 
@@ -143,7 +145,7 @@ export default function Checkout() {
           await supabase.functions.invoke("create-checkout", {
             body: {
               order_id: order.id,
-              total_dzd: getTotal(), // Free shipping for Chargily
+              total_dzd: roundedTotal, // Rounded total for Chargily
               customer_name: data.fullName,
               customer_email: user.email,
               locale: i18n.language,
@@ -191,9 +193,13 @@ export default function Checkout() {
 
   const paymentMethod = watch("paymentMethod");
   const wilayaName = watch("wilaya");
-  const shippingFee =
-    paymentMethod === "chargily" ? 0 : calculateShippingFee(wilayaName);
-  const finalTotal = getTotal() + shippingFee;
+  const baseShipping = calculateShippingFee(wilayaName);
+  
+  // Final total is Product Price (Inclusive) + Shipping, rounded to nearest 10
+  const rawTotal = getTotal(paymentMethod) + baseShipping;
+  const finalTotal = Math.round(rawTotal / 10) * 10;
+  // Adjust shipping display to include the minor rounding difference so total matches
+  const displayShippingFee = finalTotal - getTotal(paymentMethod);
 
   return (
     <>
@@ -372,17 +378,9 @@ export default function Checkout() {
                           <div className="text-xs text-gray-500">
                             {t("checkout.onlineDescription")}
                           </div>
-                          <div className="text-xs text-green-600 font-semibold mt-1">
-                              الشحن مجاني!
-                          </div>
                         </div>
                       </label>
-                      {paymentMethod === "chargily" && (
-                        <div className="text-xs bg-green-50 border border-green-200 text-green-700 p-2 rounded-lg text-center">
-                           توفير {formatDZD(calculateShippingFee(wilayaName))}{" "}
-                          على الشحن!
-                        </div>
-                      )}
+                      {/* Note about shipping if needed */}
                     </div>
                   </div>
 
@@ -514,7 +512,12 @@ export default function Checkout() {
                           : ""}
                       </p>
                       <div className="text-sm font-bold text-blue-600 mt-1">
-                        {item.quantity} × {formatDZD(item.price_dzd)}
+                        {item.quantity} × {formatDZD(paymentMethod === 'chargily' && item.price_chargily && item.price_chargily > 0 ? item.price_chargily : item.price_dzd)}
+                        {paymentMethod === 'chargily' && item.price_chargily && item.price_chargily > 0 && item.price_chargily < item.price_dzd && (
+                          <span className="text-[10px] text-green-600 ml-1 line-through opacity-50">
+                            {formatDZD(item.price_dzd)}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -522,32 +525,20 @@ export default function Checkout() {
               </div>
 
               <div className="space-y-4 mb-6 pt-4 border-t border-gray-100">
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-gray-900 font-medium">
                   <span>المنتجات ({getItemCount()} قطع)</span>
-                  <span>{formatDZD(getTotal())}</span>
+                  <span>{formatDZD(getTotal(paymentMethod))}</span>
                 </div>
                 <div className="flex justify-between items-center text-gray-600">
                   <span className="flex items-center gap-2">
-                    الشحن
-                    {paymentMethod === "chargily" && (
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-semibold">
-                        مجاني 
-                      </span>
-                    )}
+                    مصاريف الشحن
                   </span>
                   <span>
-                    {shippingFee === 0 && wilayaName
-                      ? "مجاني"
-                      : shippingFee === 0 && !wilayaName
-                        ? t("إختر الولاية لتحديد سعر الشحن")
-                        : formatDZD(shippingFee)}
+                    {displayShippingFee === 0 && !wilayaName
+                      ? t("إختر الولاية لتحديد السعر")
+                      : formatDZD(displayShippingFee)}
                   </span>
                 </div>
-                {paymentMethod === "chargily" && (
-                  <div className="text-xs text-green-600 bg-green-50 p-2 rounded text-center">
-                     الشحن مجاني عند الدفع الإلكتروني!
-                  </div>
-                )}
                 <div className="pt-4 border-t border-gray-100 flex justify-between items-center">
                   <span className="text-lg font-bold text-gray-900">
                     الإجمالي

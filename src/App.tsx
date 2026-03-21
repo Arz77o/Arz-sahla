@@ -40,6 +40,7 @@ const AdminCategories = lazy(() => import('./pages/admin/AdminCategories'));
 const AdminCustomers = lazy(() => import('./pages/admin/AdminCustomers'));
 const AdminCustomerDetail = lazy(() => import('./pages/admin/AdminCustomerDetail'));
 const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
+const PricingCalculator = lazy(() => import('./pages/admin/PricingCalculator'));
 
 const StoreLayout = () => (
   <div className="min-h-screen flex flex-col font-sans bg-gray-50">
@@ -102,6 +103,7 @@ function App() {
             <Route path="customers" element={<AdminCustomers />} />
             <Route path="customers/:id" element={<AdminCustomerDetail />} />
             <Route path="settings" element={<AdminSettings />} />
+            <Route path="pricing-calculator" element={<PricingCalculator />} />
           </Route>
         </Routes>
         <Toaster position="top-center" richColors />

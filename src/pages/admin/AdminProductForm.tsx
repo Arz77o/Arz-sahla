@@ -30,6 +30,7 @@ interface ProductFormValues {
   description_en: string;
   price_usd: number;
   price_dzd: number;
+  price_chargily: number;
   stock_quantity: number;
   category_id: string;
   avg_rating: number;
@@ -73,6 +74,7 @@ export default function AdminProductForm() {
       description_en: "",
       price_usd: 0,
       price_dzd: 0,
+      price_chargily: 0,
       stock_quantity: 0,
       category_id: "",
       avg_rating: 5,
@@ -111,6 +113,7 @@ export default function AdminProductForm() {
             description_en: productData.description_en || "",
             price_usd: productData.price_usd || 0,
             price_dzd: productData.price_dzd || 0,
+            price_chargily: productData.price_chargily || 0,
             stock_quantity: productData.stock_quantity || 0,
             category_id: productData.category_id || "",
             avg_rating: productData.avg_rating ?? 5,
@@ -205,6 +208,7 @@ export default function AdminProductForm() {
         description_en: data.description_en?.trim() || null,
         price_usd: Number(data.price_usd),
         price_dzd: Number(data.price_dzd),
+        price_chargily: Number(data.price_chargily),
         stock_quantity: Number(data.stock_quantity),
         category_id: data.category_id || null,
         avg_rating: Number(data.avg_rating),
@@ -550,7 +554,7 @@ export default function AdminProductForm() {
 
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 text-sm text-blue-800">
               💡 <strong>سعر البيع</strong> = السعر الذي يراه الزبون |{" "}
-              <strong>سعر الشراء</strong> = تكلفة المنتج من المورد
+              <strong>سعر التكلفة</strong> = تكلفة المنتج من المورد
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -583,7 +587,7 @@ export default function AdminProductForm() {
               {/* Price USD / Purchase Price */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                  💰 سعر الشراء
+                  💰 سعر التكلفة
                 </label>
                 <div
                   dir="ltr"
@@ -605,6 +609,35 @@ export default function AdminProductForm() {
                     {errors.price_usd.message}
                   </p>
                 )}
+              </div>
+
+              {/* Price Chargily */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                  ⚡ سعر Chargily
+                </label>
+                <div
+                  dir="ltr"
+                  className={`flex rounded-lg border-2 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 ${errors.price_chargily ? "border-red-500" : "border-gray-200"}`}
+                >
+                  <span className="flex items-center px-3 bg-green-100 text-green-700 text-sm font-bold">
+                    DZD
+                  </span>
+                  <input
+                    type="number"
+                    {...register("price_chargily", { valueAsNumber: true })}
+                    className="flex-1 px-3 py-2.5 outline-none font-bold text-lg text-green-600 bg-white"
+                    dir="ltr"
+                  />
+                </div>
+                {errors.price_chargily && (
+                  <p className="text-red-500 text-xs">
+                    {errors.price_chargily?.message as string}
+                  </p>
+                )}
+                <p className="text-[10px] text-gray-500 mt-1">
+                  💡 اتركه 0 إذا كنت لا تريد تقديم خصم خاص بـ Chargily
+                </p>
               </div>
 
               {/* Stock Quantity */}
@@ -803,11 +836,10 @@ export default function AdminProductForm() {
                           onClick={() =>
                             setNewReview({ ...newReview, rating: star })
                           }
-                          className={`w-8 h-8 rounded flex items-center justify-center transition-colors ${
-                            newReview.rating >= star
-                              ? "bg-amber-100 text-amber-600"
-                              : "bg-gray-100 text-gray-400"
-                          }`}
+                          className={`w-8 h-8 rounded flex items-center justify-center transition-colors ${newReview.rating >= star
+                            ? "bg-amber-100 text-amber-600"
+                            : "bg-gray-100 text-gray-400"
+                            }`}
                         >
                           <Star
                             className={`w-4 h-4 ${newReview.rating >= star ? "fill-current" : ""}`}

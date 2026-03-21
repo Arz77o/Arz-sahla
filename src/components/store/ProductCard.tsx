@@ -12,6 +12,7 @@ interface ProductCardProps {
     name_en: string;
     price_usd: number;
     price_dzd: number;
+    price_chargily: number;
     images: string[];
     avg_rating: number;
     stock_quantity: number;
@@ -51,6 +52,11 @@ export const ProductCard = React.memo<ProductCardProps>(({ product }) => {
             <span className="bg-red-600 text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg">
               نفدت الكمية
             </span>
+          </div>
+        )}
+        {product.price_chargily > 0 && product.price_chargily < priceDZD && (
+          <div className="absolute top-2 right-2 bg-green-600/90 text-white text-[10px] fold-bold px-2 py-1 rounded-md flex items-center gap-1 shadow-sm backdrop-blur-sm">
+            <span>خصم الدفع الإلكتروني ⚡</span>
           </div>
         )}
       </div>

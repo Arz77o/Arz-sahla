@@ -187,6 +187,7 @@ export type Database = {
           name_en: string;
           price_dzd: number | null;
           price_usd: number;
+          price_chargily: number | null;
           stock_quantity: number | null;
           variants: Json;
         };
@@ -205,6 +206,7 @@ export type Database = {
           name_en: string;
           price_dzd?: number | null;
           price_usd: number;
+          price_chargily?: number | null;
           stock_quantity?: number | null;
           variants?: Json;
         };
@@ -223,6 +225,7 @@ export type Database = {
           name_en?: string;
           price_dzd?: number | null;
           price_usd?: number;
+          price_chargily?: number | null;
           stock_quantity?: number | null;
           variants?: Json;
         };
