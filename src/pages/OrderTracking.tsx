@@ -242,7 +242,7 @@ export default function OrderTracking() {
               {/* Timeline Line */}
               <div className="absolute right-6 top-0 bottom-0 w-0.5 bg-gray-200"></div>
 
-              {/* Step 1: Paid */}
+              {/* Step 1: Received */}
               <div className="relative flex items-start gap-6 mb-10">
                 <div
                   className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${currentStep >= 1
@@ -252,14 +252,14 @@ export default function OrderTracking() {
                 >
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
-                <div className="pt-3">
+                <div className="pt-3 text-right">
                   <h4
                     className={`text-lg font-bold ${currentStep >= 1 ? "text-gray-900" : "text-gray-400"}`}
                   >
-                    تم إستلام الطلب
+                    تم استلام الطلب
                   </h4>
                   <p className="text-sm text-gray-500 mt-1">
-                    تم إستلام الطلب و سنراسلك للتأكد.
+                    لقد استلمنا طلبك بنجاح وهو قيد المراجعة الأولية.
                   </p>
                 </div>
               </div>
@@ -274,19 +274,19 @@ export default function OrderTracking() {
                 >
                   <Clock className="w-6 h-6" />
                 </div>
-                <div className="pt-3">
+                <div className="pt-3 text-right">
                   <h4
                     className={`text-lg font-bold ${currentStep >= 2 ? "text-gray-900" : "text-gray-400"}`}
                   >
                     تأكيد الطلب
                   </h4>
                   <p className="text-sm text-gray-500 mt-1">
-                    تم تأكيد طلبك وجاري تحضيره للشحن.
+                    تم تأكيد طلبك هاتفياً أو تلقائياً وجاري تحضيره للتغليف.
                   </p>
                 </div>
               </div>
 
-              {/* Step 3: Logistics */}
+              {/* Step 3: Shipped */}
               <div className="relative flex items-start gap-6 mb-10">
                 <div
                   className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${currentStep >= 3
@@ -296,18 +296,18 @@ export default function OrderTracking() {
                 >
                   <Truck className="w-6 h-6" />
                 </div>
-                <div className="pt-3">
+                <div className="pt-3 text-right">
                   <h4
                     className={`text-lg font-bold ${currentStep >= 3 ? "text-gray-900" : "text-gray-400"}`}
                   >
-                    شحن المنتج للزبون من شركة الشحن
+                    تم الشحن (Yalidine)
                   </h4>
                   <p className="text-sm text-gray-500 mt-1 mb-3">
-                    تم تسليم الطرد لشركة الشحن وهو في طريقه إليك.
+                    طلبك الآن مع شركة الشحن وهو في طريقه إلى مكتب الولاية الخاصة بك.
                   </p>
 
                   {order.tracking_number && currentStep >= 3 && (
-                    <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 inline-block">
+                    <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 inline-block text-right">
                       <div className="text-xs text-blue-600 font-medium mb-1">
                         🚚 رقم تتبع Yalidine:
                       </div>
@@ -320,14 +320,14 @@ export default function OrderTracking() {
                         rel="noopener noreferrer"
                         className="text-sm text-blue-600 hover:text-blue-800 font-medium underline"
                       >
-                        تتبع طردك على Yalidine &rarr;
+                        تتبع طردك على موقع Yalidine &larr;
                       </a>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Step 4: Delivered */}
+              {/* Step 4: Ready for Pickup / Delivered */}
               <div className="relative flex items-start gap-6">
                 <div
                   className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${currentStep >= 4
@@ -335,16 +335,16 @@ export default function OrderTracking() {
                     : "bg-gray-100 text-gray-400"
                     }`}
                 >
-                  <CheckCircle2 className="w-6 h-6" />
+                  <Home className="w-6 h-6" />
                 </div>
-                <div className="pt-3">
+                <div className="pt-3 text-right">
                   <h4
                     className={`text-lg font-bold ${currentStep >= 4 ? "text-gray-900" : "text-gray-400"}`}
                   >
-                    استلام الطرد
+                    جاهز للاستلام / تم التسليم
                   </h4>
                   <p className="text-sm text-gray-500 mt-1">
-                    تأكيد استلام الطرد من مكتب الشحن.
+                    الطلب وصل لمكتب الشحن (Stop Desk) أو تم استلامه بنجاح.
                   </p>
                 </div>
               </div>

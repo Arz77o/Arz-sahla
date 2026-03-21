@@ -1,60 +1,147 @@
 import React from 'react';
 import { SEOMeta } from '../components/shared/SEOMeta';
+import { ShieldCheck, Info, CheckCircle2, AlertTriangle, Truck, CreditCard, RefreshCcw, Lock } from 'lucide-react';
 
 export default function Terms() {
+  const lastUpdate = "مارس 2026";
+
   return (
     <>
-      <SEOMeta title="الشروط والأحكام" />
-      <div className="container mx-auto px-4 py-16 max-w-4xl">
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 md:p-12">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">الشروط والأحكام</h1>
-          
-          <div className="prose max-w-none text-gray-600 space-y-6">
-            <p>
-              مرحباً بك في منصة Sahla. باستخدامك لموقعنا، فإنك توافق على الشروط والأحكام التالية. يرجى قراءتها بعناية.
-            </p>
+      <SEOMeta title="الشروط والأحكام وسياسة الإرجاع" />
+      <div className="min-h-screen bg-white py-12 md:py-32" dir="rtl">
+        <div className="container mx-auto px-4 max-w-5xl">
+          {/* Header Section */}
+          <div className="mb-20 md:mb-32 border-b border-surface-high pb-12">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+              <div>
+                <h1 className="text-6xl md:text-9xl font-display font-bold text-gray-900 tracking-tighter leading-none mb-6">
+                  Sahla DZ
+                </h1>
+                <p className="text-sm font-bold uppercase tracking-[0.3em] text-primary italic">
+                  الشروط والأحكام — سياسة الإرجاع والاستبدال
+                </p>
+              </div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400 border border-surface-high px-4 py-2 bg-surface-low">
+                آخر تحديث: {lastUpdate}
+              </div>
+            </div>
+          </div>
 
-            <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">1. طبيعة الخدمة</h2>
-            <p>
-              Sahla هي منصة وسيطة تقدم خدمة الشراء بالوكالة من موقع AliExpress. نحن نقوم بدفع قيمة المنتجات بالعملة الصعبة نيابة عنك، وتدفع لنا بالدينار الجزائري. نحن لا نملك المنتجات المعروضة ولا نقوم بتصنيعها.
-            </p>
+          <div className="border border-surface-high">
+            {/* Intro Notice */}
+            <div className="bg-primary p-8 md:p-12 text-white">
+              <p className="text-xl md:text-2xl font-display font-bold leading-tight tracking-tight italic">
+                يُرجى قراءة هذه الشروط بعناية قبل إتمام أي طلب شراء. بالنقر على 'أوافق على الشروط والأحكام' فإنك تقر بقراءة وفهم وقبول جميع البنود الواردة في هذه الوثيقة.
+              </p>
+            </div>
 
-            <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">2. الأسعار والدفع</h2>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>جميع الأسعار المعروضة على الموقع هي بالدينار الجزائري وتشمل عمولة الخدمة.</li>
-              <li>الأسعار قابلة للتغيير بناءً على تقلبات أسعار الصرف.</li>
-              <li>يتم الدفع مسبقاً وبشكل كامل عبر طرق الدفع الإلكتروني المتاحة (البطاقة الذهبية، CIB) عبر منصة Chargily.</li>
-              <li>لا نقوم بمعالجة أو حفظ بيانات بطاقتك البنكية؛ تتم العملية بالكامل على خوادم Chargily الآمنة.</li>
-            </ul>
+            <div className="p-8 md:p-16 space-y-24 bg-white">
+              {/* 1. General Info */}
+              <section className="relative">
+                <div className="flex items-center gap-6 mb-12">
+                  <div className="text-4xl font-display font-bold text-primary/20 leading-none">01.</div>
+                  <h2 className="text-3xl font-display font-bold text-gray-900 uppercase tracking-tight">معلومات عامة</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-surface-high border border-surface-high">
+                  <div className="p-8 bg-white">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-2">اسم المتجر</span>
+                    <span className="font-display font-bold text-gray-900 text-xl tracking-tight">Sahla DZ</span>
+                  </div>
+                  <div className="p-8 bg-white">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-2">نوع النشاط</span>
+                    <span className="font-display font-bold text-gray-900 tracking-tight text-lg">بيئة إلكترونية — بيع منتجات إلكترونيات وإكسسوارات</span>
+                  </div>
+                  <div className="p-8 bg-white">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-2">منطقة التوصيل</span>
+                    <span className="font-display font-bold text-gray-900 tracking-tight text-lg">جميع ولايات الجزائر الـ 58</span>
+                  </div>
+                  <div className="p-8 bg-white">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-2">طرق الدفع</span>
+                    <span className="font-display font-bold text-gray-900 tracking-tight text-lg italic uppercase text-primary">Chargily (CIB/Edahabia) & COD</span>
+                  </div>
+                </div>
+              </section>
 
-            <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">3. الشحن والتوصيل</h2>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>يتم شحن المنتجات مباشرة من البائعين في الصين إلى العنوان الذي تقدمه.</li>
-              <li>تتراوح مدة التوصيل عادة بين 15 إلى 45 يوم عمل. هذه المدة تقديرية وقد تتأثر بعوامل خارجة عن إرادتنا مثل الجمارك أو شركات الشحن.</li>
-              <li>أنت مسؤول عن تقديم عنوان صحيح وكامل. لا نتحمل مسؤولية ضياع الطرود بسبب خطأ في العنوان.</li>
-            </ul>
+              {/* 2. Products and Prices */}
+              <section>
+                <div className="flex items-center gap-6 mb-12">
+                  <div className="text-4xl font-display font-bold text-primary/20 leading-none">02.</div>
+                  <h2 className="text-3xl font-display font-bold text-gray-900 uppercase tracking-tight">المنتجات والأسعار</h2>
+                </div>
+                <div className="space-y-12 text-gray-700">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-l-2 border-primary pl-8">
+                    <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900">وصف المنتجات</h3>
+                    <div className="md:col-span-2 space-y-4">
+                      <p className="text-sm leading-loose">نقدم منتجات إلكترونية من علامات تجارية موثوقة. الصور المعروضة تمثل الحالة الحقيقية للمنتج. الأسعار تشمل تكاليف الخدمة وقابلة للتغيير بناءً على متطلبات السوق.</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
 
-            <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">4. الجمارك والرسوم الإضافية</h2>
-            <p className="font-bold text-amber-700 bg-amber-50 p-4 rounded-lg border border-amber-200">
-              أنت (العميل) تتحمل المسؤولية الكاملة عن أي رسوم جمركية، ضرائب، أو مصاريف بريدية (مثل ضريبة 130 دج لبريد الجزائر) قد تُفرض على طردك عند وصوله إلى الجزائر.
-            </p>
+              {/* 6. Return Policy - Red Alert Block */}
+              <section className="bg-surface-low -mx-8 md:-mx-16 p-8 md:p-16 border-y border-surface-high">
+                <div className="flex items-center gap-6 mb-16">
+                  <div className="text-4xl font-display font-bold text-red-600/20 leading-none">06.</div>
+                  <h2 className="text-3xl font-display font-bold text-red-600 uppercase tracking-tight italic">سياسة الإرجاع</h2>
+                </div>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                  <div className="space-y-6">
+                    <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900 flex items-center gap-3 mb-8">
+                      <div className="w-1.5 h-1.5 bg-green-500" />
+                      حالات القبول
+                    </h3>
+                    <div className="grid grid-cols-1 gap-px bg-surface-high border border-surface-high">
+                      {[
+                        { title: "منتج تالف أو مكسور", action: "استبدال أو استرجاع كامل" },
+                        { title: "منتج مختلف تماماً", action: "تصحيح فوري" },
+                        { title: "ضمان تشغيل", action: "صلاحية 7 أيام" }
+                      ].map((item, i) => (
+                        <div key={i} className="bg-white p-6">
+                          <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-1">{item.title}</p>
+                          <p className="text-sm font-bold text-gray-900">{item.action}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
-            <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">5. الإلغاء والاسترجاع</h2>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>يمكنك إلغاء الطلب واسترداد أموالك بالكامل إذا لم نقم بعد بتنفيذ عملية الشراء على AliExpress.</li>
-              <li>بمجرد شراء المنتج وشحنه، لا يمكن إلغاء الطلب.</li>
-              <li>في حال وصول منتج تالف أو غير مطابق للمواصفات، يجب إبلاغنا وتزويدنا بالصور خلال 48 ساعة من الاستلام لكي نقوم بفتح نزاع مع البائع نيابة عنك.</li>
-              <li>استرداد الأموال في حالة النزاع يعتمد على قرار منصة AliExpress.</li>
-            </ul>
+                  <div className="space-y-6">
+                    <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900 flex items-center gap-3 mb-8">
+                      <div className="w-1.5 h-1.5 bg-red-500" />
+                      حالات الرفض
+                    </h3>
+                    <div className="space-y-4">
+                      {[
+                        "تجاوز فترة 7 أيام",
+                        "فتح العلبة الأصلية أو إتلافها",
+                        "تغيير الرأي الشخصي",
+                        "كسر ناتج عن سوء الاستخدام"
+                      ].map((item, i) => (
+                        <div key={i} className="flex items-center gap-4 text-gray-500 text-xs font-medium uppercase tracking-widest border-b border-surface-high pb-4 last:border-0 italic">
+                          <span>✕</span>
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </section>
 
-            <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">6. إخلاء المسؤولية</h2>
-            <p>
-              نحن نعمل كوسطاء فقط. لا نتحمل مسؤولية جودة المنتجات، أو تأخر الشحن من قبل البائع، أو حجز الطرود من قبل الجمارك الجزائرية.
-            </p>
-
-            <p className="mt-12 text-sm text-gray-500">
-              آخر تحديث: {new Date().toLocaleDateString('ar-DZ')}
-            </p>
+              {/* Final Conclusion */}
+              <section className="text-center pt-24 border-t border-surface-high">
+                <div className="inline-block p-12 bg-surface-low border border-surface-high">
+                  <p className="text-lg font-display font-bold text-gray-900 mb-6 uppercase tracking-widest">
+                    Agreement Confirmation
+                  </p>
+                  <p className="text-gray-400 text-xs uppercase tracking-[0.2em] leading-loose max-w-sm mx-auto">
+                    By proceeding, you confirm full adherence to our curated trading standards and architectural service protocols.
+                  </p>
+                </div>
+                <div className="mt-20 font-display font-bold text-gray-300 text-xs uppercase tracking-[0.5em]">
+                  Sahla DZ — Architectural Archive 2026
+                </div>
+              </section>
+            </div>
           </div>
         </div>
       </div>

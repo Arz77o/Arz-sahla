@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { SEOMeta } from "../components/shared/SEOMeta";
 import { ProductCard } from "../components/store/ProductCard";
 import { supabase } from "../lib/supabase";
-import { Loader2 } from "lucide-react";
+import { Loader2, Filter, X, AlertTriangle } from "lucide-react";
 
 export default function Products() {
   const { t, i18n } = useTranslation();
@@ -102,74 +102,106 @@ export default function Products() {
   return (
     <>
       <SEOMeta title={t("nav.products")} />
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row gap-8">
-          {/* Sidebar Filters */}
-          <aside className="w-full md:w-64 flex-shrink-0">
-            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm sticky top-24">
-              <h3 className="font-bold text-lg mb-4">الفئات</h3>
-              <ul className="space-y-2 mb-8">
-                <li>
-                  <button
+      <div className="bg-white min-h-screen">
+        <div className="container mx-auto px-4 py-12 md:py-24">
+          {/* Hero Section */}
+          <div className="mb-16 md:mb-24 border-b border-surface-high pb-12">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+              <div>
+                <h1 className="text-6xl md:text-9xl font-display font-bold text-gray-900 tracking-tighter leading-none mb-6">
+                  Catalog
+                </h1>
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">
+                  {products.length} CURATED ARCHIVAL PIECES
+                </p>
+              </div>
+              <div className="flex gap-4">
+                {categoryFilter && (
+                  <button 
                     onClick={() => updateFilter("category", null)}
-                    className={`text-sm ${!categoryFilter ? "font-bold text-blue-600" : "text-gray-600 hover:text-blue-600"}`}
+                    className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-primary border border-primary px-4 py-2 hover:bg-primary hover:text-white transition-all"
                   >
-                    الكل
+                    <X className="w-3 h-3" />
+                    Clear Filter
                   </button>
-                </li>
-                {categories.map((cat) => (
-                  <li key={cat.id}>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col lg:flex-row gap-16">
+            {/* Sidebar Filters */}
+            <aside className="w-full lg:w-72 shrink-0">
+              <div className="sticky top-24 space-y-12">
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900 mb-8 flex items-center gap-3">
+                    <Filter className="w-4 h-4 text-primary" />
+                    Categories
+                  </h3>
+                  <div className="flex flex-col gap-px bg-surface-high border border-surface-high">
                     <button
-                      onClick={() => updateFilter("category", cat.slug)}
-                      className={`text-sm ${categoryFilter === cat.slug ? "font-bold text-blue-600" : "text-gray-600 hover:text-blue-600"}`}
+                      onClick={() => updateFilter("category", null)}
+                      className={`text-left p-6 transition-all text-[11px] font-bold uppercase tracking-widest ${!categoryFilter ? "bg-primary text-white" : "bg-white text-gray-500 hover:bg-surface-low hover:text-gray-900"}`}
                     >
-                      {isAr ? cat.name_ar : cat.name_en}
+                      All Collections
                     </button>
-                  </li>
-                ))}
-              </ul>
+                    {categories.map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => updateFilter("category", cat.slug)}
+                        className={`text-left p-6 transition-all text-[11px] font-bold uppercase tracking-widest ${categoryFilter === cat.slug ? "bg-primary text-white" : "bg-white text-gray-500 hover:bg-surface-low hover:text-gray-900"}`}
+                      >
+                        {isAr ? cat.name_ar : cat.name_en}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="p-8 bg-surface-low border border-surface-high">
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
+                    Our catalog is updated weekly with new architectural pieces focused on functionality and minimalist design.
+                  </p>
+                </div>
+              </div>
+            </aside>
+
+            {/* Product Grid */}
+            <div className="flex-1">
+              {error && (
+                <div className="mb-12 p-8 bg-red-50 border border-red-100 flex items-start gap-4">
+                  <AlertTriangle className="w-6 h-6 text-red-600 mt-1" />
+                  <div>
+                    <p className="font-display font-bold text-red-900 uppercase tracking-widest text-sm mb-2">Error Loading Catalog</p>
+                    <p className="text-sm text-red-600 font-medium">{error}</p>
+                  </div>
+                </div>
+              )}
+
+              {loading ? (
+                <div className="flex justify-center items-center h-96">
+                  <div className="space-y-6 text-center">
+                    <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto stroke-1" />
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-300">Synchronizing Archive...</p>
+                  </div>
+                </div>
+              ) : products.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-y-16 gap-x-8">
+                  {products.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-32 border border-surface-high bg-surface-low">
+                  <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.3em] mb-8">No Items Found in this Collection</p>
+                  <button
+                    onClick={() => setSearchParams({})}
+                    className="text-xs font-bold uppercase tracking-widest text-primary underline underline-offset-8 decoration-2 italic hover:text-primary-dim"
+                  >
+                    Back to All Products
+                  </button>
+                </div>
+              )}
             </div>
-          </aside>
-
-          {/* Product Grid */}
-          <div className="flex-1">
-            <div className="mb-6 flex justify-between items-center">
-              <h1 className="text-2xl font-bold text-gray-900">
-                {t("nav.products")}
-              </h1>
-              <span className="text-sm text-gray-500">
-                {products.length} منتج
-              </span>
-            </div>
-
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-                <p className="font-semibold">خطأ</p>
-                <p className="text-sm">{error}</p>
-              </div>
-            )}
-
-            {loading ? (
-              <div className="flex justify-center items-center h-64">
-                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-              </div>
-            ) : products.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                {products.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-16 bg-white rounded-xl border border-gray-100">
-                <p className="text-gray-500">لا توجد منتجات</p>
-                <button
-                  onClick={() => setSearchParams({})}
-                  className="mt-4 text-blue-600 font-medium hover:underline"
-                >
-                  مسح الفلاتر
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </div>

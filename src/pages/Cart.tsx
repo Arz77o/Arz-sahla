@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Trash2, ShoppingBag, ShieldCheck } from 'lucide-react';
+import { Trash2, ShoppingBag, ShieldCheck, ArrowRight, ArrowLeft } from 'lucide-react';
 import { SEOMeta } from '../components/shared/SEOMeta';
 import { useCartStore } from '../store/cartStore';
 import { useAuthStore } from '../store/authStore';
@@ -28,14 +28,20 @@ export default function Cart() {
     return (
       <>
         <SEOMeta title={t('cart.title')} />
-        <div className="container mx-auto px-4 py-16 text-center">
-          <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-400">
-            <ShoppingBag className="w-12 h-12" />
+        <div className="container mx-auto px-4 py-24 md:py-40 text-center">
+          <div className="w-32 h-32 bg-surface-low border border-surface-high flex items-center justify-center mx-auto mb-10 text-gray-300">
+            <ShoppingBag className="w-14 h-14 stroke-1" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('cart.empty')}</h1>
+          <h1 className="text-4xl md:text-6xl font-display font-bold text-gray-900 mb-8 tracking-tighter uppercase tracking-[0.05em]">
+            {t('cart.empty')}
+          </h1>
+          <p className="text-gray-400 mb-12 max-w-md mx-auto text-sm font-medium uppercase tracking-widest leading-relaxed">
+            Your architectural journey starts with a single selection.
+          </p>
           <Link to="/products">
-            <Button size="lg" className="rounded-full px-8">
-              تصفح المنتجات
+            <Button size="lg" className="h-16 px-12 text-lg font-bold tracking-tighter uppercase tracking-widest">
+              {isAr ? <ArrowLeft className="mr-3 w-5 h-5" /> : <ArrowRight className="ml-3 w-5 h-5" />}
+              Explore Products
             </Button>
           </Link>
         </div>
@@ -46,101 +52,130 @@ export default function Cart() {
   return (
     <>
       <SEOMeta title={t('cart.title')} />
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-8">{t('cart.title')}</h1>
+      <div className="container mx-auto px-4 py-12 md:py-24">
+        {/* Header Section */}
+        <div className="max-w-6xl mx-auto mb-16 md:mb-24 flex flex-col md:flex-row md:items-end justify-between border-b border-surface-high pb-10 gap-8">
+          <div>
+            <h1 className="text-5xl md:text-8xl font-display font-bold text-gray-900 tracking-tighter leading-none mb-4">
+              {t('cart.title')}
+            </h1>
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">
+              Review your curated collection ({getItemCount()} items)
+            </p>
+          </div>
+          <Link to="/products" className="text-[10px] font-bold uppercase tracking-widest text-primary hover:underline underline-offset-8 decoration-2 italic">
+            Continue Shopping
+          </Link>
+        </div>
         
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Cart Items */}
-          <div className="flex-1 space-y-4">
+        <div className="flex flex-col lg:flex-row gap-12 max-w-7xl mx-auto items-start">
+          {/* Cart Items List */}
+          <div className="flex-1 space-y-6 w-full">
             {items.map((item) => (
-              <div key={item.product_id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex gap-4 items-center">
-                <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-50 flex-shrink-0 border border-gray-100">
+              <div 
+                key={item.product_id} 
+                className="bg-white border border-surface-high p-6 md:p-8 flex flex-col sm:flex-row gap-8 items-start group transition-all hover:border-gray-300"
+              >
+                {/* Product Image */}
+                <div className="w-full sm:w-40 aspect-square bg-surface-low border border-surface-high overflow-hidden shrink-0">
                   <img 
                     src={item.image || (item as any).images?.[0] || 'https://picsum.photos/seed/sahla/200/200'} 
                     alt={isAr ? item.name_ar : item.name_en} 
-                    className="w-full h-full object-cover" 
+                    className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700" 
                   />
                 </div>
                 
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-gray-900 line-clamp-2 mb-1">
-                    {isAr ? item.name_ar : item.name_en}
-                  </h3>
+                {/* Product Info */}
+                <div className="flex-1 min-w-0 h-full flex flex-col">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-lg md:text-xl font-display font-bold text-gray-900 leading-tight tracking-tight">
+                      {isAr ? item.name_ar : item.name_en}
+                    </h3>
+                    <div className="text-xl font-display font-bold text-primary">
+                      {formatDZD(item.price_dzd)}
+                    </div>
+                  </div>
+                  
                   {item.variant && (
-                    <p className="text-sm text-gray-500 mb-2">
+                    <div className="inline-block px-3 py-1 bg-surface-low border border-surface-high text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-6 w-fit">
                       {item.variant.group}: {item.variant.option}
-                    </p>
+                    </div>
                   )}
-                  <div className="flex items-center gap-2 mt-2">
-                    <button
-                      onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
-                      className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors"
+                  
+                  {/* Controls */}
+                  <div className="mt-auto flex items-center justify-between">
+                    <div className="flex items-center gap-px bg-surface-high border border-surface-high">
+                      <button
+                        onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
+                        className="w-10 h-10 flex items-center justify-center bg-white text-gray-400 hover:text-gray-900 hover:bg-surface-low transition-all font-bold"
+                      >
+                        -
+                      </button>
+                      <div className="w-12 h-10 flex items-center justify-center bg-white font-bold text-gray-900 text-sm">
+                        {item.quantity}
+                      </div>
+                      <button
+                        onClick={() => updateQuantity(item.product_id, item.quantity + 1)}
+                        className="w-10 h-10 flex items-center justify-center bg-white text-gray-400 hover:text-gray-900 hover:bg-surface-low transition-all font-bold"
+                      >
+                        +
+                      </button>
+                    </div>
+                    
+                    <button 
+                      onClick={() => removeItem(item.product_id)}
+                      className="text-[10px] font-bold uppercase tracking-widest text-red-400 hover:text-red-700 transition-colors flex items-center gap-2"
                     >
-                      -
+                      <Trash2 className="w-3.5 h-3.5" />
+                      {t('cart.remove')}
                     </button>
-                    <span className="w-6 text-center font-bold text-gray-900">
-                      {item.quantity}
-                    </span>
-                    <button
-                      onClick={() => updateQuantity(item.product_id, item.quantity + 1)}
-                      className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors"
-                    >
-                      +
-                    </button>
-                    <span className="text-[10px] text-gray-400 mr-2">
-                      (المتوفر: {item.stock_limit})
-                    </span>
                   </div>
-                </div>
-
-                <div className="flex flex-col items-end justify-between h-24">
-                  <div className="text-lg font-bold text-blue-600 whitespace-nowrap">
-                    {formatDZD(item.price_dzd)}
-                  </div>
-                  <button 
-                    onClick={() => removeItem(item.product_id)}
-                    className="text-sm text-red-500 hover:text-red-700 flex items-center gap-1"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    <span className="hidden sm:inline">{t('cart.remove')}</span>
-                  </button>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Order Summary */}
-          <div className="w-full lg:w-96 flex-shrink-0">
-            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm sticky top-24">
-              <h2 className="text-lg font-bold text-gray-900 mb-6">ملخص الطلب</h2>
+          {/* Sidebar Summary */}
+          <div className="w-full lg:w-[400px] shrink-0 sticky top-24">
+            <div className="bg-surface-low p-8 md:p-12 border border-surface-high">
+              <h2 className="text-xl font-display font-bold text-gray-900 mb-10 uppercase tracking-widest">
+                Summary
+              </h2>
               
-              <div className="space-y-4 mb-6">
-                <div className="flex justify-between text-gray-600">
-                  <span>المنتجات ({getItemCount()} قطع)</span>
-                  <span>{formatDZD(getTotal())}</span>
+              <div className="space-y-6 mb-12">
+                <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
+                  <span>Subtotal ({getItemCount()} items)</span>
+                  <span className="text-gray-900">{formatDZD(getTotal())}</span>
                 </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>الشحن</span>
-                  <span className="text-gray-400 font-medium">يُحسب عند الدفع</span>
+                <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
+                  <span>Shipping</span>
+                  <span className="text-xs italic lowercase">At Checkout</span>
                 </div>
-                <div className="pt-4 border-t border-gray-100 flex justify-between items-center">
-                  <span className="text-lg font-bold text-gray-900">{t('cart.total')}</span>
-                  <span className="text-2xl font-black text-blue-600">{formatDZD(getTotal())}</span>
+                
+                <div className="pt-10 border-t border-surface-high flex justify-between items-end">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">Total</span>
+                  <span className="text-4xl font-display font-bold text-primary tracking-tighter leading-none">
+                    {formatDZD(getTotal())}
+                  </span>
                 </div>
               </div>
 
               <Button 
                 size="lg" 
-                className="w-full h-14 text-lg font-bold rounded-xl mb-4"
+                className="w-full h-20 text-lg font-display font-bold tracking-tight bg-primary hover:bg-primary-dim uppercase tracking-widest"
                 onClick={handleCheckout}
               >
                 {t('cart.checkout')}
               </Button>
 
-              <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-                <ShieldCheck className="w-4 h-4 text-green-500" />
-                <span>{t('cart.secure')}</span>
+              <div className="mt-10 flex items-center justify-center gap-4 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                <ShieldCheck className="w-4 h-4 text-primary" />
+                <span>Curated & Guaranteed</span>
               </div>
+              
+              <p className="mt-8 text-[9px] text-gray-400 leading-relaxed uppercase tracking-wider text-center">
+                Shipping options and exact delivery fees are determined during the delivery step based on your location.
+              </p>
             </div>
           </div>
         </div>

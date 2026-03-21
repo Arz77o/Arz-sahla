@@ -9,71 +9,79 @@ export default function FAQ() {
   return (
     <>
       <SEOMeta title={t('nav.faq')} />
-      <div className="container mx-auto px-4 py-16 max-w-3xl">
-        <div className="text-center mb-12">
-          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-600">
-            <HelpCircle className="w-8 h-8" />
+      <div className="bg-white min-h-screen">
+        <div className="container mx-auto px-4 py-16 md:py-32 max-w-5xl">
+          {/* Header Section */}
+          <div className="mb-20 md:mb-32 border-b border-surface-high pb-12">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+              <div>
+                <h1 className="text-6xl md:text-9xl font-display font-bold text-gray-900 tracking-tighter leading-none mb-6">
+                  {t('nav.faq')}
+                </h1>
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">
+                  ESSENTIAL ARCHIVAL KNOWLEDGE
+                </p>
+              </div>
+              <div className="w-16 h-16 bg-surface-low border border-surface-high flex items-center justify-center text-primary">
+                <HelpCircle className="w-8 h-8 stroke-1" />
+              </div>
+            </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">{t('nav.faq')}</h1>
-          <p className="text-gray-600">إجابات على الأسئلة الأكثر شيوعاً حول خدماتنا.</p>
-        </div>
 
-        <div className="space-y-8">
-          <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b pb-2">كيفية استلام المنتج</h2>
-            <div className="space-y-4">
-              <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <h3 className="font-bold text-lg mb-2 text-blue-600">كم يستغرق التوصيل؟</h3>
-                <p className="text-gray-600 leading-relaxed">بما أن المنتجات تشحن مباشرة من الصين، فإن مدة التوصيل تتراوح عادة بين 15 إلى 45 يوم عمل حسب شركة الشحن والجمارك.</p>
-              </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <h3 className="font-bold text-lg mb-2 text-blue-600">أين أستلم طردي؟</h3>
-                <p className="text-gray-600 leading-relaxed">يتم تسليم الطرود عادة إلى أقرب مركز بريد (Algérie Poste) لعنوانك، أو عبر شركة التوصيل (EMS) إذا كانت متوفرة.</p>
-              </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <h3 className="font-bold text-lg mb-2 text-blue-600">هل أدفع رسوم جمركية؟</h3>
-                <p className="text-gray-600 leading-relaxed">نعم، قد تخضع بعض المنتجات لرسوم جمركية عند وصولها للجزائر (مثل ضريبة 130 دج للطرود العادية). هذه الرسوم يدفعها العميل عند الاستلام.</p>
-              </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <h3 className="font-bold text-lg mb-2 text-blue-600">ماذا أفعل إذا لم يصل المنتج؟</h3>
-                <p className="text-gray-600 leading-relaxed">إذا تجاوزت المدة 60 يوماً ولم يصل المنتج، يرجى التواصل معنا لفتح نزاع واسترداد أموالك.</p>
-              </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <h3 className="font-bold text-lg mb-2 text-blue-600">هل يمكنني إرجاع المنتج؟</h3>
-                <p className="text-gray-600 leading-relaxed">سياسة الإرجاع تعتمد على البائع في AliExpress. في حال وصول منتج تالف أو غير مطابق، يرجى تصويره فوراً والتواصل معنا.</p>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+            <aside className="lg:col-span-4 sticky top-24 h-fit">
+              <p className="text-sm text-gray-400 leading-relaxed uppercase tracking-widest font-bold">
+                Everything you need to know about our curated delivery and acquisition protocols.
+              </p>
+            </aside>
+
+            <div className="lg:col-span-8 space-y-24">
+              <section className="space-y-12">
+                <div className="flex items-center gap-6">
+                  <div className="text-4xl font-display font-bold text-primary/20 leading-none underline decoration-2 underline-offset-8">01.</div>
+                  <h2 className="text-2xl font-display font-bold text-gray-900 uppercase tracking-tight italic">Delivery Protocols</h2>
+                </div>
+                <div className="space-y-px bg-surface-high border border-surface-high">
+                  {[
+                    { q: "كم يستغرق التوصيل؟", a: "يستغرق التوصيل من 2 إلى 7 أيام عمل لجميع ولايات الجزائر الـ 58." },
+                    { q: "أين أستلم طردي؟", a: "يتم تسليم الطرود عبر خدمة Stop Desk (الاستلام من مكتب شركة الشحن) في ولايتك." },
+                    { q: "هل هناك رسوم إضافية؟", a: "لا توجد رسوم خفية. تدفع فقط السعر الإجمالي الموضح في الطلب." }
+                  ].map((item, i) => (
+                    <div key={i} className="bg-white p-8 md:p-10 group hover:bg-surface-low transition-all">
+                      <h3 className="text-lg font-display font-bold text-gray-900 mb-4 tracking-tight">{item.q}</h3>
+                      <p className="text-sm text-gray-500 leading-relaxed">{item.a}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section className="space-y-12">
+                <div className="flex items-center gap-6">
+                  <div className="text-4xl font-display font-bold text-primary/20 leading-none underline decoration-2 underline-offset-8">02.</div>
+                  <h2 className="text-2xl font-display font-bold text-gray-900 uppercase tracking-tight italic">Acquisition & Payment</h2>
+                </div>
+                <div className="space-y-px bg-surface-high border border-surface-high">
+                  {[
+                    { q: "ما هي طرق الدفع المتوفرة؟", a: "نوفر الدفع عند الاستلام (COD) والدفع الإلكتروني عبر البطاقة الذهبية أو CIB." },
+                    { q: "كيف أتأكد من نجاح طلبي؟", a: "ستصلك رسالة تأكيد عبر WhatsApp أو عبر الاتصال الهاتفي خلال 24 ساعة." },
+                    { q: "كيف أتتبع شحنتي؟", a: "يمكنك تتبع حالة طلبك من صفحة 'تتبع الطلب' باستخدام رقم طلبك." }
+                  ].map((item, i) => (
+                    <div key={i} className="bg-white p-8 md:p-10 group hover:bg-surface-low transition-all">
+                      <h3 className="text-lg font-display font-bold text-gray-900 mb-4 tracking-tight">{item.q}</h3>
+                      <p className="text-sm text-gray-500 leading-relaxed">{item.a}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <div className="p-12 bg-surface-low border border-surface-high text-center">
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 mb-6 font-medium">Still have inquiries?</p>
+                <div className="text-lg font-display font-bold text-gray-900 tracking-tight italic">
+                  Contact our support via WhatsApp for immediate assistance.
+                </div>
               </div>
             </div>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b pb-2">كيف تتبع منتجك</h2>
-            <div className="space-y-4">
-              <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <h3 className="font-bold text-lg mb-2 text-blue-600">كيف أحصل على رقم التتبع؟</h3>
-                <p className="text-gray-600 leading-relaxed">بمجرد شحن البائع للمنتج، سنقوم بتحديث حالة طلبك وإضافة رقم التتبع الدولي. ستتلقى أيضاً بريداً إلكترونياً بذلك.</p>
-              </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <h3 className="font-bold text-lg mb-2 text-blue-600">أين يمكنني تتبع الشحنة؟</h3>
-                <p className="text-gray-600 leading-relaxed">يمكنك تتبع شحنتك عبر صفحة "تتبع الطلب" في موقعنا، أو باستخدام مواقع التتبع العالمية مثل 17Track.net.</p>
-              </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <h3 className="font-bold text-lg mb-2 text-blue-600">رقم التتبع لا يعمل، ماذا أفعل؟</h3>
-                <p className="text-gray-600 leading-relaxed">قد يستغرق ظهور معلومات التتبع من 3 إلى 7 أيام بعد الشحن. يرجى التحلي بالصبر والمحاولة لاحقاً.</p>
-              </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <h3 className="font-bold text-lg mb-2 text-blue-600">ما معنى "Arrived at destination country"؟</h3>
-                <p className="text-gray-600 leading-relaxed">تعني أن الطرد وصل إلى الجزائر وهو الآن قيد المعالجة الجمركية قبل توجيهه إلى مركز البريد الخاص بك.</p>
-              </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <h3 className="font-bold text-lg mb-2 text-blue-600">كيف أعرف أن الطرد في مركز البريد؟</h3>
-                <p className="text-gray-600 leading-relaxed">ستتلقى إشعاراً في هاتفك يأكد أن طردك وصل إلى عنوانك و يرجى أخذه من المركز حاملا معك بطاقة التعريف و رقم  التتبع المرسل إليك في البريد الإلكتروني، أو يمكنك تتبع الرقم محلياً عبر موقع بريد الجزائر إذا كان مدعوماً.</p>
-              </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <h3 className="font-bold text-lg mb-2 text-blue-600">هل يمكن تتبع جميع الطرود؟</h3>
-                <p className="text-gray-600 leading-relaxed">معظم الطرود توفر تتبعاً كاملاً، لكن بعض طرق الشحن الاقتصادي قد توفر تتبعاً جزئياً يتوقف عند وصول الطرد للجزائر.</p>
-              </div>
-            </div>
-          </section>
+          </div>
         </div>
       </div>
     </>

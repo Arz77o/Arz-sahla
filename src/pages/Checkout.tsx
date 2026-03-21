@@ -204,32 +204,26 @@ export default function Checkout() {
   return (
     <>
       <SEOMeta title={t("checkout.title")} />
-      <div className="container mx-auto px-4 py-8">
-        {/* Progress Bar */}
-        <div className="max-w-3xl mx-auto mb-12">
-          <div className="flex items-center justify-between relative">
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-200 z-0 rounded-full"></div>
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-1 bg-blue-600 z-0 rounded-full"></div>
-
-            <div className="relative z-10 flex flex-col items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold shadow-sm">
-                <CheckCircle2 className="w-6 h-6" />
+      <div className="container mx-auto px-4 py-12 md:py-20">
+        {/* Minimalist Progress Header */}
+        <div className="max-w-4xl mx-auto mb-16 md:mb-24">
+          <div className="flex justify-between items-end border-b border-surface-high pb-8">
+            <h1 className="text-4xl md:text-6xl font-display font-bold tracking-tighter text-gray-900">
+              {t("checkout.title")}
+            </h1>
+            <div className="flex gap-8 text-[10px] font-bold uppercase tracking-[0.2em]">
+              <div className="flex items-center gap-3 text-gray-400">
+                <span>01</span>
+                <span className="hidden sm:inline">Cart</span>
               </div>
-              <span className="text-sm font-medium text-blue-600">السلة</span>
-            </div>
-
-            <div className="relative z-10 flex flex-col items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold shadow-sm border-4 border-white">
-                2
+              <div className="flex items-center gap-3 text-primary">
+                <span>02</span>
+                <span className="underline underline-offset-8 decoration-2 italic">Delivery</span>
               </div>
-              <span className="text-sm font-bold text-blue-600">التوصيل</span>
-            </div>
-
-            <div className="relative z-10 flex flex-col items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold shadow-sm border-4 border-white">
-                3
+              <div className="flex items-center gap-3 text-gray-400">
+                <span>03</span>
+                <span className="hidden sm:inline">Payment</span>
               </div>
-              <span className="text-sm font-medium text-gray-500">الدفع</span>
             </div>
           </div>
         </div>
@@ -237,61 +231,63 @@ export default function Checkout() {
         <div className="flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto">
           {/* Form */}
           <div className="flex-1">
-            <div className="bg-white p-6 md:p-8 rounded-2xl border border-gray-100 shadow-sm">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                معلومات التوصيل
+            <div className="bg-white border border-surface-high p-8 md:p-14">
+              <h2 className="text-2xl font-display font-bold text-gray-900 mb-10 tracking-tighter uppercase tracking-widest flex items-center gap-6">
+                Shipping Info
+                <div className="h-px bg-surface-high flex-grow" />
               </h2>
 
               <form
                 id="checkout-form"
                 onSubmit={handleSubmit(onSubmit)}
-                className="space-y-6"
+                className="space-y-10"
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block">
                       {t("checkout.fullName")} *
                     </label>
                     <input
                       {...register("fullName")}
-                      className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.fullName ? "border-red-500 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"}`}
-                      placeholder="الاسم واللقب كما في بطاقة الهوية"
+                      className={`w-full px-5 py-4 border transition-all font-medium text-gray-900 ${errors.fullName ? "border-red-500 bg-red-50" : "border-surface-high bg-surface-low focus:bg-white focus:border-primary"}`}
+                      placeholder="Jane Doe"
                     />
                     {errors.fullName && (
-                      <p className="text-red-500 text-xs mt-1">
+                      <p className="text-red-500 text-[10px] font-bold uppercase tracking-widest mt-2 px-1">
                         {errors.fullName.message}
                       </p>
                     )}
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block">
                       {t("checkout.phone")} *
                     </label>
                     <input
                       {...register("phone")}
-                      className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.phone ? "border-red-500 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"}`}
+                      className={`w-full px-5 py-4 border transition-all font-medium text-gray-900 ${errors.phone ? "border-red-500 bg-red-50" : "border-surface-high bg-surface-low focus:bg-white focus:border-primary"}`}
                       placeholder="0550123456"
                       dir="ltr"
                     />
                     {errors.phone && (
-                      <p className="text-red-500 text-xs mt-1">
+                      <p className="text-red-500 text-[10px] font-bold uppercase tracking-widest mt-2 px-1">
                         {errors.phone.message}
                       </p>
                     )}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block">
                       {t("checkout.wilaya")} *
                     </label>
                     <select
                       {...register("wilaya")}
-                      className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.wilaya ? "border-red-500 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"}`}
+                      className={`w-full px-5 py-4 border transition-all font-medium text-gray-900 appearance-none bg-no-repeat bg-[right_1.25rem_center] ${errors.wilaya ? "border-red-500 bg-red-50" : "border-surface-high bg-surface-low focus:bg-white focus:border-primary"}`}
+                      style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")` }}
                     >
-                      <option value="">اختر الولاية...</option>
+                      <option value="">Choose State...</option>
                       {WILAYAS.map((w) => (
                         <option
                           key={w.code}
@@ -302,173 +298,151 @@ export default function Checkout() {
                       ))}
                     </select>
                     {errors.wilaya && (
-                      <p className="text-red-500 text-xs mt-1">
+                      <p className="text-red-500 text-[10px] font-bold uppercase tracking-widest mt-2 px-1">
                         {errors.wilaya.message}
                       </p>
                     )}
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block">
                       {t("checkout.commune")} *
                     </label>
                     <input
                       {...register("commune")}
-                      className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.commune ? "border-red-500 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"}`}
-                      placeholder={t("checkout.communePlaceholder")}
+                      className={`w-full px-5 py-4 border transition-all font-medium text-gray-900 ${errors.commune ? "border-red-500 bg-red-50" : "border-surface-high bg-surface-low focus:bg-white focus:border-primary"}`}
+                      placeholder="Municipality"
                     />
                     {errors.commune && (
-                      <p className="text-red-500 text-xs mt-1">
+                      <p className="text-red-500 text-[10px] font-bold uppercase tracking-widest mt-2 px-1">
                         {errors.commune.message}
                       </p>
                     )}
                   </div>
 
-                  <div className="md:col-span-3 space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
-                      العنوان التفصيلي (اختياري)
+                  <div className="md:col-span-2 space-y-3">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block">
+                      Detailed Address (Optional)
                     </label>
                     <textarea
                       {...register("address")}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none"
-                      placeholder="رقم المنزل، اسم الشارع، أو أي تفاصيل إضافية عن العنوان..."
+                      className="w-full px-5 py-4 border border-surface-high bg-surface-low focus:bg-white focus:border-primary outline-none transition-all resize-none font-medium"
+                      placeholder="Street name, building number, apartment..."
                       rows={2}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-6 mt-8 pt-8 border-t border-gray-100">
+                <div className="space-y-12 mt-12 pt-12 border-t border-surface-high">
                   {/* Payment Method Selection */}
-                  <div className="space-y-4">
-                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                      💳 {t("checkout.paymentMethod")}
+                  <div className="space-y-6">
+                    <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-gray-900 flex items-center gap-3">
+                      <div className="w-1.5 h-1.5 bg-primary" />
+                      {t("checkout.paymentMethod")}
                     </h3>
-                    <div className="space-y-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <label
-                        className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${watch("paymentMethod") === "cod" ? "border-blue-600 bg-blue-50" : "border-gray-100 hover:border-gray-200"}`}
+                        className={`flex items-center gap-6 p-6 border transition-all cursor-pointer ${watch("paymentMethod") === "cod" ? "border-primary bg-primary/5 shadow-inner" : "border-surface-high bg-white hover:border-gray-300"}`}
                       >
                         <input
                           type="radio"
                           {...register("paymentMethod")}
                           value="cod"
-                          className="w-5 h-5 text-blue-600"
+                          className="w-5 h-5 accent-primary"
                         />
                         <div className="flex-1">
-                          <div className="font-bold text-gray-900">
+                          <div className="text-xs font-bold uppercase tracking-widest text-gray-900 mb-1">
                             {t("checkout.cod")}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
                             {t("checkout.codDescription")}
                           </div>
                         </div>
                       </label>
                       <label
-                        className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${watch("paymentMethod") === "chargily" ? "border-blue-600 bg-blue-50" : "border-gray-100 hover:border-gray-200"}`}
+                        className={`flex items-center gap-6 p-6 border transition-all cursor-pointer ${watch("paymentMethod") === "chargily" ? "border-primary bg-primary/5 shadow-inner" : "border-surface-high bg-white hover:border-gray-300"}`}
                       >
                         <input
                           type="radio"
                           {...register("paymentMethod")}
                           value="chargily"
-                          className="w-5 h-5 text-blue-600"
+                          className="w-5 h-5 accent-primary"
                         />
                         <div className="flex-1">
-                          <div className="font-bold text-gray-900">
+                          <div className="text-xs font-bold uppercase tracking-widest text-gray-900 mb-1">
                             {t("checkout.online")}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
                             {t("checkout.onlineDescription")}
                           </div>
                         </div>
                       </label>
-                      {/* Note about shipping if needed */}
                     </div>
                   </div>
 
                   {/* Contact Preference */}
-                  <div className="space-y-4 pt-6 border-t border-gray-100">
-                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                       {t("checkout.contactPreference")} *
+                  <div className="space-y-6">
+                    <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-gray-900 flex items-center gap-3">
+                      <div className="w-1.5 h-1.5 bg-primary" />
+                      {t("checkout.contactPreference")} *
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      <label
-                        className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${watch("contactPreference") === "phone" ? "border-blue-600 bg-blue-50" : "border-gray-100 hover:border-gray-200"}`}
-                      >
-                        <input
-                          type="radio"
-                          {...register("contactPreference")}
-                          value="phone"
-                          className="w-4 h-4 text-blue-600"
-                        />
-                        <div className="flex items-center gap-2">
-                          <Phone className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm font-medium">{t("checkout.phoneCall")}</span>
-                        </div>
-                      </label>
-
-                      <label
-                        className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${watch("contactPreference") === "whatsapp" ? "border-blue-600 bg-blue-50" : "border-gray-100 hover:border-gray-200"}`}
-                      >
-                        <input
-                          type="radio"
-                          {...register("contactPreference")}
-                          value="whatsapp"
-                          className="w-4 h-4 text-blue-600"
-                        />
-                        <div className="flex items-center gap-2">
-                          <MessageSquare className="w-4 h-4 text-green-500" />
-                          <span className="text-sm font-medium">{t("checkout.whatsapp")}</span>
-                        </div>
-                      </label>
-
-                      <label
-                        className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${watch("contactPreference") === "email" ? "border-blue-600 bg-blue-50" : "border-gray-100 hover:border-gray-200"}`}
-                      >
-                        <input
-                          type="radio"
-                          {...register("contactPreference")}
-                          value="email"
-                          className="w-4 h-4 text-blue-600"
-                        />
-                        <div className="flex items-center gap-2">
-                          <Mail className="w-4 h-4 text-red-500" />
-                          <span className="text-sm font-medium">{t("checkout.email")}</span>
-                        </div>
-                      </label>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-surface-high border border-surface-high">
+                      {[
+                        { id: "phone", icon: Phone, label: t("checkout.phoneCall") },
+                        { id: "whatsapp", icon: MessageSquare, label: t("checkout.whatsapp") },
+                        { id: "email", icon: Mail, label: t("checkout.email") },
+                      ].map((item) => (
+                        <label
+                          key={item.id}
+                          className={`flex flex-col items-center gap-4 p-6 cursor-pointer transition-all ${watch("contactPreference") === item.id ? "bg-primary text-white" : "bg-white text-gray-500 hover:bg-surface-low hover:text-gray-900"}`}
+                        >
+                          <input
+                            type="radio"
+                            {...register("contactPreference")}
+                            value={item.id}
+                            className="sr-only"
+                          />
+                          <item.icon className={`w-5 h-5 ${watch("contactPreference") === item.id ? "text-white" : "text-gray-400"}`} />
+                          <span className="text-[10px] font-bold uppercase tracking-widest">{item.label}</span>
+                        </label>
+                      ))}
                     </div>
                   </div>
                 </div>
+                </div>
 
                 {/* Terms and Conditions Checkbox */}
-                <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
-                  <div className="flex items-center h-5 mt-0.5">
+                <div className="mt-12 bg-surface-low border border-surface-high p-8 flex items-start gap-6">
+                  <div className="flex items-center mt-1">
                     <input
                       id="termsAccepted"
                       type="checkbox"
                       {...register("termsAccepted")}
-                      className="w-5 h-5 rounded border-blue-300 text-blue-600 focus:ring-blue-500"
+                      className="w-6 h-6 border-surface-high text-primary focus:ring-primary accent-primary"
                     />
                   </div>
                   <div className="flex flex-col">
                     <label
                       htmlFor="termsAccepted"
-                      className="text-sm font-medium text-blue-900 cursor-pointer"
+                      className="text-xs font-bold uppercase tracking-widest text-gray-900 cursor-pointer mb-2"
                     >
                       أوافق على{" "}
                       <Link
                         to="/terms"
                         target="_blank"
-                        className="underline hover:text-blue-700"
+                        className="underline decoration-2 underline-offset-4 hover:text-primary transition-colors"
                       >
                         الشروط والأحكام
                       </Link>{" "}
                       الخاصة بمتجر Sahla
                     </label>
-                    <p className="text-xs text-blue-700 mt-1">
+                    <p className="text-xs text-gray-400 leading-relaxed uppercase tracking-wider font-medium">
                       أؤكد أن معلومات التواصل صحيحة وأنني مستعد لاستقبال المنتج
                       في غضون 2-7 أيام عمل.
                     </p>
                     {errors.termsAccepted && (
-                      <p className="text-red-500 text-xs mt-1">
+                      <p className="text-red-500 text-[10px] font-bold uppercase tracking-widest mt-3 px-1">
                         {errors.termsAccepted.message}
                       </p>
                     )}
@@ -479,19 +453,19 @@ export default function Checkout() {
           </div>
 
           {/* Order Summary */}
-          <div className="w-full lg:w-96 shrink-0">
-            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm sticky top-24">
-              <h2 className="text-lg font-bold text-gray-900 mb-6">
-                ملخص الطلب
+          <div className="w-full lg:w-[400px] shrink-0">
+            <div className="bg-surface-low p-8 md:p-10 border border-surface-high sticky top-24">
+              <h2 className="text-xl font-display font-bold text-gray-900 mb-10 uppercase tracking-widest">
+                Overview
               </h2>
 
-              <div className="space-y-4 mb-6 max-h-[40vh] overflow-y-auto pr-2">
+              <div className="space-y-6 mb-10 max-h-[40vh] overflow-y-auto pr-4 scrollbar-thin">
                 {items.map((item) => (
                   <div
                     key={item.product_id}
-                    className="flex gap-3 items-center"
+                    className="flex gap-5 items-center group"
                   >
-                    <div className="w-16 h-16 rounded-md overflow-hidden bg-gray-50 border border-gray-100 shrink-0">
+                    <div className="w-20 h-20 overflow-hidden bg-white border border-surface-high shrink-0">
                       <img
                         src={
                           item.image ||
@@ -499,22 +473,22 @@ export default function Checkout() {
                           "https://picsum.photos/seed/sahla/100/100"
                         }
                         alt=""
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-500"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-medium text-gray-900 line-clamp-1">
+                      <h4 className="text-[11px] font-bold text-gray-900 uppercase tracking-widest line-clamp-1 mb-1">
                         {isAr ? item.name_ar : item.name_en}
                       </h4>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
                         {item.variant
                           ? `${item.variant.group}: ${item.variant.option}`
                           : ""}
                       </p>
-                      <div className="text-sm font-bold text-blue-600 mt-1">
+                      <div className="text-sm font-display font-bold text-primary mt-2 flex items-center gap-2">
                         {item.quantity} × {formatDZD(paymentMethod === 'chargily' && item.price_chargily && item.price_chargily > 0 ? item.price_chargily : item.price_dzd)}
                         {paymentMethod === 'chargily' && item.price_chargily && item.price_chargily > 0 && item.price_chargily < item.price_dzd && (
-                          <span className="text-[10px] text-green-600 ml-1 line-through opacity-50">
+                          <span className="text-[10px] text-gray-300 line-through">
                             {formatDZD(item.price_dzd)}
                           </span>
                         )}
@@ -524,26 +498,26 @@ export default function Checkout() {
                 ))}
               </div>
 
-              <div className="space-y-4 mb-6 pt-4 border-t border-gray-100">
-                <div className="flex justify-between text-gray-900 font-medium">
-                  <span>المنتجات ({getItemCount()} قطع)</span>
-                  <span>{formatDZD(getTotal(paymentMethod))}</span>
+              <div className="space-y-4 mb-10 pt-10 border-t border-surface-high">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Items ({getItemCount()})</span>
+                  <span className="text-sm font-bold text-gray-900">{formatDZD(getTotal(paymentMethod))}</span>
                 </div>
                 <div className="flex justify-between items-center text-gray-600">
-                  <span className="flex items-center gap-2">
-                    مصاريف الشحن
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                    Shipping
                   </span>
-                  <span>
+                  <span className="text-sm font-bold text-gray-900">
                     {displayShippingFee === 0 && !wilayaName
-                      ? t("إختر الولاية لتحديد السعر")
+                      ? t("إختر الولاية")
                       : formatDZD(displayShippingFee)}
                   </span>
                 </div>
-                <div className="pt-4 border-t border-gray-100 flex justify-between items-center">
-                  <span className="text-lg font-bold text-gray-900">
-                    الإجمالي
+                <div className="pt-10 border-t border-surface-high flex justify-between items-end">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">
+                    Total DZD
                   </span>
-                  <span className="text-2xl font-black text-blue-600">
+                  <span className="text-4xl font-display font-bold text-primary tracking-tighter">
                     {formatDZD(finalTotal)}
                   </span>
                 </div>
@@ -553,22 +527,22 @@ export default function Checkout() {
                 type="submit"
                 form="checkout-form"
                 size="lg"
-                className="w-full h-14 text-lg font-bold rounded-xl mb-4 bg-blue-600 hover:bg-blue-700"
+                className="w-full h-20 text-lg font-display font-bold tracking-tight bg-primary hover:bg-primary-dim uppercase tracking-widest"
                 disabled={!isValid || !termsAccepted || isSubmitting}
               >
                 {isSubmitting ? (
                   <Loader2 className="w-6 h-6 animate-spin" />
                 ) : (
-                  `${t("checkout.pay")} — ${formatDZD(finalTotal)}`
+                  `${t("checkout.pay")}`
                 )}
               </Button>
 
-              <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-                <ShieldCheck className="w-4 h-4 text-green-500" />
+              <div className="flex items-center justify-center gap-4 text-[10px] font-bold uppercase tracking-widest text-gray-400 mt-6">
+                <ShieldCheck className="w-4 h-4 text-primary" />
                 <span>
                   {watch("paymentMethod") === "cod"
-                    ? "أتمم الطلب وسنتصل بك لتأكيده"
-                    : "دفع آمن عبر Chargily"}
+                    ? "Verify Order on Delivery"
+                    : "Secure SSL encrypted Payment"}
                 </span>
               </div>
             </div>
