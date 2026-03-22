@@ -41,19 +41,30 @@ interface ProductFormValues {
   is_published: boolean;
 }
 
+import { 
+  useProduct, 
+  useUpdateProduct, 
+  useCreateProduct,
+  useCreateReview,
+  useDeleteReview
+} from "../../hooks/useProducts";
+import { useCategories } from "../../hooks/useCategories";
+
 export default function AdminProductForm() {
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
   const navigate = useNavigate();
 
-  const [categories, setCategories] = useState<any[]>([]);
-  const [loading, setLoading] = useState(isEdit);
-  const [isSaving, setIsSaving] = useState(false);
+  const { data: categories = [] } = useCategories();
+  const { data: product, isLoading: loading } = useProduct(id || "");
+  const updateMutation = useUpdateProduct();
+  const createMutation = useCreateProduct();
+
+  const isSaving = updateMutation.isPending || createMutation.isPending;
+
   const [images, setImages] = useState<string[]>([]);
   const [imageUrlInput, setImageUrlInput] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const [productReviews, setProductReviews] = useState<any[]>([]);
-  const [isAddingReview, setIsAddingReview] = useState(false);
   const [newReview, setNewReview] = useState({
     rating: 5,
     comment: "",
@@ -64,7 +75,6 @@ export default function AdminProductForm() {
   const [variants, setVariants] = useState<{ group: string; options: string[] }[]>([]);
   const [variantInput, setVariantInput] = useState<{ [key: number]: string }>({});
 
-  // ✅ useForm<ProductFormValues> without zodResolver — no type conflicts
   const {
     register,
     handleSubmit,
@@ -91,53 +101,24 @@ export default function AdminProductForm() {
   const priceUsd = watch("price_usd");
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { data: catData } = await supabaseAdmin
-          .from("categories")
-          .select("*");
-        if (catData) setCategories(catData);
-
-        if (isEdit) {
-          const { data: prodData, error } = await supabaseAdmin
-            .from("products")
-            .select("*, reviews(*)")
-            .eq("id", id)
-            .single();
-
-          if (error || !prodData) {
-            toast.error("المنتج غير موجود");
-            navigate("/admin/products");
-            return;
-          }
-
-          const productData = prodData as any;
-          reset({
-            name_ar: productData.name_ar || "",
-            name_en: productData.name_en || "",
-            description_ar: productData.description_ar || "",
-            description_en: productData.description_en || "",
-            price_usd: productData.price_usd || 0,
-            price_dzd: productData.price_dzd || 0,
-            price_chargily: productData.price_chargily || 0,
-            stock_quantity: productData.stock_quantity || 0,
-            category_id: productData.category_id || "",
-            avg_rating: productData.avg_rating ?? 5,
-            is_published: productData.is_published ?? false,
-          });
-          setImages(productData.images || []);
-          setProductReviews(productData.reviews || []);
-          setVariants(productData.variants || []);
-        }
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [id, isEdit, reset, navigate]);
+    if (product) {
+      reset({
+        name_ar: product.name_ar || "",
+        name_en: product.name_en || "",
+        description_ar: product.description_ar || "",
+        description_en: product.description_en || "",
+        price_usd: product.price_usd || 0,
+        price_dzd: product.price_dzd || 0,
+        price_chargily: product.price_chargily || 0,
+        stock_quantity: product.stock_quantity || 0,
+        category_id: product.category_id || "",
+        avg_rating: product.avg_rating ?? 5,
+        is_published: product.is_published ?? false,
+      });
+      setImages(product.images || []);
+      setVariants(product.variants || []);
+    }
+  }, [product, reset]);
 
   const handleAddImage = () => {
     if (!imageUrlInput.trim()) return;
@@ -206,80 +187,59 @@ export default function AdminProductForm() {
     }
     if (hasError) return;
 
-    setIsSaving(true);
-    try {
-      const dbPayload = {
-        name_ar: data.name_ar.trim(),
-        name_en: data.name_en.trim(),
-        description_ar: data.description_ar?.trim() || null,
-        description_en: data.description_en?.trim() || null,
-        price_usd: Number(data.price_usd),
-        price_dzd: Number(data.price_dzd),
-        price_chargily: Number(data.price_chargily),
-        stock_quantity: Number(data.stock_quantity),
-        category_id: data.category_id || null,
-        avg_rating: Number(data.avg_rating),
-        is_published: data.is_published,
-        images: images,
-        variants: variants,
-      };
+    const dbPayload = {
+      name_ar: data.name_ar.trim(),
+      name_en: data.name_en.trim(),
+      description_ar: data.description_ar?.trim() || null,
+      description_en: data.description_en?.trim() || null,
+      price_usd: Number(data.price_usd),
+      price_dzd: Number(data.price_dzd),
+      price_chargily: Number(data.price_chargily),
+      stock_quantity: Number(data.stock_quantity),
+      category_id: data.category_id || null,
+      avg_rating: Number(data.avg_rating),
+      is_published: data.is_published,
+      images: images,
+      variants: variants,
+    };
 
-      if (isEdit) {
-        const { error } = await (supabaseAdmin as any)
-          .from("products")
-          .update(dbPayload)
-          .eq("id", id);
-        if (error) throw error;
-        toast.success("تم تحديث المنتج بنجاح");
-      } else {
-        const { error } = await (supabaseAdmin as any)
-          .from("products")
-          .insert(dbPayload);
-        if (error) throw error;
-        toast.success("تم إضافة المنتج بنجاح");
-        navigate("/admin/products");
-      }
-    } catch (error: any) {
-      toast.error(error.message || "فشل حفظ المنتج");
-    } finally {
-      setIsSaving(false);
+    if (isEdit) {
+      updateMutation.mutate({ id: id!, ...dbPayload });
+    } else {
+      createMutation.mutate(dbPayload, {
+        onSuccess: () => navigate("/admin/products")
+      });
     }
   };
+
+  const createReviewMutation = useCreateReview();
+  const deleteReviewMutation = useDeleteReview(id || "");
 
   const handleAddReview = async () => {
     if (!newReview.comment.trim()) {
       toast.error("يرجى كتابة تعليق");
       return;
     }
-    setIsAddingReview(true);
-    try {
-      const { data, error } = await (supabaseAdmin as any)
-        .from("reviews")
-        .insert({
-          product_id: id,
-          rating: newReview.rating,
-          comment: newReview.comment,
-          images: newReview.images,
-          user_id: (await supabaseAdmin.auth.getUser()).data.user?.id, // Admin themselves or mock user
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      setProductReviews([data, ...productReviews]);
-      setNewReview({
-        rating: 5,
-        comment: "",
-        images: [],
-        imageUrl: "",
-        isUploadingReviewImage: false,
-      });
-      toast.success("تم إضافة التقييم بنجاح");
-    } catch (error: any) {
-      toast.error(error.message || "فشل إضافة التقييم");
-    } finally {
-      setIsAddingReview(false);
-    }
+    
+    const user = (await supabaseAdmin.auth.getUser()).data.user;
+    
+    createReviewMutation.mutate({
+      product_id: id,
+      rating: newReview.rating,
+      comment: newReview.comment,
+      images: newReview.images,
+      user_id: user?.id,
+    }, {
+      onSuccess: () => {
+        setNewReview({
+          rating: 5,
+          comment: "",
+          images: [],
+          imageUrl: "",
+          isUploadingReviewImage: false,
+        });
+      }
+    });
   };
 
   const handleReviewImageUpload = async (
@@ -295,7 +255,7 @@ export default function AdminProductForm() {
       const filePath = `reviews/${fileName}`;
 
       const { error: uploadError } = await supabaseAdmin.storage
-        .from("products") // Using products bucket or creating reviews bucket
+        .from("products") 
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
@@ -318,17 +278,7 @@ export default function AdminProductForm() {
 
   const handleDeleteReview = async (reviewId: string) => {
     if (!window.confirm("حذف هذا التقييم؟")) return;
-    try {
-      const { error } = await supabaseAdmin
-        .from("reviews")
-        .delete()
-        .eq("id", reviewId);
-      if (error) throw error;
-      setProductReviews(productReviews.filter((r) => r.id !== reviewId));
-      toast.success("تم حذف التقييم");
-    } catch (error: any) {
-      toast.error(error.message);
-    }
+    deleteReviewMutation.mutate(reviewId);
   };
 
   if (loading) {
@@ -813,7 +763,7 @@ export default function AdminProductForm() {
           <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4 sticky top-24">
             <h2 className="text-lg font-bold text-gray-900 mb-4 border-b pb-3 flex items-center gap-2">
               <Eye className="w-5 h-5 text-purple-600" />
-              معاينة المنتج
+              معاينة المنتج ({product?.reviews?.length || 0} تقييم)
             </h2>
 
             <div className="space-y-4">
@@ -942,7 +892,7 @@ export default function AdminProductForm() {
             </h2>
             <div className="flex items-center gap-2 text-sm text-gray-500">
               <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-              <span>{productReviews.length} تقييم مضاف</span>
+              <span>{(product?.reviews?.length || 0)} تقييم مضاف</span>
             </div>
           </div>
 
@@ -1084,9 +1034,9 @@ export default function AdminProductForm() {
                   <Button
                     className="w-full bg-blue-600 hover:bg-blue-700 font-bold"
                     onClick={handleAddReview}
-                    disabled={isAddingReview || !newReview.comment}
+                    disabled={createReviewMutation.isPending || !newReview.comment}
                   >
-                    {isAddingReview ? (
+                    {createReviewMutation.isPending ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
                       "نشر التقييم في المتجر"
@@ -1098,12 +1048,12 @@ export default function AdminProductForm() {
 
             {/* List of Reviews */}
             <div className="lg:col-span-2 space-y-4">
-              {productReviews.length === 0 ? (
+              {(!product?.reviews || product.reviews.length === 0) ? (
                 <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl py-12 text-center text-gray-400">
                   لا توجد تقييمات مضافة لهذا المنتج حتى الآن.
                 </div>
               ) : (
-                productReviews.map((review) => (
+                product.reviews.map((review: any) => (
                   <div
                     key={review.id}
                     className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm"

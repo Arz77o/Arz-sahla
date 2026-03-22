@@ -4,12 +4,10 @@ import { useTranslation } from "react-i18next";
 import {
   ShoppingCart,
   Star,
-  Check,
   Loader2,
   X,
 } from "lucide-react";
 import { SEOMeta } from "../components/shared/SEOMeta";
-import { supabase } from "../lib/supabase";
 import { formatDZD, calculatePriceDZD } from "../lib/pricing";
 import { useCartStore } from "../store/cartStore";
 import { useSettingsStore } from "../store/settingsStore";
@@ -17,6 +15,7 @@ import { Button } from "../components/ui/button";
 import { toast } from "sonner";
 import { Reveal } from "../components/shared/Reveal";
 import { pixel, VIEW_CONTENT } from "../lib/pixel";
+import { useProduct } from "../hooks/useProducts";
 
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -25,8 +24,8 @@ export default function ProductDetail() {
   const { usd_to_dzd_rate, commission_rate } = useSettingsStore();
   const isAr = i18n.language === "ar";
 
-  const [product, setProduct] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: product, isLoading: loading } = useProduct(slug || "");
+  
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [selectedVariant, setSelectedVariant] = useState<{
     group: string;
@@ -38,34 +37,23 @@ export default function ProductDetail() {
   const { addItem, isInCart } = useCartStore();
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("products")
-        .select("*, reviews(*)")
-        .eq("id", slug)
-        .single();
-
-      if (error || !data) {
-        toast.error("المنتج غير موجود");
-        navigate("/products");
-        return;
-      }
-
-      const productData = data as any;
-      setProduct(productData);
-      setSelectedImage(productData.images?.[0] || "");
-      if (productData.variants && productData.variants.length > 0) {
+    if (product) {
+      setSelectedImage(product.images?.[0] || "");
+      if (product.variants && product.variants.length > 0) {
         setSelectedVariant({
-          group: productData.variants[0].group,
-          option: productData.variants[0].options[0],
+          group: product.variants[0].group,
+          option: product.variants[0].options[0],
         });
       }
-      setLoading(false);
-    };
+    }
+  }, [product]);
 
-    fetchProduct();
-  }, [slug, navigate]);
+  useEffect(() => {
+    if (!loading && !product) {
+      toast.error("المنتج غير موجود");
+      navigate("/products");
+    }
+  }, [loading, product, navigate]);
 
   // Track ViewContent when product is loaded
   useEffect(() => {
@@ -123,6 +111,16 @@ export default function ProductDetail() {
       quantity: quantity,
       stock_limit: product.stock_quantity,
     });
+
+    pixel.track('AddToCart', {
+      content_ids: [product.id],
+      content_name: isAr ? product.name_ar : product.name_en,
+      content_type: 'product',
+      value: priceDZD,
+      currency: 'DZD'
+    });
+
+    toast.success(t("product.added_to_cart"));
   };
 
   return (

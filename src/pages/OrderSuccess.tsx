@@ -26,7 +26,7 @@ export default function OrderSuccess() {
       try {
         const { data } = await supabase
           .from("orders")
-          .select("*, order_items(count)")
+          .select("*, order_items(product_id)")
           .eq("id", orderId)
           .single();
         if (data) {
@@ -38,12 +38,14 @@ export default function OrderSuccess() {
             (data.payment_method === 'chargily' && data.status === 'paid');
 
           if (isSuccessful) {
+            const contentIds = (data as any).order_items?.map((item: any) => item.product_id) || [];
             pixel.track(PURCHASE, {
               value: data.total_dzd,
               currency: 'DZD',
               content_type: 'product',
+              content_ids: contentIds,
               order_id: data.id,
-              num_items: (data as any).order_items?.[0]?.count || 1
+              num_items: contentIds.length
             });
           }
         }

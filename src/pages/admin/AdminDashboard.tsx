@@ -87,8 +87,8 @@ export default function AdminDashboard() {
             .single(),
         ]);
 
-        const exchangeRate = (settingsData as any)?.usd_to_dzd_rate || 200;
-        const profitFactor = (settingsData as any)?.profit_per_usd || 50;
+        // Note: Exchange rate is no longer used for cost calculation as all prices are in DZD
+        // price_usd field is repurposed to store cost price in DZD.
 
         // 1.1 Calculate Costs and Profits from Order Items (for delivered/shipped/processing/paid)
         const { data: itemsData } = await (supabaseAdmin as any)
@@ -162,8 +162,7 @@ export default function AdminDashboard() {
         .select("profit_per_usd, usd_to_dzd_rate")
         .single();
 
-      const exchangeRate = (settingsData as any)?.usd_to_dzd_rate || 200;
-      const profitFactor = (settingsData as any)?.profit_per_usd || 50;
+      // Note: All prices are treated as DZD. price_usd field stores the cost price in DZD.
 
       const { data: orders, error } = await supabaseAdmin
         .from("orders")

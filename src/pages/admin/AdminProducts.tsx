@@ -1,46 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Edit, Trash2, Loader2, Star } from 'lucide-react';
-import { toast } from 'sonner';
 import { SEOMeta } from '../../components/shared/SEOMeta';
-import { supabaseAdmin } from '../../lib/supabase';
 import { formatDZD, calculatePriceDZD } from '../../lib/pricing';
 import { Button } from '../../components/ui/button';
 import { useSettingsStore } from '../../store/settingsStore';
+import { useProducts, useDeleteProduct } from '../../hooks/useProducts';
 
 export default function AdminProducts() {
-  const [products, setProducts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const { usd_to_dzd_rate, commission_rate } = useSettingsStore();
 
-  const fetchProducts = async () => {
-    setLoading(true);
-    const { data, error } = await supabaseAdmin
-      .from('products')
-      .select('*, categories(name_ar)')
-      .order('created_at', { ascending: false });
-
-    if (!error && data) {
-      setProducts(data);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  const { data: products = [], isLoading: loading } = useProducts(undefined, true);
+  const deleteMutation = useDeleteProduct();
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
-
-    try {
-      const { error } = await supabaseAdmin.from('products').delete().eq('id', id);
-      if (error) throw error;
-      toast.success('تم حذف المنتج بنجاح');
-      fetchProducts();
-    } catch (error: any) {
-      toast.error('فشل حذف المنتج');
-    }
+    deleteMutation.mutate(id);
   };
 
   return (

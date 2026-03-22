@@ -11,7 +11,7 @@ interface SettingsState {
 }
 
 export const useSettingsStore = create<SettingsState>((set) => ({
-  usd_to_dzd_rate: 250, // Default fallback
+  usd_to_dzd_rate: 1, // Default fallback (now DZD strictly)
   commission_rate: 1.2, // Default fallback
   shipping_cost_dzd: 0,
   profit_per_usd: 50,

@@ -311,11 +311,9 @@ export type Database = {
           id?: number;
           inventory_mode?: string | null;
           payment_methods?: Json | null;
-          profit_per_usd?: number | null;
           shipping_cost_dzd?: number | null;
           site_active?: boolean;
           updated_at?: string;
-          usd_to_dzd_rate?: number;
         };
         Update: {
           commission_rate?: number;
@@ -359,54 +357,6 @@ export type Database = {
           wilaya_name?: string;
         };
         Relationships: [];
-      };
-      support_tickets: {
-        Row: {
-          created_at: string;
-          id: string;
-          message: string;
-          order_id: string | null;
-          reply: string | null;
-          status: Database["public"]["Enums"]["ticket_status"];
-          subject: string;
-          user_id: string;
-        };
-        Insert: {
-          created_at?: string;
-          id?: string;
-          message: string;
-          order_id?: string | null;
-          reply?: string | null;
-          status?: Database["public"]["Enums"]["ticket_status"];
-          subject: string;
-          user_id: string;
-        };
-        Update: {
-          created_at?: string;
-          id?: string;
-          message?: string;
-          order_id?: string | null;
-          reply?: string | null;
-          status?: Database["public"]["Enums"]["ticket_status"];
-          subject?: string;
-          user_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "support_tickets_order_id_fkey";
-            columns: ["order_id"];
-            isOneToOne: false;
-            referencedRelation: "orders";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "support_tickets_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "users";
-            referencedColumns: ["id"];
-          },
-        ];
       };
       users: {
         Row: {
@@ -458,7 +408,6 @@ export type Database = {
         | "not_received"
         | "cancelled";
       price_source: "manual" | "auto";
-      ticket_status: "open" | "closed";
       user_role: "customer" | "admin";
     };
     CompositeTypes: {

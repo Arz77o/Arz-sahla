@@ -1,16 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Loader2, Save, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { SEOMeta } from '../../components/shared/SEOMeta';
-import { supabaseAdmin } from '../../lib/supabase';
 import { Button } from '../../components/ui/button';
 import type { Database } from '../../types/database.types';
+import { 
+  useCategories, 
+  useDeleteCategory, 
+  useUpdateCategory, 
+  useCreateCategory 
+} from '../../hooks/useCategories';
 
 type Category = Database['public']['Tables']['categories']['Row'];
 
 export default function AdminCategories() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: categories = [], isLoading: loading } = useCategories();
+  const deleteMutation = useDeleteCategory();
+  const updateMutation = useUpdateCategory();
+  const createMutation = useCreateCategory();
   
   // Form state
   const [isEditing, setIsEditing] = useState(false);
@@ -19,24 +26,6 @@ export default function AdminCategories() {
   const [nameEn, setNameEn] = useState('');
   const [slug, setSlug] = useState('');
   const [icon, setIcon] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
-
-  const fetchCategories = async () => {
-    setLoading(true);
-    const { data, error } = await supabaseAdmin
-      .from('categories')
-      .select('*')
-      .order('created_at', { ascending: true });
-
-    if (!error && data) {
-      setCategories(data);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
 
   const handleEdit = (cat: Category) => {
     setIsEditing(true);
@@ -58,15 +47,7 @@ export default function AdminCategories() {
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('هل أنت متأكد من حذف هذه الفئة؟ سيتم حذف جميع المنتجات المرتبطة بها!')) return;
-    
-    try {
-      const { error } = await supabaseAdmin.from('categories').delete().eq('id', id);
-      if (error) throw error;
-      toast.success('تم حذف الفئة بنجاح');
-      fetchCategories();
-    } catch (error: any) {
-      toast.error('فشل حذف الفئة');
-    }
+    deleteMutation.mutate(id);
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -76,38 +57,26 @@ export default function AdminCategories() {
       return;
     }
 
-    setIsSaving(true);
-    try {
-      const categoryData = {
-        name_ar: nameAr,
-        name_en: nameEn,
-        slug,
-        icon: icon || null,
-      };
+    const categoryData = {
+      name_ar: nameAr,
+      name_en: nameEn,
+      slug,
+      icon: icon || null,
+      parent_id: null,
+    };
 
-      if (editId) {
-        const { error } = await (supabaseAdmin
-          .from('categories' as any) as any)
-          .update(categoryData as any)
-          .eq('id', editId);
-        if (error) throw error;
-        toast.success('تم تحديث الفئة بنجاح');
-      } else {
-        const { error } = await (supabaseAdmin
-          .from('categories' as any) as any)
-          .insert(categoryData as any);
-        if (error) throw error;
-        toast.success('تم إضافة الفئة بنجاح');
-      }
-      
-      handleCancel();
-      fetchCategories();
-    } catch (error: any) {
-      toast.error(error.message || 'فشل حفظ الفئة');
-    } finally {
-      setIsSaving(false);
+    if (editId) {
+      updateMutation.mutate({ id: editId, ...categoryData }, {
+        onSuccess: () => handleCancel()
+      });
+    } else {
+      createMutation.mutate(categoryData, {
+        onSuccess: () => handleCancel()
+      });
     }
   };
+
+  const isSaving = updateMutation.isPending || createMutation.isPending;
 
   return (
     <>

@@ -71,41 +71,7 @@ serve(async (req) => {
         throw updateError
       }
 
-      // Send confirmation email via Resend
-      const resendApiKey = Deno.env.get('RESEND_API_KEY')
-      if (resendApiKey) {
-        // Fetch order details for email
-        const { data: order } = await supabaseClient
-          .from('orders')
-          .select('*, users(email)')
-          .eq('id', orderId)
-          .single()
-
-        if (order && order.users?.email) {
-          await fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${resendApiKey}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              from: 'Sahla <orders@sahla.dz>',
-              to: order.users.email,
-              subject: `تأكيد الطلب #${orderId.split('-')[0]}`,
-              html: `
-                <div dir="rtl">
-                  <h1>شكراً لتسوقك من سهلة!</h1>
-                  <p>مرحباً ${order.full_name}،</p>
-                  <p>لقد استلمنا طلبك بنجاح وتم تأكيد الدفع.</p>
-                  <p>رقم الطلب: <strong>${orderId.split('-')[0]}</strong></p>
-                  <p>يمكنك تتبع حالة طلبك عبر الرابط التالي:</p>
-                  <a href="${Deno.env.get('APP_URL')}/tracking?id=${orderId}">تتبع الطلب</a>
-                </div>
-              `,
-            }),
-          })
-        }
-      }
+      // Email logic removed per user request
     }
 
     return new Response(JSON.stringify({ received: true }), {

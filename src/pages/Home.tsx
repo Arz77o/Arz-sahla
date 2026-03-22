@@ -1,34 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ShoppingBag, Truck, Headset, ShieldCheck } from 'lucide-react';
 import { SEOMeta } from '../components/shared/SEOMeta';
 import { ProductCard } from '../components/store/ProductCard';
-import { supabase } from '../lib/supabase';
 import { Button } from '../components/ui/button';
 import { Reveal } from '../components/shared/Reveal';
+import { useProducts } from '../hooks/useProducts';
+import { useCategories } from '../hooks/useCategories';
 
 export default function Home() {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const isAr = i18n.language === 'ar';
-  const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
-
-  useEffect(() => {
-    const fetchHomeData = async () => {
-      const { data: catData } = await supabase.from('categories').select('*');
-      if (catData) setCategories(catData);
-
-      const { data: prodData } = await supabase
-        .from('products')
-        .select('*')
-        .eq('is_published', true)
-        .eq('auto_hidden', false)
-        .limit(8);
-      if (prodData) setFeaturedProducts(prodData);
-    };
-    fetchHomeData();
-  }, []);
+  
+  const { data: categories = [] } = useCategories();
+  const { data: featuredProducts = [] } = useProducts();
 
   return (
     <>

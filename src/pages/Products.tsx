@@ -1,93 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { SEOMeta } from "../components/shared/SEOMeta";
 import { ProductCard } from "../components/store/ProductCard";
-import { supabase } from "../lib/supabase";
 import { Loader2, Filter, X, AlertTriangle } from "lucide-react";
+import { useProducts } from "../hooks/useProducts";
+import { useCategories } from "../hooks/useCategories";
 
 export default function Products() {
   const { t, i18n } = useTranslation();
   const isAr = i18n.language === "ar";
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [products, setProducts] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const hasInitialized = React.useRef(false);
+  const categorySlug = searchParams.get("category");
+  
+  const { data: categories = [], isLoading: isCategoriesLoading } = useCategories();
+  
+  const selectedCategory = categories.find(c => c.slug === categorySlug);
+  const categoryId = categorySlug ? selectedCategory?.id : undefined;
 
-  const categoryFilter = searchParams.get("category");
+  const { 
+    data: products = [], 
+    isLoading: isProductsLoading, 
+    error: productsError 
+  } = useProducts(categoryId);
 
-  // Fetch categories once on mount
-  useEffect(() => {
-    if (hasInitialized.current) return;
-    hasInitialized.current = true;
-
-    const loadCategories = async () => {
-      try {
-        const { data, error: err } = await supabase
-          .from("categories")
-          .select("*");
-
-        if (err) {
-          console.error("Categories error:", err);
-        } else {
-          setCategories(data || []);
-        }
-      } catch (err) {
-        console.error("Categories exception:", err);
-      }
-    };
-
-    loadCategories();
-  }, []);
-
-  // Fetch products when filter changes
-  useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        let query = supabase
-          .from("products")
-          .select("*")
-          .eq("is_published", true)
-          .eq("auto_hidden", false);
-
-        // Apply category filter if set
-        if (categoryFilter && categories.length > 0) {
-          const category = categories.find((c) => c.slug === categoryFilter);
-          if (category) {
-            query = query.eq("category_id", category.id);
-          } else {
-            setProducts([]);
-            setLoading(false);
-            return;
-          }
-        }
-
-        const { data, error: err } = await query;
-
-        if (err) {
-          console.error("Products error:", err);
-          setError(err.message);
-          setProducts([]);
-        } else {
-          setProducts(data || []);
-        }
-      } catch (err: any) {
-        console.error("Products exception:", err);
-        setError(err?.message || "Unknown error");
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProducts();
-  }, [categoryFilter, categories]);
+  const loading = isCategoriesLoading || isProductsLoading;
+  const error = productsError ? (productsError as any).message : null;
 
   const updateFilter = (key: string, value: string | null) => {
     const newParams = new URLSearchParams(searchParams);
@@ -116,7 +55,7 @@ export default function Products() {
                 </p>
               </div>
               <div className="flex gap-4">
-                {categoryFilter && (
+                {categorySlug && (
                   <button 
                     onClick={() => updateFilter("category", null)}
                     className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-primary border border-primary px-4 py-2 hover:bg-primary hover:text-white transition-all"
@@ -141,7 +80,7 @@ export default function Products() {
                   <div className="flex flex-col gap-px bg-surface-high border border-surface-high">
                     <button
                       onClick={() => updateFilter("category", null)}
-                      className={`text-left p-6 transition-all text-[11px] font-bold uppercase tracking-widest ${!categoryFilter ? "bg-primary text-white" : "bg-white text-gray-500 hover:bg-surface-low hover:text-gray-900"}`}
+                      className={`text-left p-6 transition-all text-[11px] font-bold uppercase tracking-widest ${!categorySlug ? "bg-primary text-white" : "bg-white text-gray-500 hover:bg-surface-low hover:text-gray-900"}`}
                     >
                       All Collections
                     </button>
@@ -149,7 +88,7 @@ export default function Products() {
                       <button
                         key={cat.id}
                         onClick={() => updateFilter("category", cat.slug)}
-                        className={`text-left p-6 transition-all text-[11px] font-bold uppercase tracking-widest ${categoryFilter === cat.slug ? "bg-primary text-white" : "bg-white text-gray-500 hover:bg-surface-low hover:text-gray-900"}`}
+                        className={`text-left p-6 transition-all text-[11px] font-bold uppercase tracking-widest ${categorySlug === cat.slug ? "bg-primary text-white" : "bg-white text-gray-500 hover:bg-surface-low hover:text-gray-900"}`}
                       >
                         {isAr ? cat.name_ar : cat.name_en}
                       </button>

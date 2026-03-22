@@ -28,7 +28,7 @@ const checkoutSchema = z.object({
   paymentMethod: z.enum(["cod", "chargily"], {
     message: "يرجى اختيار طريقة الدفع",
   }),
-  contactPreference: z.enum(["phone", "whatsapp", "email"], {
+  contactPreference: z.enum(["phone", "whatsapp"], {
     message: "يرجى اختيار طريقة التواصل المفضلة",
   }),
   termsAccepted: z.boolean().refine((val) => val === true, {
@@ -440,7 +440,6 @@ export default function Checkout() {
                       {[
                         { id: "phone", icon: Phone, label: t("checkout.phoneCall") },
                         { id: "whatsapp", icon: MessageSquare, label: t("checkout.whatsapp") },
-                        { id: "email", icon: Mail, label: t("checkout.email") },
                       ].map((item) => (
                         <label
                           key={item.id}
