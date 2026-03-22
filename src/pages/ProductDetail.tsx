@@ -14,8 +14,9 @@ import { useSettingsStore } from "../store/settingsStore";
 import { Button } from "../components/ui/button";
 import { toast } from "sonner";
 import { Reveal } from "../components/shared/Reveal";
-import { pixel, VIEW_CONTENT } from "../lib/pixel";
-import { useProduct } from "../hooks/useProducts";
+import { useProduct, useCreateReview, useDeleteReview } from '../hooks/useProducts';
+import { useCategories } from '../hooks/useCategories';
+import { gtag } from '../lib/gtag';
 
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -55,32 +56,6 @@ export default function ProductDetail() {
     }
   }, [loading, product, navigate]);
 
-  // Track ViewContent when product is loaded
-  useEffect(() => {
-    if (product) {
-      pixel.track(VIEW_CONTENT, {
-        content_ids: [product.id],
-        content_name: isAr ? product.name_ar : product.name_en,
-        content_type: 'product',
-        value: calculatePriceDZD(
-          product.price_usd,
-          usd_to_dzd_rate,
-          commission_rate,
-          product.price_dzd
-        ),
-        currency: 'DZD'
-      });
-    }
-  }, [product, isAr, usd_to_dzd_rate, commission_rate]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
   if (!product) return null;
 
   const name = isAr ? product.name_ar : product.name_en;
@@ -93,6 +68,22 @@ export default function ProductDetail() {
   );
   const inCart = isInCart(product.id);
   const outOfStock = product.stock_quantity <= 0;
+
+  // Track view_item for GA4
+  useEffect(() => {
+    if (product) {
+      gtag.trackEcommerce('view_item', {
+        currency: 'DZD',
+        value: priceDZD,
+        items: [{
+          item_id: product.id,
+          item_name: name,
+          price: priceDZD,
+          quantity: 1
+        }]
+      });
+    }
+  }, [product, name, priceDZD]);
 
   const handleAddToCart = () => {
     const imageUrl = product.images?.[0] || "";
@@ -112,12 +103,16 @@ export default function ProductDetail() {
       stock_limit: product.stock_quantity,
     });
 
-    pixel.track('AddToCart', {
-      content_ids: [product.id],
-      content_name: isAr ? product.name_ar : product.name_en,
-      content_type: 'product',
-      value: priceDZD,
-      currency: 'DZD'
+    // Track add_to_cart for GA4
+    gtag.trackEcommerce('add_to_cart', {
+      currency: 'DZD',
+      value: priceDZD * quantity,
+      items: [{
+        item_id: product.id,
+        item_name: name,
+        price: priceDZD,
+        quantity: quantity
+      }]
     });
 
     toast.success(t("product.added_to_cart"));

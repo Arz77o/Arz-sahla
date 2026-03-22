@@ -4,7 +4,6 @@ import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'sonner';
 import { useAuthInit } from './hooks/useAuthInit';
 import { PageLoader } from './components/shared/PageLoader';
-import { MetaPixel } from './components/shared/MetaPixel';
 
 // Store Components
 import { Header } from './components/store/Header';
@@ -16,6 +15,7 @@ import { AdminSidebar } from './components/admin/AdminSidebar';
 // Shared Components
 import { ProtectedRoute } from './components/shared/ProtectedRoute';
 import { AdminRoute } from './components/shared/AdminRoute';
+import { GoogleAnalytics } from './components/shared/GoogleAnalytics';
 
 // Lazy Loaded Pages
 const Home = lazy(() => import('./pages/Home'));
@@ -73,7 +73,7 @@ function App() {
   return (
     <HelmetProvider>
       <BrowserRouter>
-        <MetaPixel />
+        <GoogleAnalytics />
         <Routes>
           {/* Public Store Routes */}
           <Route element={<StoreLayout />}>

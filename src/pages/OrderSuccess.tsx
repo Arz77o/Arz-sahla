@@ -6,7 +6,7 @@ import { useCartStore } from "../store/cartStore";
 import { supabase } from "../lib/supabase";
 import { formatDZD } from "../lib/pricing";
 import { Button } from "../components/ui/button";
-import { pixel, PURCHASE } from "../lib/pixel";
+import { gtag } from "../lib/gtag";
 
 export default function OrderSuccess() {
   const [searchParams] = useSearchParams();
@@ -31,21 +31,21 @@ export default function OrderSuccess() {
           .single();
         if (data) {
           setOrder(data);
-          
-          // Track Meta Pixel Purchase only if appropriate
-          const isSuccessful = 
-            data.payment_method === 'cod' || 
+
+          // Track Purchase for GA4
+          const isSuccessful =
+            data.payment_method === 'cod' ||
             (data.payment_method === 'chargily' && data.status === 'paid');
 
           if (isSuccessful) {
-            const contentIds = (data as any).order_items?.map((item: any) => item.product_id) || [];
-            pixel.track(PURCHASE, {
+            gtag.trackEcommerce('purchase', {
+              transaction_id: data.id,
               value: data.total_dzd,
               currency: 'DZD',
-              content_type: 'product',
-              content_ids: contentIds,
-              order_id: data.id,
-              num_items: contentIds.length
+              items: (data as any).order_items?.map((item: any) => ({
+                item_id: item.product_id,
+                quantity: item.quantity || 1
+              })) || []
             });
           }
         }
