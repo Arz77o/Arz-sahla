@@ -14,6 +14,10 @@ import {
   Tag,
   Link as LinkIcon,
   CheckCircle2,
+  Plus,
+  Palette,
+  Layers,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { SEOMeta } from "../../components/shared/SEOMeta";
@@ -57,6 +61,8 @@ export default function AdminProductForm() {
     imageUrl: "",
     isUploadingReviewImage: false,
   });
+  const [variants, setVariants] = useState<{ group: string; options: string[] }[]>([]);
+  const [variantInput, setVariantInput] = useState<{ [key: number]: string }>({});
 
   // ✅ useForm<ProductFormValues> without zodResolver — no type conflicts
   const {
@@ -121,6 +127,7 @@ export default function AdminProductForm() {
           });
           setImages(productData.images || []);
           setProductReviews(productData.reviews || []);
+          setVariants(productData.variants || []);
         }
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -214,6 +221,7 @@ export default function AdminProductForm() {
         avg_rating: Number(data.avg_rating),
         is_published: data.is_published,
         images: images,
+        variants: variants,
       };
 
       if (isEdit) {
@@ -443,6 +451,130 @@ export default function AdminProductForm() {
                     {errors.category_id.message}
                   </p>
                 )}
+              </div>
+            </div>
+          </div>
+
+          {/* Product Variants (Colors, Sizes, etc.) */}
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-6">
+            <div className="flex items-center justify-between border-b pb-3">
+              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <Layers className="w-5 h-5 text-indigo-600" />
+                خيارات المنتج (ألوان، مقاسات...)
+              </h2>
+            </div>
+
+            <div className="space-y-6">
+              {variants.map((v, gi) => (
+                <div key={gi} className="p-4 bg-gray-50 border border-gray-100 rounded-lg space-y-4">
+                  <div className="flex justify-between items-center gap-3">
+                    <div className="flex-1">
+                      <input
+                        type="text"
+                        value={v.group}
+                        onChange={(e) => {
+                          const newV = [...variants];
+                          newV[gi].group = e.target.value;
+                          setVariants(newV);
+                        }}
+                        placeholder="اسم المجموعة (مثال: اللون، المقاس)"
+                        className="w-full bg-white px-3 py-1.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 font-bold text-sm"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setVariants(variants.filter((_, i) => i !== gi))}
+                      className="text-red-400 hover:text-red-600 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {v.options.map((opt, oi) => (
+                      <span
+                        key={oi}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-bold text-indigo-700 shadow-sm transition-all hover:border-indigo-300"
+                      >
+                        {opt}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newV = [...variants];
+                            newV[gi].options = newV[gi].options.filter((_, i) => i !== oi);
+                            setVariants(newV);
+                          }}
+                          className="hover:text-red-500"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                    {v.options.length === 0 && (
+                      <span className="text-xs text-gray-400 italic">لا توجد خيارات مضافة بعد...</span>
+                    )}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={variantInput[gi] || ""}
+                      onChange={(e) => setVariantInput({ ...variantInput, [gi]: e.target.value })}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          const val = variantInput[gi];
+                          if (val?.trim()) {
+                            const newV = [...variants];
+                            if (!newV[gi].options.includes(val.trim())) {
+                              newV[gi].options = [...newV[gi].options, val.trim()];
+                              setVariants(newV);
+                              setVariantInput({ ...variantInput, [gi]: "" });
+                            }
+                          }
+                        }
+                      }}
+                      placeholder="أضف خيار جديد (مثال: أحمر) واضغط Enter"
+                      className="flex-1 bg-white px-4 py-2 rounded-lg border border-gray-200 text-xs focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const val = variantInput[gi];
+                        if (val?.trim()) {
+                          const newV = [...variants];
+                          if (!newV[gi].options.includes(val.trim())) {
+                            newV[gi].options = [...newV[gi].options, val.trim()];
+                            setVariants(newV);
+                            setVariantInput({ ...variantInput, [gi]: "" });
+                          }
+                        }
+                      }}
+                      className="px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              <div className="flex flex-wrap gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setVariants([...variants, { group: "اللون", options: [] }])}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-indigo-50 text-indigo-700 rounded-lg text-sm font-bold hover:bg-indigo-100 transition-all border border-indigo-100"
+                >
+                  <Palette className="w-4 h-4" />
+                  + إضافة مجموعة ألوان
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setVariants([...variants, { group: "", options: [] }])}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-gray-50 text-gray-700 rounded-lg text-sm font-bold hover:bg-gray-100 transition-all border border-gray-200"
+                >
+                  <Plus className="w-4 h-4" />
+                  + إضافة مجموعة خيارات أخرى
+                </button>
               </div>
             </div>
           </div>

@@ -4,6 +4,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'sonner';
 import { useAuthInit } from './hooks/useAuthInit';
 import { PageLoader } from './components/shared/PageLoader';
+import { MetaPixel } from './components/shared/MetaPixel';
 
 // Store Components
 import { Header } from './components/store/Header';
@@ -72,6 +73,7 @@ function App() {
   return (
     <HelmetProvider>
       <BrowserRouter>
+        <MetaPixel />
         <Routes>
           {/* Public Store Routes */}
           <Route element={<StoreLayout />}>

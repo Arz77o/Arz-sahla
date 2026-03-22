@@ -15,6 +15,7 @@ import type { Database } from "../types/database.types";
 import { WILAYAS } from "../lib/algeria";
 import { formatDZD } from "../lib/pricing";
 import { Button } from "../components/ui/button";
+import { pixel, INITIATE_CHECKOUT } from "../lib/pixel";
 
 const checkoutSchema = z.object({
   fullName: z.string().min(3, "الاسم الكامل مطلوب"),
@@ -47,19 +48,44 @@ export default function Checkout() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [shippingFeesConfig, setShippingFeesConfig] = useState<any[]>([]);
+  const [storeSettings, setStoreSettings] = useState({ free_shipping_threshold: 800 });
 
   React.useEffect(() => {
-    const fetchFees = async () => {
-      const { data } = await supabase.from("shipping_fees").select("*");
-      if (data) setShippingFeesConfig(data);
+    const fetchData = async () => {
+      const [feesRes, settingsRes] = await Promise.all([
+        supabase.from("shipping_fees").select("*"),
+        supabase.from("settings").select("*").single()
+      ]);
+      
+      if (feesRes.data) setShippingFeesConfig(feesRes.data);
+      if (settingsRes.data) {
+        const s = settingsRes.data as any;
+        const pm = s.payment_methods || {};
+        setStoreSettings({
+          free_shipping_threshold: pm.free_shipping_threshold ?? 800
+        });
+      }
     };
-    fetchFees();
+    fetchData();
+  }, []);
+
+  // Track InitiateCheckout once when entering the page
+  React.useEffect(() => {
+    if (items.length > 0) {
+      pixel.track(INITIATE_CHECKOUT, {
+        content_ids: items.map(i => i.product_id),
+        num_items: getItemCount(),
+        value: getTotal(),
+        currency: 'DZD'
+      });
+    }
   }, []);
 
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isValid },
   } = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutSchema),
@@ -76,7 +102,6 @@ export default function Checkout() {
     },
   });
 
-  const termsAccepted = watch("termsAccepted");
 
   React.useEffect(() => {
     if (items.length === 0) {
@@ -88,13 +113,48 @@ export default function Checkout() {
     return null;
   }
 
+  const calculateShippingFee = (wilayaName?: string) => {
+    if (!wilayaName) return 0;
+
+    // Check dynamic fees from database first
+    const feeConfig = shippingFeesConfig.find(
+      (f) => f.wilaya_name === wilayaName,
+    );
+    if (feeConfig) {
+      return feeConfig.desk_fee;
+    }
+
+    // Default fallback fees
+    return wilayaName === "الجزائر" || wilayaName === "Alger" ? 200 : 400;
+  };
+
+  const paymentMethod = watch("paymentMethod");
+  const wilayaName = watch("wilaya");
+  const normalBaseShipping = calculateShippingFee(wilayaName);
+  const isEligibleForFreeShipping = normalBaseShipping <= storeSettings.free_shipping_threshold;
+
+  React.useEffect(() => {
+    if (wilayaName && normalBaseShipping > storeSettings.free_shipping_threshold && paymentMethod === 'chargily') {
+      setValue("paymentMethod", "cod");
+      toast.info(`الدفع الإلكتروني والشحن المجاني غير متاح لهذه الولاية حالياً بسبب تكاليف الشحن التي تتجاوز ${storeSettings.free_shipping_threshold} دج.`);
+    }
+  }, [wilayaName, normalBaseShipping, paymentMethod, setValue, storeSettings.free_shipping_threshold]);
+
+  const baseShipping = paymentMethod === 'chargily' && isEligibleForFreeShipping ? 0 : normalBaseShipping;
+  
+  // Final total is Product Price (Inclusive) + Shipping, rounded to nearest 10
+  const rawTotal = getTotal(paymentMethod) + baseShipping;
+  const finalTotal = Math.round(rawTotal / 10) * 10;
+  // Adjust shipping display to include the minor rounding difference so total matches
+  const displayShippingFee = finalTotal - getTotal(paymentMethod);
+
   const onSubmit: SubmitHandler<CheckoutFormValues> = async (data) => {
     if (!user) return;
 
     setIsSubmitting(true);
     try {
       // 1. Create Order
-      const baseShipping = calculateShippingFee(data.wilaya);
+      const baseShipping = data.paymentMethod === 'chargily' && isEligibleForFreeShipping ? 0 : calculateShippingFee(data.wilaya);
       const roundedTotal = Math.round((getTotal(data.paymentMethod) + baseShipping) / 10) * 10;
       const actualShippingForDB = roundedTotal - getTotal(data.paymentMethod);
 
@@ -176,30 +236,7 @@ export default function Checkout() {
     }
   };
 
-  const calculateShippingFee = (wilayaName?: string) => {
-    if (!wilayaName) return 0;
-
-    // Check dynamic fees from database first
-    const feeConfig = shippingFeesConfig.find(
-      (f) => f.wilaya_name === wilayaName,
-    );
-    if (feeConfig) {
-      return feeConfig.desk_fee;
-    }
-
-    // Default fallback fees
-    return wilayaName === "الجزائر" || wilayaName === "Alger" ? 200 : 400;
-  };
-
-  const paymentMethod = watch("paymentMethod");
-  const wilayaName = watch("wilaya");
-  const baseShipping = calculateShippingFee(wilayaName);
-  
-  // Final total is Product Price (Inclusive) + Shipping, rounded to nearest 10
-  const rawTotal = getTotal(paymentMethod) + baseShipping;
-  const finalTotal = Math.round(rawTotal / 10) * 10;
-  // Adjust shipping display to include the minor rounding difference so total matches
-  const displayShippingFee = finalTotal - getTotal(paymentMethod);
+  const termsAccepted = watch("termsAccepted");
 
   return (
     <>
@@ -361,20 +398,32 @@ export default function Checkout() {
                         </div>
                       </label>
                       <label
-                        className={`flex items-center gap-6 p-6 border transition-all cursor-pointer ${watch("paymentMethod") === "chargily" ? "border-primary bg-primary/5 shadow-inner" : "border-surface-high bg-white hover:border-gray-300"}`}
+                        className={`flex flex-col md:flex-row items-center gap-6 p-6 border transition-all ${
+                          !isEligibleForFreeShipping && wilayaName 
+                            ? "opacity-60 bg-gray-50 border-gray-200 cursor-not-allowed" 
+                            : watch("paymentMethod") === "chargily" 
+                              ? "border-primary bg-primary/5 shadow-inner cursor-pointer" 
+                              : "border-surface-high bg-white hover:border-gray-300 cursor-pointer"
+                        }`}
                       >
                         <input
                           type="radio"
                           {...register("paymentMethod")}
                           value="chargily"
+                          disabled={!isEligibleForFreeShipping && !!wilayaName}
                           className="w-5 h-5 accent-primary"
                         />
                         <div className="flex-1">
-                          <div className="text-xs font-bold uppercase tracking-widest text-gray-900 mb-1">
+                          <div className="text-xs font-bold uppercase tracking-widest text-gray-900 mb-1 flex items-center gap-2">
                             {t("checkout.online")}
+                            {!isEligibleForFreeShipping && wilayaName && (
+                              <span className="text-[8px] bg-amber-100 text-amber-700 px-1.5 py-0.5 font-bold uppercase tracking-[0.2em]">COD Only</span>
+                            )}
                           </div>
                           <div className="text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
-                            {t("checkout.onlineDescription")}
+                            {!isEligibleForFreeShipping && wilayaName 
+                              ? "عذراً، الدفع الإلكتروني غير متاح لولايتكم" 
+                              : t("checkout.onlineDescription")}
                           </div>
                         </div>
                       </label>
@@ -508,9 +557,11 @@ export default function Checkout() {
                     Shipping
                   </span>
                   <span className="text-sm font-bold text-gray-900">
-                    {displayShippingFee === 0 && !wilayaName
-                      ? t("إختر الولاية")
-                      : formatDZD(displayShippingFee)}
+                    {paymentMethod === 'chargily' 
+                      ? t("checkout.freeShipping") 
+                      : (displayShippingFee === 0 && !wilayaName
+                          ? t("إختر الولاية")
+                          : formatDZD(displayShippingFee))}
                   </span>
                 </div>
                 <div className="pt-10 border-t border-surface-high flex justify-between items-end">

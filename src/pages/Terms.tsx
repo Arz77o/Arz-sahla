@@ -78,6 +78,75 @@ export default function Terms() {
                 </div>
               </section>
 
+              {/* 3. Shipping and Delivery */}
+              <section>
+                <div className="flex items-center gap-6 mb-12">
+                  <div className="text-4xl font-display font-bold text-primary/20 leading-none">03.</div>
+                  <h2 className="text-3xl font-display font-bold text-gray-900 uppercase tracking-tight">الشحن والتوصيل</h2>
+                </div>
+                <div className="space-y-10 text-gray-700">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-l-2 border-primary pl-8">
+                    <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900">طريقة الشحن</h3>
+                    <div className="md:col-span-2 space-y-4 text-sm leading-loose">
+                      <p>نعتمد حصرياً على خدمة <span className="font-bold text-gray-900">Yalidine Express</span> بنظام <span className="italic">Stop Desk</span> (الاستلام من المكتب). يلتزم الزبون بالتوجه لمكتب ياليدين في ولايته لاستلام طرده فور وصوله.</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-l-2 border-gray-100 pl-8">
+                    <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900">الجدول الزمني</h3>
+                    <div className="md:col-span-2 space-y-4 text-sm leading-loose">
+                      <p>تستغرق عملية التجهيز من 24-48 ساعة، بينما يستغرق التوصيل من 2 إلى 5 أيام عمل حسب بعد الولاية.</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* 4. Payment Rules */}
+              <section>
+                <div className="flex items-center gap-6 mb-12">
+                  <div className="text-4xl font-display font-bold text-primary/20 leading-none">04.</div>
+                  <h2 className="text-3xl font-display font-bold text-gray-900 uppercase tracking-tight">طرق الدفع والرسوم</h2>
+                </div>
+                <div className="space-y-10 text-gray-700">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-l-2 border-primary pl-8">
+                    <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900">الدفع الإلكتروني (FREE)</h3>
+                    <div className="md:col-span-2 space-y-4 text-sm leading-loose">
+                      <p className="bg-primary/5 p-6 border-r-4 border-primary">
+                        <span className="font-bold text-primary block mb-2 underline decoration-wavy">عرض حصري:</span>
+                        عند اختيار الدفع عبر <span className="font-bold">البطاقة الذهبية أو CIB</span>، يستفيد الزبون من <span className="font-bold uppercase">شحن مجاني بالكامل</span> (يطبق العرض على الولايات التي يقل سعر شحنها عن 800 دج).
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-l-2 border-gray-100 pl-8">
+                    <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900">الدفع عند الاستلام</h3>
+                    <div className="md:col-span-2 space-y-4 text-sm leading-loose">
+                      <p>في حال اختيار الدفع عند الاستلام (COD)، يلتزم الزبون بدفع سعر المنتج + مصاريف الشحن الكاملة للولاية المعنية لموظف شركة التوصيل.</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* 5. Customer Obligations */}
+              <section>
+                <div className="flex items-center gap-6 mb-12">
+                  <div className="text-4xl font-display font-bold text-primary/20 leading-none">05.</div>
+                  <h2 className="text-3xl font-display font-bold text-gray-900 uppercase tracking-tight">التزامات العميل</h2>
+                </div>
+                <div className="space-y-6 text-sm text-gray-600 leading-loose">
+                  <p className="flex items-start gap-4 uppercase tracking-[0.1em]">
+                    <span className="text-primary font-bold">✓</span>
+                    يجب تزويدنا برقم هاتف شغال واسم حقيقي لضمان تأكيد الطلب.
+                  </p>
+                  <p className="flex items-start gap-4 uppercase tracking-[0.1em]">
+                    <span className="text-primary font-bold">✓</span>
+                    الطلبات غير المؤكدة عبر الهاتف خلال 48 ساعة يتم إلغاؤها تلقائياً.
+                  </p>
+                  <p className="flex items-start gap-4 uppercase tracking-[0.1em]">
+                    <span className="text-red-600 font-bold italic underline">⚠️ تنبيه:</span>
+                    رفض استلام الطلبات المؤكدة (COD) يسبب خسائر مادية للمتجر، وقد يؤدي لإدراج رقم الهاتف في القائمة السوداء لشركتنا وشركائنا.
+                  </p>
+                </div>
+              </section>
+
               {/* 6. Return Policy - Red Alert Block */}
               <section className="bg-surface-low -mx-8 md:-mx-16 p-8 md:p-16 border-y border-surface-high">
                 <div className="flex items-center gap-6 mb-16">

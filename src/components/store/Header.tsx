@@ -19,7 +19,7 @@ export const Header: React.FC = () => {
   return (
     <header className="glass-header w-full">
       <div className="bg-primary text-white text-center py-1.5 text-xs font-medium tracking-wide">
-        إحصل على تخفيض عند إختيار الدفع الإلكتروني
+        إحصل على شحن مجاني عند الدفع بchargily 📢❗🚨
       </div>
       <div className="container mx-auto px-4 h-20 flex items-center justify-between">
         <Link to="/" className="text-2xl font-display font-bold text-primary tracking-tighter">

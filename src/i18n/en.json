@@ -63,6 +63,7 @@
     "phoneCall": "Phone Call",
     "whatsapp": "WhatsApp Message",
     "email": "Email Message",
-    "pay": "Confirm Order"
+    "pay": "Confirm Order",
+    "freeShipping": "Free Shipping"
   }
 }

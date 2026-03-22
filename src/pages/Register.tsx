@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Loader2, Mail, Lock, User, Phone } from 'lucide-react';
+import { Loader2, Mail, Lock, User, Phone, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { SEOMeta } from '../components/shared/SEOMeta';
 import { supabase } from '../lib/supabase';
@@ -64,95 +64,116 @@ export default function Register() {
   return (
     <>
       <SEOMeta title={t('nav.register')} />
-      <div className="container mx-auto px-4 py-16 flex justify-center">
-        <div className="w-full max-w-md bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('nav.register')}</h1>
-            <p className="text-gray-500">انضم إلى Sahla وابدأ التسوق</p>
+      <div className="bg-white min-h-screen flex items-center justify-center py-20">
+        <div className="w-full max-w-lg px-4">
+          <div className="mb-16 border-b border-surface-high pb-8">
+            <h1 className="text-6xl md:text-8xl font-display font-bold text-gray-900 tracking-tighter leading-none mb-4">
+              Join
+            </h1>
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary italic">
+              CREATE YOUR ARCHIVAL IDENTITY
+            </p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">الاسم الكامل</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
+            <div className="space-y-8">
+              {/* Full Name */}
+              <div className="space-y-4">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block ml-auto">الاسم الكامل</label>
+                <div className="relative border-b border-surface-high focus-within:border-primary transition-all">
+                  <div className="absolute inset-y-0 right-0 flex items-center pointer-events-none">
+                    <User className="h-4 w-4 text-gray-400 stroke-1" />
+                  </div>
+                  <input 
+                    type="text"
+                    {...register('fullName')}
+                    className="w-full pl-0 pr-8 py-4 bg-transparent text-gray-900 font-display font-medium text-lg outline-none placeholder:text-gray-200"
+                    placeholder="الاسم واللقب"
+                  />
                 </div>
-                <input 
-                  type="text"
-                  {...register('fullName')}
-                  className={`w-full pl-4 pr-12 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.fullName ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-gray-50 focus:bg-white'}`}
-                  placeholder="الاسم واللقب"
-                />
+                {errors.fullName && <p className="text-red-500 text-[10px] font-bold uppercase tracking-widest mt-2">✕ {errors.fullName.message}</p>}
               </div>
-              {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName.message}</p>}
+
+              {/* Phone */}
+              <div className="space-y-4">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block ml-auto">رقم الهاتف</label>
+                <div className="relative border-b border-surface-high focus-within:border-primary transition-all">
+                  <div className="absolute inset-y-0 right-0 flex items-center pointer-events-none">
+                    <Phone className="h-4 w-4 text-gray-400 stroke-1" />
+                  </div>
+                  <input 
+                    type="text"
+                    {...register('phone')}
+                    className="w-full pl-0 pr-8 py-4 bg-transparent text-gray-900 font-display font-medium text-lg outline-none placeholder:text-gray-200"
+                    placeholder="0550123456"
+                    dir="ltr"
+                  />
+                </div>
+                {errors.phone && <p className="text-red-500 text-[10px] font-bold uppercase tracking-widest mt-2">✕ {errors.phone.message}</p>}
+              </div>
+
+              {/* Email */}
+              <div className="space-y-4">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block ml-auto">البريد الإلكتروني</label>
+                <div className="relative border-b border-surface-high focus-within:border-primary transition-all">
+                  <div className="absolute inset-y-0 right-0 flex items-center pointer-events-none">
+                    <Mail className="h-4 w-4 text-gray-400 stroke-1" />
+                  </div>
+                  <input 
+                    type="email"
+                    {...register('email')}
+                    className="w-full pl-0 pr-8 py-4 bg-transparent text-gray-900 font-display font-medium text-lg outline-none placeholder:text-gray-200"
+                    placeholder="name@archival.com"
+                    dir="ltr"
+                  />
+                </div>
+                {errors.email && <p className="text-red-500 text-[10px] font-bold uppercase tracking-widest mt-2">✕ {errors.email.message}</p>}
+              </div>
+
+              {/* Password */}
+              <div className="space-y-4">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block ml-auto">كلمة المرور</label>
+                <div className="relative border-b border-surface-high focus-within:border-primary transition-all">
+                  <div className="absolute inset-y-0 right-0 flex items-center pointer-events-none">
+                    <Lock className="h-4 w-4 text-gray-400 stroke-1" />
+                  </div>
+                  <input 
+                    type="password"
+                    {...register('password')}
+                    className="w-full pl-0 pr-8 py-4 bg-transparent text-gray-900 font-display font-medium text-lg outline-none placeholder:text-gray-200"
+                    placeholder="••••••••"
+                    dir="ltr"
+                  />
+                </div>
+                {errors.password && <p className="text-red-500 text-[10px] font-bold uppercase tracking-widest mt-2">✕ {errors.password.message}</p>}
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">رقم الهاتف</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                  <Phone className="h-5 w-5 text-gray-400" />
-                </div>
-                <input 
-                  type="text"
-                  {...register('phone')}
-                  className={`w-full pl-4 pr-12 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.phone ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-gray-50 focus:bg-white'}`}
-                  placeholder="0550123456"
-                  dir="ltr"
-                />
+            <div className="flex flex-col gap-6 pt-6">
+              <Button 
+                type="submit" 
+                className="w-full h-16 text-lg font-bold uppercase tracking-widest"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin stroke-1" /> : t('nav.register')}
+              </Button>
+              
+              <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-gray-400 italic">
+                <Link to="/" className="flex items-center gap-2 hover:text-primary">
+                  <ArrowLeft className="w-3 h-3" />
+                  Back to Store
+                </Link>
+                <Link to={`/login?returnTo=${encodeURIComponent(returnTo)}`} className="text-primary hover:underline underline-offset-4">
+                  Already have an account?
+                </Link>
               </div>
-              {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
             </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">البريد الإلكتروني</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
-                </div>
-                <input 
-                  type="email"
-                  {...register('email')}
-                  className={`w-full pl-4 pr-12 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.email ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-gray-50 focus:bg-white'}`}
-                  placeholder="name@example.com"
-                  dir="ltr"
-                />
-              </div>
-              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">كلمة المرور</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
-                </div>
-                <input 
-                  type="password"
-                  {...register('password')}
-                  className={`w-full pl-4 pr-12 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none transition-all ${errors.password ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-gray-50 focus:bg-white'}`}
-                  placeholder="••••••••"
-                  dir="ltr"
-                />
-              </div>
-              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
-            </div>
-
-            <Button 
-              type="submit" 
-              className="w-full h-12 text-lg font-bold rounded-xl bg-blue-600 hover:bg-blue-700"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : t('nav.register')}
-            </Button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-gray-600">
-            لديك حساب بالفعل؟{' '}
-            <Link to={`/login?returnTo=${encodeURIComponent(returnTo)}`} className="text-blue-600 font-bold hover:underline">
-              {t('nav.login')}
-            </Link>
+          <div className="mt-24 pt-8 border-t border-surface-high text-center">
+            <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-gray-200">
+              Sahla DZ — Registration Protocol 2026
+            </span>
           </div>
         </div>
       </div>

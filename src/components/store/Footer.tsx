@@ -31,9 +31,9 @@ export const Footer: React.FC = () => {
         </div>
         <div>
           <h4 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-6">تواصل معنا</h4>
-          <a 
-            href="https://www.facebook.com/profile.php?id=61583335271001" 
-            target="_blank" 
+          <a
+            href="https://www.facebook.com/profile.php?id=61579502319748"
+            target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 hover:text-primary transition-colors"
           >

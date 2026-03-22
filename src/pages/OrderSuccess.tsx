@@ -6,6 +6,7 @@ import { useCartStore } from "../store/cartStore";
 import { supabase } from "../lib/supabase";
 import { formatDZD } from "../lib/pricing";
 import { Button } from "../components/ui/button";
+import { pixel, PURCHASE } from "../lib/pixel";
 
 export default function OrderSuccess() {
   const [searchParams] = useSearchParams();
@@ -28,7 +29,24 @@ export default function OrderSuccess() {
           .select("*, order_items(count)")
           .eq("id", orderId)
           .single();
-        if (data) setOrder(data);
+        if (data) {
+          setOrder(data);
+          
+          // Track Meta Pixel Purchase only if appropriate
+          const isSuccessful = 
+            data.payment_method === 'cod' || 
+            (data.payment_method === 'chargily' && data.status === 'paid');
+
+          if (isSuccessful) {
+            pixel.track(PURCHASE, {
+              value: data.total_dzd,
+              currency: 'DZD',
+              content_type: 'product',
+              order_id: data.id,
+              num_items: (data as any).order_items?.[0]?.count || 1
+            });
+          }
+        }
       } catch (error) {
         console.error("Error fetching order:", error);
       } finally {

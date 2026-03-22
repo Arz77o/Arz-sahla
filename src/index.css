@@ -1,6 +1,10 @@
 @import "tailwindcss";
 
-@theme {
+/* 
+  ARCHITECTURAL ARCHIVE DESIGN SYSTEM
+  Standard CSS Variables for IDE Compatibility
+*/
+:root {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Outfit", "Inter", sans-serif;
   
@@ -11,42 +15,65 @@
   --color-surface-lowest: #ffffff;
   --color-surface-high: #e3e9ec;
   
-  --radius-none: 0;
-  --radius-sm: 0;
-  --radius-md: 0;
-  --radius-lg: 0;
-  --radius-xl: 0;
-  --radius-2xl: 0;
-  --radius-3xl: 0;
-  --radius-full: 0;
+  --radius-none: 0px;
+}
+
+@theme {
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  
+  --color-primary: var(--color-primary);
+  --color-primary-dim: var(--color-primary-dim);
+  --color-surface: var(--color-surface);
+  --color-surface-low: var(--color-surface-low);
+  --color-surface-lowest: var(--color-surface-lowest);
+  --color-surface-high: var(--color-surface-high);
+  
+  --radius: 0px;
 }
 
 @layer base {
   body {
-    @apply bg-surface text-gray-900 font-sans antialiased;
     background-color: var(--color-surface);
+    color: #111827; /* gray-900 */
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display tracking-tight;
+    font-family: var(--font-display);
+    letter-spacing: -0.025em; /* tracking-tight */
   }
 }
 
 @layer components {
   .btn-sharp {
-    @apply rounded-none transition-all duration-200 active:scale-95;
+    border-radius: 0;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
+  
+  .btn-sharp:active {
+    transform: scale(0.95);
   }
   
   .glass-header {
-    @apply sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-none;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: none;
   }
   
   .tonal-card {
-    @apply bg-surface-lowest border-none transition-colors duration-200;
+    background-color: var(--color-surface-lowest);
+    border: none;
+    transition-property: background-color;
+    transition-duration: 200ms;
   }
   
-  /* Global Sharp Corner Override */
-  * {
-    border-radius: 0 !important;
-  }
 }

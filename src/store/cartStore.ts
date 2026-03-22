@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { toast } from 'sonner';
+import { pixel, ADD_TO_CART } from '../lib/pixel';
 
 export interface CartItem {
   product_id: string;
@@ -54,6 +55,15 @@ export const useCartStore = create<CartState>()(
         } else {
           set({ items: [...items, item] });
           toast.success("تمت الإضافة إلى السلة");
+          
+          // Track Meta Pixel Event
+          pixel.track(ADD_TO_CART, {
+            content_name: item.name_en,
+            content_ids: [item.product_id],
+            content_type: 'product',
+            value: item.price_dzd,
+            currency: 'DZD'
+          });
         }
       },
       updateQuantity: (product_id, quantity) => {
