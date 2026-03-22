@@ -15,7 +15,7 @@ import type { Database } from "../types/database.types";
 import { WILAYAS } from "../lib/algeria";
 import { formatDZD } from "../lib/pricing";
 import { Button } from "../components/ui/button";
-import { pixel, INITIATE_CHECKOUT } from "../lib/pixel";
+import { gtag } from "../lib/gtag";
 
 const checkoutSchema = z.object({
   fullName: z.string().min(3, "الاسم الكامل مطلوب"),
@@ -69,14 +69,18 @@ export default function Checkout() {
     fetchData();
   }, []);
 
-  // Track InitiateCheckout once when entering the page
+  // Track begin_checkout for GA4
   React.useEffect(() => {
     if (items.length > 0) {
-      pixel.track(INITIATE_CHECKOUT, {
-        content_ids: items.map(i => i.product_id),
-        num_items: getItemCount(),
+      gtag.trackEcommerce('begin_checkout', {
+        currency: 'DZD',
         value: getTotal(),
-        currency: 'DZD'
+        items: items.map(i => ({
+          item_id: i.product_id,
+          item_name: isAr ? i.name_ar : i.name_en,
+          price: i.price_dzd,
+          quantity: i.quantity
+        }))
       });
     }
   }, []);

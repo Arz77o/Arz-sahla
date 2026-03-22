@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { toast } from 'sonner';
-import { pixel, ADD_TO_CART } from '../lib/pixel';
+import { gtag } from '../lib/gtag';
 
 export interface CartItem {
   product_id: string;
@@ -56,13 +56,16 @@ export const useCartStore = create<CartState>()(
           set({ items: [...items, item] });
           toast.success("تمت الإضافة إلى السلة");
           
-          // Track Meta Pixel Event
-          pixel.track(ADD_TO_CART, {
-            content_name: item.name_en,
-            content_ids: [item.product_id],
-            content_type: 'product',
-            value: item.price_dzd,
-            currency: 'DZD'
+          // Track add_to_cart for GA4
+          gtag.trackEcommerce('add_to_cart', {
+            currency: 'DZD',
+            value: item.price_dzd * item.quantity,
+            items: [{
+              item_id: item.product_id,
+              item_name: item.name_en,
+              price: item.price_dzd,
+              quantity: item.quantity
+            }]
           });
         }
       },

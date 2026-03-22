@@ -103,18 +103,6 @@ export default function ProductDetail() {
       stock_limit: product.stock_quantity,
     });
 
-    // Track add_to_cart for GA4
-    gtag.trackEcommerce('add_to_cart', {
-      currency: 'DZD',
-      value: priceDZD * quantity,
-      items: [{
-        item_id: product.id,
-        item_name: name,
-        price: priceDZD,
-        quantity: quantity
-      }]
-    });
-
     toast.success(t("product.added_to_cart"));
   };
 
