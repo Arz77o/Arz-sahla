@@ -9,8 +9,8 @@ interface SEOMetaProps {
 }
 
 export const SEOMeta: React.FC<SEOMetaProps> = ({
-  title = 'Sahla — اشتري من AliExpress وادفع بالدينار الجزائري',
-  description = 'منصة الشراء بالوكالة من AliExpress — ندفع بالنيابة عنك وتستلم في بيتك بالجزائر',
+  title = 'Sahla DZ',
+  description = 'متجركم الأول للإلكترونيات والإكسسوارات في الجزائر — جودة، سرعة، وأمان في التوصيل.',
   image = '/og-image.jpg',
   url = typeof window !== 'undefined' ? window.location.href : '',
 }) => {
