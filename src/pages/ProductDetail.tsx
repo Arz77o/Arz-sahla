@@ -55,21 +55,18 @@ export default function ProductDetail() {
       navigate("/products");
     }
   }, [loading, product, navigate]);
-
-  if (!product) return null;
-
-  const name = isAr ? product.name_ar : product.name_en;
-  const description = isAr ? product.description_ar : product.description_en;
-  const priceDZD = calculatePriceDZD(
+  const name = product ? (isAr ? product.name_ar : product.name_en) : "";
+  const description = product ? (isAr ? product.description_ar : product.description_en) : "";
+  const priceDZD = product ? calculatePriceDZD(
     product.price_usd,
     usd_to_dzd_rate,
     commission_rate,
     product.price_dzd,
-  );
-  const inCart = isInCart(product.id);
-  const outOfStock = product.stock_quantity <= 0;
+  ) : 0;
+  const inCart = product ? isInCart(product.id) : false;
+  const outOfStock = product ? product.stock_quantity <= 0 : false;
 
-  // Track view_item for GA4
+  // Track view_item for GA4 (All hooks must be before early returns)
   useEffect(() => {
     if (product) {
       gtag.trackEcommerce('view_item', {
@@ -84,6 +81,9 @@ export default function ProductDetail() {
       });
     }
   }, [product, name, priceDZD]);
+
+  if (!product) return null;
+
 
   const handleAddToCart = () => {
     const imageUrl = product.images?.[0] || "";
