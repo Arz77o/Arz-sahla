@@ -12,7 +12,7 @@ export default function AdminSettings() {
   const [settings, setSettings] = useState({
     free_shipping_threshold: 800,
     default_profit_margin: 50,
-    meta_pixel_id: '',
+    ga_id: '',
   });
 
   const [shippingFees, setShippingFees] = useState<any[]>([]);
@@ -40,7 +40,7 @@ export default function AdminSettings() {
       setSettings({
         free_shipping_threshold: pm.free_shipping_threshold ?? 800,
         default_profit_margin: pm.default_profit_margin ?? 50,
-        meta_pixel_id: pm.meta_pixel_id || '',
+        ga_id: pm.ga_id || '',
       });
     }
     setLoading(false);
@@ -194,16 +194,16 @@ export default function AdminSettings() {
 
               <div className="space-y-2 border-t pt-4">
                 <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">
-                  Meta Pixel ID (Facebook)
+                  Google Analytics Measurement ID (GA4)
                 </label>
                 <input
                   type="text"
-                  value={settings.meta_pixel_id}
-                  onChange={(e) => setSettings({ ...settings, meta_pixel_id: e.target.value })}
-                  placeholder="Ex: 123456789012345"
+                  value={settings.ga_id}
+                  onChange={(e) => setSettings({ ...settings, ga_id: e.target.value })}
+                  placeholder="Ex: G-XXXXXXXXXX"
                   className="w-full px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl font-mono text-xs focus:ring-2 focus:ring-blue-500 outline-none"
                 />
-                <p className="text-[9px] text-gray-400 leading-tight italic">أدخل معرف البيكسل (ID) لتفعيل تتبع الحملات الإعلانية تلقائياً.</p>
+                <p className="text-[9px] text-gray-400 leading-tight italic">أدخل معرف التتبع (GA4) لتفعيل إحصائيات زوار الموقع تلقائياً.</p>
               </div>
             </div>
 
