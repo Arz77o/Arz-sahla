@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, AlertCircle, CheckCircle2, ShieldCheck, Phone, MessageSquare, Mail } from "lucide-react";
+import { Loader2, AlertCircle, CheckCircle2, ShieldCheck, Phone, MessageSquare, Mail, Send } from "lucide-react";
 import { toast } from "sonner";
 
 import { SEOMeta } from "../components/shared/SEOMeta";
@@ -28,7 +28,7 @@ const checkoutSchema = z.object({
   paymentMethod: z.enum(["cod", "chargily"], {
     message: "يرجى اختيار طريقة الدفع",
   }),
-  contactPreference: z.enum(["phone", "whatsapp"], {
+  contactPreference: z.enum(["phone", "whatsapp", "telegram"], {
     message: "يرجى اختيار طريقة التواصل المفضلة",
   }),
   termsAccepted: z.boolean().refine((val) => val === true, {
@@ -444,6 +444,7 @@ export default function Checkout() {
                       {[
                         { id: "phone", icon: Phone, label: t("checkout.phoneCall") },
                         { id: "whatsapp", icon: MessageSquare, label: t("checkout.whatsapp") },
+                        { id: "telegram", icon: Send, label: t("checkout.telegram") },
                       ].map((item) => (
                         <label
                           key={item.id}

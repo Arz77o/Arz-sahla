@@ -262,13 +262,16 @@ ${order.yalidine_desk ? `مكتب ياليدين: ${order.yalidine_desk}` : ""}`
               </div>
               <div>
                 <div className="text-sm text-gray-500 mb-1">طريقة التأكيد المفضلة</div>
-                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-sm font-bold ${order.contact_preference === 'whatsapp' ? 'bg-green-100 text-green-800' :
+                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-sm font-bold ${
+                  order.contact_preference === 'whatsapp' ? 'bg-green-100 text-green-800' :
+                  order.contact_preference === 'telegram' ? 'bg-blue-100 text-blue-800' :
                   order.contact_preference === 'email' ? 'bg-red-100 text-red-800' :
-                    'bg-blue-100 text-blue-800'
-                  }`}>
+                  'bg-amber-100 text-amber-800'
+                }`}>
                   {order.contact_preference === 'whatsapp' ? '✅ واتساب (WhatsApp)' :
-                    order.contact_preference === 'email' ? '✉️ إيميل (Email)' :
-                      '📞 إتصال هاتفي (Phone Call)'}
+                   order.contact_preference === 'telegram' ? '✈️ تيليقرام (Telegram)' :
+                   order.contact_preference === 'email' ? '✉️ إيميل (Email)' :
+                   '📞 إتصال هاتفي (Phone Call)'}
                 </div>
               </div>
               <div className="md:col-span-2">

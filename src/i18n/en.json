@@ -62,6 +62,7 @@
     "contactPreference": "How should we confirm your order?",
     "phoneCall": "Phone Call",
     "whatsapp": "WhatsApp Message",
+    "telegram": "Telegram Message",
     "email": "Email Message",
     "pay": "Confirm Order",
     "freeShipping": "Free Shipping"
