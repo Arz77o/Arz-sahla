@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import {
-  ShoppingCart,
-  Star,
-  Loader2,
-  X,
-} from "lucide-react";
+import { ShoppingCart, Star, Loader2, X } from "lucide-react";
 import { SEOMeta } from "../components/shared/SEOMeta";
 import { formatDZD, calculatePriceDZD } from "../lib/pricing";
 import { useCartStore } from "../store/cartStore";
@@ -14,9 +9,13 @@ import { useSettingsStore } from "../store/settingsStore";
 import { Button } from "../components/ui/button";
 import { toast } from "sonner";
 import { Reveal } from "../components/shared/Reveal";
-import { useProduct, useCreateReview, useDeleteReview } from '../hooks/useProducts';
-import { useCategories } from '../hooks/useCategories';
-import { gtag } from '../lib/gtag';
+import {
+  useProduct,
+  useCreateReview,
+  useDeleteReview,
+} from "../hooks/useProducts";
+import { useCategories } from "../hooks/useCategories";
+import { gtag } from "../lib/gtag";
 
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -26,7 +25,7 @@ export default function ProductDetail() {
   const isAr = i18n.language === "ar";
 
   const { data: product, isLoading: loading } = useProduct(slug || "");
-  
+
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [selectedVariant, setSelectedVariant] = useState<{
     group: string;
@@ -56,34 +55,41 @@ export default function ProductDetail() {
     }
   }, [loading, product, navigate]);
   const name = product ? (isAr ? product.name_ar : product.name_en) : "";
-  const description = product ? (isAr ? product.description_ar : product.description_en) : "";
-  const priceDZD = product ? calculatePriceDZD(
-    product.price_usd,
-    usd_to_dzd_rate,
-    commission_rate,
-    product.price_dzd,
-  ) : 0;
+  const description = product
+    ? isAr
+      ? product.description_ar
+      : product.description_en
+    : "";
+  const priceDZD = product
+    ? calculatePriceDZD(
+        product.price_usd,
+        usd_to_dzd_rate,
+        commission_rate,
+        product.price_dzd,
+      )
+    : 0;
   const inCart = product ? isInCart(product.id) : false;
   const outOfStock = product ? product.stock_quantity <= 0 : false;
 
   // Track view_item for GA4 (All hooks must be before early returns)
   useEffect(() => {
     if (product) {
-      gtag.trackEcommerce('view_item', {
-        currency: 'DZD',
+      gtag.trackEcommerce("view_item", {
+        currency: "DZD",
         value: priceDZD,
-        items: [{
-          item_id: product.id,
-          item_name: name,
-          price: priceDZD,
-          quantity: 1
-        }]
+        items: [
+          {
+            item_id: product.id,
+            item_name: name,
+            price: priceDZD,
+            quantity: 1,
+          },
+        ],
       });
     }
   }, [product, name, priceDZD]);
 
   if (!product) return null;
-
 
   const handleAddToCart = () => {
     const imageUrl = product.images?.[0] || "";
@@ -121,12 +127,15 @@ export default function ProductDetail() {
             {/* Gallery Column */}
             <Reveal width="100%" delay={0.1} y={30} fullHeight>
               <div className="bg-white p-6 md:p-12 space-y-8 h-full">
-                <div 
+                <div
                   className="aspect-square bg-surface-low border border-surface-high overflow-hidden cursor-zoom-in"
                   onClick={() => setZoomedImage(selectedImage)}
                 >
                   <img
-                    src={selectedImage || "https://picsum.photos/seed/sahla/800/800"}
+                    src={
+                      selectedImage ||
+                      "https://picsum.photos/seed/sahla/800/800"
+                    }
                     alt={name}
                     className="w-full h-full object-cover grayscale-[10%] hover:grayscale-0 transition-all duration-700"
                   />
@@ -143,7 +152,11 @@ export default function ProductDetail() {
                             : "border-surface-high hover:border-gray-400"
                         }`}
                       >
-                        <img src={img} alt="" className="w-full h-full object-cover" />
+                        <img
+                          src={img}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
                       </button>
                     ))}
                   </div>
@@ -157,10 +170,16 @@ export default function ProductDetail() {
                 <div className="flex-grow">
                   {/* Product Meta */}
                   <div className="flex items-center gap-6 mb-10">
-                    <span className={`inline-block px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] ${
-                      outOfStock ? "bg-red-50 text-red-700" : "bg-primary/10 text-primary"
-                    }`}>
-                      {outOfStock ? t("product.outOfStock") : t("product.available")}
+                    <span
+                      className={`inline-block px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] ${
+                        outOfStock
+                          ? "bg-red-50 text-red-700"
+                          : "bg-primary/10 text-primary"
+                      }`}
+                    >
+                      {outOfStock
+                        ? t("product.outOfStock")
+                        : t("product.available")}
                     </span>
                     {!outOfStock && product.stock_quantity < 10 && (
                       <span className="text-[10px] text-amber-600 font-bold uppercase tracking-widest">
@@ -181,13 +200,18 @@ export default function ProductDetail() {
                     {formatDZD(priceDZD)}
                   </div>
 
-                  {product.price_chargily > 0 && product.price_chargily < priceDZD && (
-                    <div className="bg-surface-high border border-surface-high p-4 mb-10">
-                      <span className="text-[11px] font-bold uppercase tracking-widest text-primary">
-                        Prix Électronique: <span className="text-lg ml-2">{formatDZD(product.price_chargily)}</span> ⚡
-                      </span>
-                    </div>
-                  )}
+                  {product.price_chargily > 0 &&
+                    product.price_chargily < priceDZD && (
+                      <div className="bg-surface-high border border-surface-high p-4 mb-10">
+                        <span className="text-[11px] font-bold uppercase tracking-widest text-primary">
+                          Prix Électronique:{" "}
+                          <span className="text-lg ml-2">
+                            {formatDZD(product.price_chargily)}
+                          </span>{" "}
+                          ⚡
+                        </span>
+                      </div>
+                    )}
 
                   {/* Variants Selector */}
                   {product.variants && product.variants.length > 0 && (
@@ -199,13 +223,22 @@ export default function ProductDetail() {
                           </label>
                           <div className="flex flex-wrap gap-px bg-surface-high border border-surface-high">
                             {v.options.map((opt: string, oi: number) => {
-                              const active = selectedVariant?.group === v.group && selectedVariant?.option === opt;
+                              const active =
+                                selectedVariant?.group === v.group &&
+                                selectedVariant?.option === opt;
                               return (
                                 <button
                                   key={oi}
-                                  onClick={() => setSelectedVariant({ group: v.group, option: opt })}
+                                  onClick={() =>
+                                    setSelectedVariant({
+                                      group: v.group,
+                                      option: opt,
+                                    })
+                                  }
                                   className={`flex-grow px-6 py-3 text-xs font-bold uppercase tracking-widest transition-all ${
-                                    active ? "bg-primary text-white" : "bg-white text-gray-500 hover:text-gray-900 hover:bg-surface-low"
+                                    active
+                                      ? "bg-primary text-white"
+                                      : "bg-white text-gray-500 hover:text-gray-900 hover:bg-surface-low"
                                   }`}
                                 >
                                   {opt}
@@ -225,15 +258,25 @@ export default function ProductDetail() {
                         {t("cart.quantity")}
                       </label>
                       <div className="flex items-center gap-px bg-surface-high border border-surface-high w-fit">
-                        <button 
+                        <button
                           onClick={() => setQuantity(Math.max(1, quantity - 1))}
                           className="w-14 h-14 bg-white hover:bg-surface-low transition-colors font-bold text-lg"
-                        >-</button>
-                        <div className="w-14 h-14 bg-white flex items-center justify-center font-display font-bold text-xl">{quantity}</div>
-                        <button 
-                          onClick={() => setQuantity(Math.min(product.stock_quantity, quantity + 1))}
+                        >
+                          -
+                        </button>
+                        <div className="w-14 h-14 bg-white flex items-center justify-center font-display font-bold text-xl">
+                          {quantity}
+                        </div>
+                        <button
+                          onClick={() =>
+                            setQuantity(
+                              Math.min(product.stock_quantity, quantity + 1),
+                            )
+                          }
                           className="w-14 h-14 bg-white hover:bg-surface-low transition-colors font-bold text-lg"
-                        >+</button>
+                        >
+                          +
+                        </button>
                       </div>
                     </div>
                   )}
@@ -244,13 +287,19 @@ export default function ProductDetail() {
                   <Button
                     size="lg"
                     className={`w-full h-20 text-xl font-display font-bold tracking-tighter ${
-                      inCart ? "bg-gray-900 hover:bg-black" : "bg-primary hover:bg-primary-dim"
+                      inCart
+                        ? "bg-gray-900 hover:bg-black"
+                        : "bg-primary hover:bg-primary-dim"
                     }`}
                     onClick={handleAddToCart}
                     disabled={outOfStock}
                   >
                     <ShoppingCart className="w-6 h-6 mr-4" />
-                    {outOfStock ? t("product.outOfStock") : inCart ? "تحديث السلة" : t("product.addToCart")}
+                    {outOfStock
+                      ? t("product.outOfStock")
+                      : inCart
+                        ? "تحديث السلة"
+                        : t("product.addToCart")}
                   </Button>
                 </div>
               </div>
@@ -285,10 +334,15 @@ export default function ProductDetail() {
                   <div className="flex items-center gap-4">
                     <div className="flex gap-0.5">
                       {[1, 2, 3, 4, 5].map((s) => (
-                        <Star key={s} className={`w-4 h-4 ${s <= Math.round(product.avg_rating) ? "fill-gray-900" : "fill-none stroke-gray-200"}`} />
+                        <Star
+                          key={s}
+                          className={`w-4 h-4 ${s <= Math.round(product.avg_rating) ? "fill-gray-900" : "fill-none stroke-gray-200"}`}
+                        />
                       ))}
                     </div>
-                    <span className="text-3xl font-display font-bold">{product.avg_rating.toFixed(1)}</span>
+                    <span className="text-3xl font-display font-bold">
+                      {product.avg_rating.toFixed(1)}
+                    </span>
                   </div>
                 </div>
 
@@ -307,25 +361,41 @@ export default function ProductDetail() {
                               </div>
                               <div className="flex gap-0.5">
                                 {[...Array(5)].map((_, i) => (
-                                  <Star key={i} className={`w-3 h-3 ${i < r.rating ? "fill-primary" : "fill-none stroke-gray-200"}`} />
+                                  <Star
+                                    key={i}
+                                    className={`w-3 h-3 ${i < r.rating ? "fill-primary" : "fill-none stroke-gray-200"}`}
+                                  />
                                 ))}
                               </div>
                             </div>
                           </div>
                           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">
-                            {new Date(r.created_at).toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric' })}
+                            {new Date(r.created_at).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              },
+                            )}
                           </span>
                         </div>
-                        <p className="text-gray-500 leading-relaxed mb-8 max-w-2xl">{r.comment}</p>
+                        <p className="text-gray-500 leading-relaxed mb-8 max-w-2xl">
+                          {r.comment}
+                        </p>
                         {r.images && r.images.length > 0 && (
                           <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                             {r.images.map((img: string, i: number) => (
-                              <div 
-                                key={i} 
+                              <div
+                                key={i}
                                 className="w-32 h-32 border border-surface-high cursor-zoom-in overflow-hidden"
                                 onClick={() => setZoomedImage(img)}
                               >
-                                <img src={img} alt="" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+                                <img
+                                  src={img}
+                                  alt=""
+                                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                                />
                               </div>
                             ))}
                           </div>
@@ -334,7 +404,9 @@ export default function ProductDetail() {
                     ))
                   ) : (
                     <div className="py-20 text-center border-2 border-dashed border-surface-high">
-                      <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-xs">Waiting for your review</p>
+                      <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-xs">
+                        Waiting for your review
+                      </p>
                     </div>
                   )}
                 </div>
@@ -352,24 +424,42 @@ export default function ProductDetail() {
                   </h3>
                   <ul className="space-y-10">
                     <li className="flex gap-6 items-start">
-                      <span className="text-lg font-display font-bold opacity-30 leading-none">01.</span>
+                      <span className="text-lg font-display font-bold opacity-30 leading-none">
+                        01.
+                      </span>
                       <div className="space-y-2">
-                        <p className="font-bold uppercase tracking-widest text-[11px] leading-tight">Yalidine Express</p>
-                        <p className="text-xs text-white/60 leading-relaxed">توصيل سريع ومضمون إلى أقرب مكتب ياليدين في ولايتك.</p>
+                        <p className="font-bold uppercase tracking-widest text-[11px] leading-tight">
+                          Maystro Express
+                        </p>
+                        <p className="text-xs text-white/60 leading-relaxed">
+                          توصيل سريع ومضمون إلى أقرب مكتب ياليدين في ولايتك.
+                        </p>
                       </div>
                     </li>
                     <li className="flex gap-6 items-start">
-                      <span className="text-lg font-display font-bold opacity-30 leading-none">02.</span>
+                      <span className="text-lg font-display font-bold opacity-30 leading-none">
+                        02.
+                      </span>
                       <div className="space-y-2">
-                        <p className="font-bold uppercase tracking-widest text-[11px] leading-tight">Secure Payment</p>
-                        <p className="text-xs text-white/60 leading-relaxed">دفع آمن بالدينار الجزائري عبر البطاقة الذهبية أو CIB.</p>
+                        <p className="font-bold uppercase tracking-widest text-[11px] leading-tight">
+                          Secure Payment
+                        </p>
+                        <p className="text-xs text-white/60 leading-relaxed">
+                          دفع آمن بالدينار الجزائري عبر البطاقة الذهبية أو CIB.
+                        </p>
                       </div>
                     </li>
                     <li className="flex gap-6 items-start">
-                      <span className="text-lg font-display font-bold opacity-30 leading-none">03.</span>
+                      <span className="text-lg font-display font-bold opacity-30 leading-none">
+                        03.
+                      </span>
                       <div className="space-y-2">
-                        <p className="font-bold uppercase tracking-widest text-[11px] leading-tight">Local Support</p>
-                        <p className="text-xs text-white/60 leading-relaxed">فريق دعم متواجد لمساندتكم في كل مراحل الطلب.</p>
+                        <p className="font-bold uppercase tracking-widest text-[11px] leading-tight">
+                          Local Support
+                        </p>
+                        <p className="text-xs text-white/60 leading-relaxed">
+                          فريق دعم متواجد لمساندتكم في كل مراحل الطلب.
+                        </p>
                       </div>
                     </li>
                   </ul>
@@ -383,18 +473,18 @@ export default function ProductDetail() {
 
       {/* Lightbox */}
       {zoomedImage && (
-        <div 
+        <div
           className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-xl flex items-center justify-center p-8 animate-in fade-in duration-300"
           onClick={() => setZoomedImage(null)}
         >
           <button className="absolute top-10 right-10 text-white/50 hover:text-white transition-colors">
             <X className="w-10 h-10 stroke-1" />
           </button>
-          <img 
-            src={zoomedImage} 
-            alt="Zoomed" 
+          <img
+            src={zoomedImage}
+            alt="Zoomed"
             className="max-w-full max-h-full shadow-2xl animate-in zoom-in-95 duration-500 shadow-white/5"
-            onClick={(e) => e.stopPropagation()} 
+            onClick={(e) => e.stopPropagation()}
           />
         </div>
       )}

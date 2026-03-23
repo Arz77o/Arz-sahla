@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Calculator,
   Truck,
@@ -12,11 +12,11 @@ import {
   Banknote,
   Info,
   EyeOff,
-  Settings
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { SEOMeta } from '../../components/shared/SEOMeta';
-import { supabaseAdmin } from '../../lib/supabase';
+  Settings,
+} from "lucide-react";
+import { toast } from "sonner";
+import { SEOMeta } from "../../components/shared/SEOMeta";
+import { supabaseAdmin } from "../../lib/supabase";
 
 interface WilayaFee {
   id: number;
@@ -31,8 +31,10 @@ export default function PricingCalculator() {
   const [wilayas, setWilayas] = useState<WilayaFee[]>([]);
   const [loadingWilayas, setLoadingWilayas] = useState(true);
   const [buyPrice, setBuyPrice] = useState<number>(1000);
-  const [shippingType, setShippingType] = useState<'yalidine' | 'manual'>('yalidine');
-  const [deliveryType] = useState<'home' | 'desk'>('desk'); // Hardcoded to desk as requested
+  const [shippingType, setShippingType] = useState<"Maystro" | "manual">(
+    "Maystro",
+  );
+  const [deliveryType] = useState<"home" | "desk">("desk"); // Hardcoded to desk as requested
   const [selectedWilayaCode, setSelectedWilayaCode] = useState<number>(22); // Default Alger
   const [manualShippingFee, setManualShippingFee] = useState<number>(0);
   const [packagingFee, setPackagingFee] = useState<number>(100);
@@ -46,21 +48,24 @@ export default function PricingCalculator() {
     const fetchData = async () => {
       try {
         const [feesRes, settingsRes] = await Promise.all([
-          supabaseAdmin.from('shipping_fees').select('*').order('wilaya_code', { ascending: true }),
-          supabaseAdmin.from('settings').select('*').single()
+          supabaseAdmin
+            .from("shipping_fees")
+            .select("*")
+            .order("wilaya_code", { ascending: true }),
+          supabaseAdmin.from("settings").select("*").single(),
         ]);
 
         if (feesRes.error) throw feesRes.error;
         setWilayas(feesRes.data || []);
-        
+
         if (settingsRes.data) {
           const s = settingsRes.data as any;
           const pm = s.payment_methods || {};
           setProfitMargin(pm.default_profit_margin ?? 50);
         }
       } catch (err: any) {
-        console.error('Error fetching data:', err);
-        toast.error('فشل تحميل الإعدادات');
+        console.error("Error fetching data:", err);
+        toast.error("فشل تحميل الإعدادات");
       } finally {
         setLoadingWilayas(false);
       }
@@ -70,34 +75,44 @@ export default function PricingCalculator() {
   }, []);
 
   const shippingFee = useMemo(() => {
-    if (shippingType === 'manual') return manualShippingFee;
-    const wilaya = wilayas.find(w => w.wilaya_code === selectedWilayaCode);
+    if (shippingType === "manual") return manualShippingFee;
+    const wilaya = wilayas.find((w) => w.wilaya_code === selectedWilayaCode);
     if (!wilaya) return 0;
-    return deliveryType === 'home' ? wilaya.home_fee : wilaya.desk_fee;
-  }, [shippingType, deliveryType, selectedWilayaCode, manualShippingFee, wilayas]);
+    return deliveryType === "home" ? wilaya.home_fee : wilaya.desk_fee;
+  }, [
+    shippingType,
+    deliveryType,
+    selectedWilayaCode,
+    manualShippingFee,
+    wilayas,
+  ]);
 
   const results = useMemo(() => {
     const currentShippingFee = shippingFee;
 
     // COD Calculations
-    const successRateCOD = 1 - (returnRateCOD / 100);
-    const returnRatioCOD = (returnRateCOD / 100) / (successRateCOD || 0.01);
+    const successRateCOD = 1 - returnRateCOD / 100;
+    const returnRatioCOD = returnRateCOD / 100 / (successRateCOD || 0.01);
     const retourLossCOD = currentShippingFee + retourFee + packagingFee;
     const retourShareCOD = returnRatioCOD * retourLossCOD;
-    const realCostCOD = buyPrice + currentShippingFee + packagingFee + retourShareCOD;
+    const realCostCOD =
+      buyPrice + currentShippingFee + packagingFee + retourShareCOD;
     const marginCOD = realCostCOD * (profitMargin / 100);
     const codSell = Math.round((realCostCOD + marginCOD) / 10) * 10;
     const codProfit = codSell - realCostCOD;
     const codMarginActual = (codProfit / (codSell || 1)) * 100;
 
     // Chargily Calculations
-    const successRateChargily = 1 - (returnRateChargily / 100);
-    const returnRatioChargily = (returnRateChargily / 100) / (successRateChargily || 0.01);
+    const successRateChargily = 1 - returnRateChargily / 100;
+    const returnRatioChargily =
+      returnRateChargily / 100 / (successRateChargily || 0.01);
     const retourLossChargily = currentShippingFee + retourFee + packagingFee;
     const retourShareChargily = returnRatioChargily * retourLossChargily;
-    const realCostChargily = buyPrice + currentShippingFee + packagingFee + retourShareChargily;
+    const realCostChargily =
+      buyPrice + currentShippingFee + packagingFee + retourShareChargily;
     const marginChargily = realCostChargily * (profitMargin / 100);
-    const chargilySell = Math.round((realCostChargily + marginChargily) / 10) * 10;
+    const chargilySell =
+      Math.round((realCostChargily + marginChargily) / 10) * 10;
     const chargilyProfit = chargilySell - realCostChargily;
     const chargilyMarginActual = (chargilyProfit / (chargilySell || 1)) * 100;
 
@@ -116,28 +131,39 @@ export default function PricingCalculator() {
       chargilyMarginActual,
       codMarginActual,
       chargilyRejectionLoss,
-      codRejectionLoss
+      codRejectionLoss,
     };
-  }, [buyPrice, shippingFee, packagingFee, retourFee, returnRateCOD, returnRateChargily, profitMargin]);
+  }, [
+    buyPrice,
+    shippingFee,
+    packagingFee,
+    retourFee,
+    returnRateCOD,
+    returnRateChargily,
+    profitMargin,
+  ]);
 
   const handleCopy = () => {
-    const selectedWilaya = wilayas.find(w => w.wilaya_code === selectedWilayaCode);
-    const selectedZoneName = shippingType === 'yalidine'
-      ? `${selectedWilayaCode} - ${selectedWilaya?.wilaya_name} (Yalidine Desk)`
-      : 'بدون شحن';
+    const selectedWilaya = wilayas.find(
+      (w) => w.wilaya_code === selectedWilayaCode,
+    );
+    const selectedZoneName =
+      shippingType === "Maystro"
+        ? `${selectedWilayaCode} - ${selectedWilaya?.wilaya_name} (Maystro Desk)`
+        : "بدون شحن";
 
-    const text = `المنتج: ${buyPrice.toLocaleString('ar-DZ')} دج
-سعر Chargily: ${results.chargilySell.toLocaleString('ar-DZ')} دج — ربح ${results.chargilyProfit.toLocaleString('ar-DZ')} دج
-سعر COD: ${results.codSell.toLocaleString('ar-DZ')} دج — ربح ${results.codProfit.toLocaleString('ar-DZ')} دج
+    const text = `المنتج: ${buyPrice.toLocaleString("ar-DZ")} دج
+سعر Chargily: ${results.chargilySell.toLocaleString("ar-DZ")} دج — ربح ${results.chargilyProfit.toLocaleString("ar-DZ")} دج
+سعر COD: ${results.codSell.toLocaleString("ar-DZ")} دج — ربح ${results.codProfit.toLocaleString("ar-DZ")} دج
 المنطقة: ${selectedZoneName}
 نسبة العودة: Chargily (${returnRateChargily}%) | COD (${returnRateCOD}%)
 هامش الربح: ${profitMargin}%`;
 
     navigator.clipboard.writeText(text);
-    toast.success('تم نسخ النتائج إلى الحافظة');
+    toast.success("تم نسخ النتائج إلى الحافظة");
   };
 
-  const formatPrice = (val: number) => val.toLocaleString('ar-DZ') + ' دج';
+  const formatPrice = (val: number) => val.toLocaleString("ar-DZ") + " دج";
 
   return (
     <div className="space-y-8" dir="rtl">
@@ -148,8 +174,12 @@ export default function PricingCalculator() {
           <Calculator className="w-6 h-6" />
         </div>
         <div>
-          <h1 className="text-2xl font-black text-gray-900">آلة حاسبة التسعير</h1>
-          <p className="text-sm text-gray-500 font-medium">خطط لتسعير منتجاتك بذكاء لضمان الربحية</p>
+          <h1 className="text-2xl font-black text-gray-900">
+            آلة حاسبة التسعير
+          </h1>
+          <p className="text-sm text-gray-500 font-medium">
+            خطط لتسعير منتجاتك بذكاء لضمان الربحية
+          </p>
         </div>
       </div>
 
@@ -181,16 +211,22 @@ export default function PricingCalculator() {
                 </label>
                 <select
                   value={selectedWilayaCode}
-                  onChange={(e) => setSelectedWilayaCode(Number(e.target.value))}
+                  onChange={(e) =>
+                    setSelectedWilayaCode(Number(e.target.value))
+                  }
                   className="w-full px-5 py-4 rounded-2xl border-2 border-gray-100 focus:border-blue-500 outline-none font-bold bg-white text-lg transition-all"
                   disabled={loadingWilayas}
                 >
                   {loadingWilayas ? (
                     <option>جاري التحميل...</option>
                   ) : (
-                    wilayas.map(wilaya => (
-                      <option key={wilaya.wilaya_code} value={wilaya.wilaya_code}>
-                        {wilaya.wilaya_code} - {wilaya.wilaya_name} (+{formatPrice(wilaya.desk_fee)})
+                    wilayas.map((wilaya) => (
+                      <option
+                        key={wilaya.wilaya_code}
+                        value={wilaya.wilaya_code}
+                      >
+                        {wilaya.wilaya_code} - {wilaya.wilaya_name} (+
+                        {formatPrice(wilaya.desk_fee)})
                       </option>
                     ))
                   )}
@@ -198,19 +234,27 @@ export default function PricingCalculator() {
               </div>
 
               {/* Advanced Toggle */}
-              <button 
+              <button
                 onClick={() => setShowAdvanced(!showAdvanced)}
                 className="w-full py-3 px-4 rounded-xl border border-dashed border-gray-300 text-gray-400 text-xs font-bold hover:text-blue-600 hover:border-blue-300 transition-all flex items-center justify-center gap-2"
               >
-                {showAdvanced ? <EyeOff className="w-3.5 h-3.5" /> : <Settings className="w-3.5 h-3.5" />}
-                {showAdvanced ? 'إخفاء الإعدادات المتقدمة' : 'تعديل هوامش الربح والتكاليف الإضافية'}
+                {showAdvanced ? (
+                  <EyeOff className="w-3.5 h-3.5" />
+                ) : (
+                  <Settings className="w-3.5 h-3.5" />
+                )}
+                {showAdvanced
+                  ? "إخفاء الإعدادات المتقدمة"
+                  : "تعديل هوامش الربح والتكاليف الإضافية"}
               </button>
 
               {/* Advanced Settings */}
               {showAdvanced && (
                 <div className="grid grid-cols-2 gap-4 pt-2 animate-in fade-in slide-in-from-top-4 duration-300">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">التغليف</label>
+                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                      التغليف
+                    </label>
                     <input
                       type="number"
                       value={packagingFee}
@@ -219,7 +263,9 @@ export default function PricingCalculator() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">سعر الـ Retour</label>
+                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                      سعر الـ Retour
+                    </label>
                     <input
                       type="number"
                       value={retourFee}
@@ -228,7 +274,9 @@ export default function PricingCalculator() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">العودة COD %</label>
+                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                      العودة COD %
+                    </label>
                     <input
                       type="number"
                       value={returnRateCOD}
@@ -237,18 +285,24 @@ export default function PricingCalculator() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">العودة Chargily %</label>
+                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                      العودة Chargily %
+                    </label>
                     <input
                       type="number"
                       value={returnRateChargily}
-                      onChange={(e) => setReturnRateChargily(Number(e.target.value))}
+                      onChange={(e) =>
+                        setReturnRateChargily(Number(e.target.value))
+                      }
                       className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-blue-500 outline-none font-bold text-sm bg-gray-50/50"
                     />
                   </div>
                   <div className="space-y-1.5 col-span-2">
                     <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex justify-between">
                       <span>نسبة الربح المستهدفة</span>
-                      <span className="text-blue-600 font-black">{profitMargin}%</span>
+                      <span className="text-blue-600 font-black">
+                        {profitMargin}%
+                      </span>
                     </label>
                     <input
                       type="range"
@@ -282,17 +336,25 @@ export default function PricingCalculator() {
                     <ShieldCheck className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-black text-gray-900 tracking-tight">الدفع الإلكتروني</h3>
-                    <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest">Chargily Gateway</p>
+                    <h3 className="font-black text-gray-900 tracking-tight">
+                      الدفع الإلكتروني
+                    </h3>
+                    <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest">
+                      Chargily Gateway
+                    </p>
                   </div>
                 </div>
 
                 <div className="p-6 rounded-[2rem] bg-emerald-50 border-2 border-emerald-100 flex flex-col items-center text-center space-y-2">
-                  <span className="text-xs font-bold text-emerald-700/60 uppercase tracking-widest">سعر البيع المقترح</span>
-                  <div className="text-4xl font-black text-emerald-900 tracking-tighter">{formatPrice(results.chargilySell)}</div>
+                  <span className="text-xs font-bold text-emerald-700/60 uppercase tracking-widest">
+                    سعر البيع المقترح
+                  </span>
+                  <div className="text-4xl font-black text-emerald-900 tracking-tighter">
+                    {formatPrice(results.chargilySell)}
+                  </div>
                   <div className="flex items-center gap-2 px-4 py-1.5 bg-white rounded-full text-emerald-600 font-black text-xs shadow-sm">
-                    <TrendingUp className="w-3.5 h-3.5" />
-                    +{formatPrice(results.chargilyProfit)} ربح صافي
+                    <TrendingUp className="w-3.5 h-3.5" />+
+                    {formatPrice(results.chargilyProfit)} ربح صافي
                   </div>
                 </div>
               </div>
@@ -304,17 +366,25 @@ export default function PricingCalculator() {
                     <Banknote className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-black text-gray-900 tracking-tight">الدفع عند الاستلام</h3>
-                    <p className="text-[10px] text-orange-600 font-bold uppercase tracking-widest">Cash on Delivery</p>
+                    <h3 className="font-black text-gray-900 tracking-tight">
+                      الدفع عند الاستلام
+                    </h3>
+                    <p className="text-[10px] text-orange-600 font-bold uppercase tracking-widest">
+                      Cash on Delivery
+                    </p>
                   </div>
                 </div>
 
                 <div className="p-6 rounded-[2rem] bg-orange-50 border-2 border-orange-100 flex flex-col items-center text-center space-y-2">
-                  <span className="text-xs font-bold text-orange-700/60 uppercase tracking-widest">سعر البيع المقترح</span>
-                  <div className="text-4xl font-black text-orange-900 tracking-tighter">{formatPrice(results.codSell)}</div>
+                  <span className="text-xs font-bold text-orange-700/60 uppercase tracking-widest">
+                    سعر البيع المقترح
+                  </span>
+                  <div className="text-4xl font-black text-orange-900 tracking-tighter">
+                    {formatPrice(results.codSell)}
+                  </div>
                   <div className="flex items-center gap-2 px-4 py-1.5 bg-white rounded-full text-orange-600 font-black text-xs shadow-sm">
-                    <TrendingUp className="w-3.5 h-3.5" />
-                    +{formatPrice(results.codProfit)} ربح صافي
+                    <TrendingUp className="w-3.5 h-3.5" />+
+                    {formatPrice(results.codProfit)} ربح صافي
                   </div>
                 </div>
               </div>
@@ -323,12 +393,20 @@ export default function PricingCalculator() {
             {/* Quick Stats Banner */}
             <div className="grid grid-cols-2 gap-4 pt-6 border-t border-gray-100">
               <div className="text-center">
-                <div className="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">التكلفة (Real Cost)</div>
-                <div className="font-bold text-gray-900 text-sm">{formatPrice(results.realCostCOD)}</div>
+                <div className="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">
+                  التكلفة (Real Cost)
+                </div>
+                <div className="font-bold text-gray-900 text-sm">
+                  {formatPrice(results.realCostCOD)}
+                </div>
               </div>
               <div className="text-center">
-                <div className="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">مخاطرة الـ Retour</div>
-                <div className="font-bold text-red-500 text-sm">-{formatPrice(results.codRejectionLoss)}</div>
+                <div className="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">
+                  مخاطرة الـ Retour
+                </div>
+                <div className="font-bold text-red-500 text-sm">
+                  -{formatPrice(results.codRejectionLoss)}
+                </div>
               </div>
             </div>
           </div>
@@ -337,7 +415,7 @@ export default function PricingCalculator() {
 
       {/* Detail Breakdown - Moved to bottom and made more subtle */}
       <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-6">
-        <button 
+        <button
           onClick={() => handleCopy()}
           className="w-full py-4 bg-gray-900 text-white rounded-2xl font-black flex items-center justify-center gap-2 hover:bg-gray-800 transition-all active:scale-[0.98] shadow-lg shadow-gray-200"
         >
@@ -347,16 +425,36 @@ export default function PricingCalculator() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-70 hover:opacity-100 transition-opacity">
           <div className="p-4 rounded-xl bg-slate-50 text-[10px] space-y-1">
-            <p className="font-bold text-slate-500 uppercase">تفاصيل التكلفة COD</p>
-            <div className="flex justify-between"><span>شراء + تغليف:</span> <span>{formatPrice(buyPrice + packagingFee)}</span></div>
-            <div className="flex justify-between"><span>شحن:</span> <span>{formatPrice(shippingFee)}</span></div>
-            <div className="flex justify-between text-blue-600"><span>تأمين العودة:</span> <span>+{formatPrice(results.retourShareCOD)}</span></div>
+            <p className="font-bold text-slate-500 uppercase">
+              تفاصيل التكلفة COD
+            </p>
+            <div className="flex justify-between">
+              <span>شراء + تغليف:</span>{" "}
+              <span>{formatPrice(buyPrice + packagingFee)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>شحن:</span> <span>{formatPrice(shippingFee)}</span>
+            </div>
+            <div className="flex justify-between text-blue-600">
+              <span>تأمين العودة:</span>{" "}
+              <span>+{formatPrice(results.retourShareCOD)}</span>
+            </div>
           </div>
           <div className="p-4 rounded-xl bg-emerald-50 text-[10px] space-y-1">
-            <p className="font-bold text-emerald-500 uppercase">تفاصيل التكلفة Chargily</p>
-            <div className="flex justify-between"><span>شراء + تغليف:</span> <span>{formatPrice(buyPrice + packagingFee)}</span></div>
-            <div className="flex justify-between"><span>شحن:</span> <span>{formatPrice(shippingFee)}</span></div>
-            <div className="flex justify-between text-emerald-600"><span>تأمين العودة:</span> <span>+{formatPrice(results.retourShareChargily)}</span></div>
+            <p className="font-bold text-emerald-500 uppercase">
+              تفاصيل التكلفة Chargily
+            </p>
+            <div className="flex justify-between">
+              <span>شراء + تغليف:</span>{" "}
+              <span>{formatPrice(buyPrice + packagingFee)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>شحن:</span> <span>{formatPrice(shippingFee)}</span>
+            </div>
+            <div className="flex justify-between text-emerald-600">
+              <span>تأمين العودة:</span>{" "}
+              <span>+{formatPrice(results.retourShareChargily)}</span>
+            </div>
           </div>
         </div>
       </div>

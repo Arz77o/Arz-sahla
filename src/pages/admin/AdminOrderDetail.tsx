@@ -66,7 +66,7 @@ export default function AdminOrderDetail() {
 طريقة التواصل: ${order.contact_preference === "whatsapp" ? "واتساب" : order.contact_preference === "email" ? "إيميل" : "إتصال هاتف"}
 العنوان: ${order.address}، ${order.commune}، ${order.wilaya}
 الرمز البريدي: ${order.zip_code}
-${order.yalidine_desk ? `مكتب ياليدين: ${order.yalidine_desk}` : ""}`;
+${order.Maystro_desk ? `مكتب ياليدين: ${order.Maystro_desk}` : ""}`;
 
     navigator.clipboard
       .writeText(addressText)
@@ -176,19 +176,20 @@ ${order.yalidine_desk ? `مكتب ياليدين: ${order.yalidine_desk}` : ""}`
 
         <div className="flex items-center gap-2">
           <div
-            className={`px-4 py-2 rounded-full text-sm font-bold ${order.status === "delivered"
-              ? "bg-green-100 text-green-800"
-              : order.status === "shipped"
-                ? "bg-blue-100 text-blue-800"
-                : order.status === "not_received" ||
-                  order.status === "cancelled"
-                  ? "bg-red-100 text-red-800"
-                  : order.status === "paid"
-                    ? "bg-emerald-100 text-emerald-800"
-                    : order.status === "processing"
-                      ? "bg-indigo-100 text-indigo-800"
-                      : "bg-gray-100 text-gray-800"
-              }`}
+            className={`px-4 py-2 rounded-full text-sm font-bold ${
+              order.status === "delivered"
+                ? "bg-green-100 text-green-800"
+                : order.status === "shipped"
+                  ? "bg-blue-100 text-blue-800"
+                  : order.status === "not_received" ||
+                      order.status === "cancelled"
+                    ? "bg-red-100 text-red-800"
+                    : order.status === "paid"
+                      ? "bg-emerald-100 text-emerald-800"
+                      : order.status === "processing"
+                        ? "bg-indigo-100 text-indigo-800"
+                        : "bg-gray-100 text-gray-800"
+            }`}
           >
             {order.status === "pending"
               ? "⭐ إنتظار التأكيد"
@@ -207,10 +208,11 @@ ${order.yalidine_desk ? `مكتب ياليدين: ${order.yalidine_desk}` : ""}`
                           : order.status}
           </div>
           <div
-            className={`px-4 py-2 rounded-full text-sm font-bold ${order.payment_method === "cod"
-              ? "bg-amber-100 text-amber-800"
-              : "bg-blue-100 text-blue-800"
-              }`}
+            className={`px-4 py-2 rounded-full text-sm font-bold ${
+              order.payment_method === "cod"
+                ? "bg-amber-100 text-amber-800"
+                : "bg-blue-100 text-blue-800"
+            }`}
           >
             {order.payment_method === "cod"
               ? "الدفع عند الاستلام (COD)"
@@ -261,17 +263,27 @@ ${order.yalidine_desk ? `مكتب ياليدين: ${order.yalidine_desk}` : ""}`
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-500 mb-1">طريقة التأكيد المفضلة</div>
-                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-sm font-bold ${
-                  order.contact_preference === 'whatsapp' ? 'bg-green-100 text-green-800' :
-                  order.contact_preference === 'telegram' ? 'bg-blue-100 text-blue-800' :
-                  order.contact_preference === 'email' ? 'bg-red-100 text-red-800' :
-                  'bg-amber-100 text-amber-800'
-                }`}>
-                  {order.contact_preference === 'whatsapp' ? '✅ واتساب (WhatsApp)' :
-                   order.contact_preference === 'telegram' ? '✈️ تيليقرام (Telegram)' :
-                   order.contact_preference === 'email' ? '✉️ إيميل (Email)' :
-                   '📞 إتصال هاتفي (Phone Call)'}
+                <div className="text-sm text-gray-500 mb-1">
+                  طريقة التأكيد المفضلة
+                </div>
+                <div
+                  className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-sm font-bold ${
+                    order.contact_preference === "whatsapp"
+                      ? "bg-green-100 text-green-800"
+                      : order.contact_preference === "telegram"
+                        ? "bg-blue-100 text-blue-800"
+                        : order.contact_preference === "email"
+                          ? "bg-red-100 text-red-800"
+                          : "bg-amber-100 text-amber-800"
+                  }`}
+                >
+                  {order.contact_preference === "whatsapp"
+                    ? "✅ واتساب (WhatsApp)"
+                    : order.contact_preference === "telegram"
+                      ? "✈️ تيليقرام (Telegram)"
+                      : order.contact_preference === "email"
+                        ? "✉️ إيميل (Email)"
+                        : "📞 إتصال هاتفي (Phone Call)"}
                 </div>
               </div>
               <div className="md:col-span-2">
@@ -279,7 +291,8 @@ ${order.yalidine_desk ? `مكتب ياليدين: ${order.yalidine_desk}` : ""}`
                   العنوان التفصيلي
                 </div>
                 <div className="font-medium text-gray-900 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                  {order.address ? `${order.address}، ` : ""}{order.commune}، {order.wilaya}
+                  {order.address ? `${order.address}، ` : ""}
+                  {order.commune}، {order.wilaya}
                   <br />
                   {order.zip_code && `الرمز البريدي: ${order.zip_code}`}
                 </div>
@@ -290,13 +303,13 @@ ${order.yalidine_desk ? `مكتب ياليدين: ${order.yalidine_desk}` : ""}`
                   <div className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-lg text-sm font-bold text-gray-800 self-start">
                     استلام من المكتب (Stop Desk)
                   </div>
-                  {order.yalidine_desk && (
+                  {order.Maystro_desk && (
                     <div className="p-3 bg-amber-50 border border-amber-100 rounded-lg">
                       <div className="text-xs text-amber-700 mb-1 font-bold">
-                        مكتب Yalidine المحدد:
+                        مكتب Maystro المحدد:
                       </div>
                       <div className="text-amber-900 font-bold">
-                        {order.yalidine_desk}
+                        {order.Maystro_desk}
                       </div>
                     </div>
                   )}
@@ -478,12 +491,12 @@ ${order.yalidine_desk ? `مكتب ياليدين: ${order.yalidine_desk}` : ""}`
                 />
                 {trackingNumber ? (
                   <a
-                    href="https://yalidine-express.com.dz/suivre-un-colis/"
+                    href="https://www.maystro-delivery.com/trackingSD.html"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 text-xs text-blue-600 hover:text-blue-800 font-medium mt-1"
                   >
-                    ↗️ تتبع الطرد على موقع Yalidine
+                    ↗️ تتبع الطرد على موقع Maystro
                   </a>
                 ) : (
                   <p className="text-xs text-gray-400">

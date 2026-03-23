@@ -160,15 +160,16 @@ export default function OrderTracking() {
               </div>
               <div className="flex flex-col items-end">
                 <span
-                  className={`inline-flex items-center px-4 py-1.5 rounded-full text-base font-black shadow-sm ${order.status === "delivered"
-                    ? "bg-green-500 text-white"
-                    : order.status === "shipped"
-                      ? "bg-blue-600 text-white"
-                      : order.status === "not_received" ||
-                        order.status === "cancelled"
-                        ? "bg-red-500 text-white"
-                        : "bg-amber-100 text-amber-800"
-                    }`}
+                  className={`inline-flex items-center px-4 py-1.5 rounded-full text-base font-black shadow-sm ${
+                    order.status === "delivered"
+                      ? "bg-green-500 text-white"
+                      : order.status === "shipped"
+                        ? "bg-blue-600 text-white"
+                        : order.status === "not_received" ||
+                            order.status === "cancelled"
+                          ? "bg-red-500 text-white"
+                          : "bg-amber-100 text-amber-800"
+                  }`}
                 >
                   {order.status === "paid" && "تَمَّ الدَّفْعُ"}
                   {order.status === "processing" && "جَارِي التَّنْفِيذُ"}
@@ -182,18 +183,19 @@ export default function OrderTracking() {
             </div>
 
             <div className="grid grid-cols-1 gap-4 mb-10">
-              {/* Yalidine Tracking Number Box */}
+              {/* Maystro Tracking Number Box */}
               <div
-                className={`p-6 rounded-2xl border flex flex-col justify-between group transition-all text-center ${order.tracking_number
-                  ? "bg-blue-50/50 border-blue-100 hover:border-blue-300"
-                  : "bg-gray-50 border-gray-100 italic"
-                  }`}
+                className={`p-6 rounded-2xl border flex flex-col justify-between group transition-all text-center ${
+                  order.tracking_number
+                    ? "bg-blue-50/50 border-blue-100 hover:border-blue-300"
+                    : "bg-gray-50 border-gray-100 italic"
+                }`}
               >
                 <div className="flex items-center justify-between mb-3 border-b border-blue-100/50 pb-3">
                   <span
                     className={`text-xs font-black uppercase tracking-widest ${order.tracking_number ? "text-blue-600" : "text-gray-400"}`}
                   >
-                    🚚 رقم تتبع الطرد - Yalidine
+                    🚚 رقم تتبع الطرد - Maystro
                   </span>
                   <Truck
                     className={`w-5 h-5 ${order.tracking_number ? "text-blue-400" : "text-gray-300"}`}
@@ -218,13 +220,13 @@ export default function OrderTracking() {
                         <Copy className="w-5 h-5" />
                       </button>
                       <a
-                        href="https://yalidine-express.com.dz/suivre-un-colis/"
+                        href="https://www.maystro-delivery.com/trackingSD.html"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-md hover:bg-blue-700 transition-all hover:scale-105 active:scale-95"
                       >
                         <ExternalLink className="w-5 h-5" />
-                        تتبع على Yalidine
+                        تتبع على Maystro
                       </a>
                     </div>
                   )}
@@ -232,7 +234,7 @@ export default function OrderTracking() {
                 {order.tracking_number && (
                   <p className="text-xs text-blue-600 mt-4 font-bold flex items-center justify-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    ادخل هذا الرقم في موقع Yalidine لتتبع طردك
+                    ادخل هذا الرقم في موقع Maystro لتتبع طردك
                   </p>
                 )}
               </div>
@@ -245,10 +247,11 @@ export default function OrderTracking() {
               {/* Step 1: Received */}
               <div className="relative flex items-start gap-6 mb-10">
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${currentStep >= 1
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-gray-400"
-                    }`}
+                  className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${
+                    currentStep >= 1
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-100 text-gray-400"
+                  }`}
                 >
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
@@ -267,10 +270,11 @@ export default function OrderTracking() {
               {/* Step 2: Confirmed */}
               <div className="relative flex items-start gap-6 mb-10">
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${currentStep >= 2
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-gray-400"
-                    }`}
+                  className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${
+                    currentStep >= 2
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-100 text-gray-400"
+                  }`}
                 >
                   <Clock className="w-6 h-6" />
                 </div>
@@ -289,10 +293,11 @@ export default function OrderTracking() {
               {/* Step 3: Shipped */}
               <div className="relative flex items-start gap-6 mb-10">
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${currentStep >= 3
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-gray-400"
-                    }`}
+                  className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${
+                    currentStep >= 3
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-100 text-gray-400"
+                  }`}
                 >
                   <Truck className="w-6 h-6" />
                 </div>
@@ -300,27 +305,28 @@ export default function OrderTracking() {
                   <h4
                     className={`text-lg font-bold ${currentStep >= 3 ? "text-gray-900" : "text-gray-400"}`}
                   >
-                    تم الشحن (Yalidine)
+                    تم الشحن (Maystro)
                   </h4>
                   <p className="text-sm text-gray-500 mt-1 mb-3">
-                    طلبك الآن مع شركة الشحن وهو في طريقه إلى مكتب الولاية الخاصة بك.
+                    طلبك الآن مع شركة الشحن وهو في طريقه إلى مكتب الولاية الخاصة
+                    بك.
                   </p>
 
                   {order.tracking_number && currentStep >= 3 && (
                     <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 inline-block text-right">
                       <div className="text-xs text-blue-600 font-medium mb-1">
-                        🚚 رقم تتبع Yalidine:
+                        🚚 رقم تتبع Maystro:
                       </div>
                       <div className="font-mono font-bold text-gray-900 text-lg mb-3">
                         {order.tracking_number}
                       </div>
                       <a
-                        href="https://yalidine-express.com.dz/suivre-un-colis/"
+                        href="https://www.maystro-delivery.com/trackingSD.html"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm text-blue-600 hover:text-blue-800 font-medium underline"
                       >
-                        تتبع طردك على موقع Yalidine &larr;
+                        تتبع طردك على موقع Maystro &larr;
                       </a>
                     </div>
                   )}
@@ -330,10 +336,11 @@ export default function OrderTracking() {
               {/* Step 4: Ready for Pickup / Delivered */}
               <div className="relative flex items-start gap-6">
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${currentStep >= 4
-                    ? "bg-green-500 text-white"
-                    : "bg-gray-100 text-gray-400"
-                    }`}
+                  className={`w-12 h-12 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${
+                    currentStep >= 4
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-100 text-gray-400"
+                  }`}
                 >
                   <Home className="w-6 h-6" />
                 </div>

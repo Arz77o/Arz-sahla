@@ -113,7 +113,7 @@ export type Database = {
           tracking_number: string | null;
           user_id: string;
           wilaya: string;
-          yalidine_desk: string | null;
+          Maystro_desk: string | null;
           zip_code: string;
           contact_preference: string;
         };
@@ -135,7 +135,7 @@ export type Database = {
           tracking_number?: string | null;
           user_id: string;
           wilaya: string;
-          yalidine_desk?: string | null;
+          Maystro_desk?: string | null;
           zip_code: string;
           contact_preference?: string;
         };
@@ -157,7 +157,7 @@ export type Database = {
           tracking_number?: string | null;
           user_id?: string;
           wilaya?: string;
-          yalidine_desk?: string | null;
+          Maystro_desk?: string | null;
           zip_code?: string;
           contact_preference?: string;
         };
