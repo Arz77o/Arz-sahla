@@ -432,7 +432,7 @@ export default function ProductDetail() {
                           Maystro Express
                         </p>
                         <p className="text-xs text-white/60 leading-relaxed">
-                          توصيل سريع ومضمون إلى أقرب مكتب ياليدين في ولايتك.
+                          توصيل سريع ومضمون إلى أقرب مكتب مايسترو في ولايتك.
                         </p>
                       </div>
                     </li>

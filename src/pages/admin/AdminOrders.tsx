@@ -6,6 +6,7 @@ import { SEOMeta } from "../../components/shared/SEOMeta";
 import { supabaseAdmin } from "../../lib/supabase";
 import { formatDZD } from "../../lib/pricing";
 import { Button } from "../../components/ui/button";
+import { AdminPageHeader } from "../../components/admin/AdminPageHeader";
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -75,7 +76,7 @@ export default function AdminOrders() {
   const tabs = [
     { id: "all", label: "الكل" },
     { id: "pending", label: "⏳ إنتظار التأكيد" },
-    { id: "paid", label: "💳 مدفوع" },
+    { id: "confirmed", label: "✅ تم التأكيد" },
     { id: "processing", label: "📦 تنفيذ" },
     { id: "shipped", label: "🚚 شحن" },
     { id: "delivered", label: "🤝 مستلم" },
@@ -85,7 +86,7 @@ export default function AdminOrders() {
 
   const statusColor: Record<string, string> = {
     pending: "bg-gray-100 text-gray-700",
-    paid: "bg-emerald-100 text-emerald-800",
+    confirmed: "bg-emerald-100 text-emerald-800",
     processing: "bg-indigo-100 text-indigo-800",
     shipped: "bg-blue-100 text-blue-800",
     delivered: "bg-green-100 text-green-800",
@@ -97,25 +98,25 @@ export default function AdminOrders() {
     <>
       <SEOMeta title="إدارة الطلبات | الإدارة" />
 
-      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">الطلبات</h1>
-          <p className="text-gray-500 mt-1">إدارة وتتبع طلبات العملاء</p>
-        </div>
+      <AdminPageHeader
+        title="الطلبات / Orders"
+        subtitle="إدارة وتتبع طلبات العملاء"
+        kicker="ORDER MANAGEMENT"
+        actions={
+          <form onSubmit={handleSearch} className="relative w-full md:w-80">
+            <input
+              type="text"
+              placeholder="Search by ID / Name / Phone"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 border border-surface-high bg-white focus:border-primary outline-none"
+            />
+            <Search className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
+          </form>
+        }
+      />
 
-        <form onSubmit={handleSearch} className="relative w-full md:w-72">
-          <input
-            type="text"
-            placeholder="بحث برقم الطلب، الاسم، الهاتف..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
-          />
-          <Search className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
-        </form>
-      </div>
-
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-white border border-surface-high overflow-hidden">
         <div className="flex overflow-x-auto border-b border-gray-200">
           {tabs.map((tab) => (
             <button

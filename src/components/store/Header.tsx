@@ -1,20 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, User, LogOut, Globe, Menu, X } from 'lucide-react';
+import { ShoppingCart, User, LogOut, Menu, X } from 'lucide-react';
 import { useCartStore } from '../../store/cartStore';
 import { useAuthStore } from '../../store/authStore';
 import { Button } from '../ui/button';
 
 export const Header: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { getItemCount } = useCartStore();
   const { user, logout } = useAuthStore();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-
-  const toggleLanguage = () => {
-    i18n.changeLanguage(i18n.language === 'ar' ? 'en' : 'ar');
-  };
 
   return (
     <header className="glass-header w-full">
@@ -34,10 +30,6 @@ export const Header: React.FC = () => {
         </nav>
 
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={toggleLanguage} className="hidden sm:flex">
-            <Globe className="w-5 h-5" />
-          </Button>
-
           <Link to="/cart" className="relative">
             <Button variant="ghost" size="icon">
               <ShoppingCart className="w-5 h-5" />
@@ -109,14 +101,6 @@ export const Header: React.FC = () => {
             >
               {t('nav.faq')}
             </Link>
-            <hr className="my-2 border-surface-high" />
-            <div className="flex items-center justify-between p-4 bg-surface-low">
-              <span className="text-sm font-medium">اللغة / Language</span>
-              <Button size="sm" variant="outline" onClick={toggleLanguage} className="gap-2">
-                <Globe className="w-4 h-4" />
-                {i18n.language === 'ar' ? 'English' : 'العربية'}
-              </Button>
-            </div>
             {user ? (
               <div className="flex flex-col gap-2 mt-2">
                 <Link

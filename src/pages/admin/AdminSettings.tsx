@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { SEOMeta } from '../../components/shared/SEOMeta';
 import { supabaseAdmin } from '../../lib/supabase';
 import { Button } from '../../components/ui/button';
+import { AdminPageHeader } from '../../components/admin/AdminPageHeader';
 
 export default function AdminSettings() {
   const [loading, setLoading] = useState(true);
@@ -134,19 +135,20 @@ export default function AdminSettings() {
     <>
       <SEOMeta title="إعدادات المتجر | الإدارة" />
       
-      <div className="mb-8 flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">إعدادات المتجر</h1>
-          <p className="text-gray-500 mt-1">إدارة الشحن، الدفع، وقواعد التسعير</p>
-        </div>
-        <Button 
-          onClick={handleSaveSettings} 
-          disabled={isSaving}
-          className="bg-blue-600 hover:bg-blue-700 h-11 px-8 rounded-xl font-bold"
-        >
-          {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : 'حفظ جميع الإعدادات'}
-        </Button>
-      </div>
+      <AdminPageHeader
+        title="إعدادات المتجر / Settings"
+        subtitle="إدارة الشحن، الدفع، وقواعد التسعير"
+        kicker="STORE CONTROLS"
+        actions={
+          <Button 
+            onClick={handleSaveSettings} 
+            disabled={isSaving}
+            className="bg-blue-600 hover:bg-blue-700 h-11 px-8 font-bold"
+          >
+            {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : 'حفظ جميع الإعدادات / Save All'}
+          </Button>
+        }
+      />
 
       <div className="max-w-4xl space-y-8 pb-12">
           
@@ -260,7 +262,7 @@ export default function AdminSettings() {
               ) : (
                 <table className="w-full text-right border-collapse">
                   <thead>
-                    <tr className="bg-gray-50/50 text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em] sticky top-0 z-10 bg-white border-b border-gray-100 shadow-sm">
+                    <tr className="bg-white text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em] sticky top-0 z-10 border-b border-gray-100 shadow-sm">
                       <th className="px-6 py-4">الولاية</th>
                       <th className="px-6 py-4">السعر (دج)</th>
                     </tr>
@@ -272,7 +274,7 @@ export default function AdminSettings() {
                         <tr key={fee.id} className="hover:bg-gray-50/50 transition-colors group">
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
-                              <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md min-w-[2rem] text-center">{fee.wilaya_code}</span>
+                              <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md min-w-8 text-center">{fee.wilaya_code}</span>
                               <span className="font-bold text-gray-800 text-sm">{fee.wilaya_name}</span>
                             </div>
                           </td>

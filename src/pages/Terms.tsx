@@ -141,7 +141,7 @@ export default function Terms() {
                           Maystro Express
                         </span>{" "}
                         بنظام <span className="italic">Stop Desk</span>{" "}
-                        (الاستلام من المكتب). يلتزم الزبون بالتوجه لمكتب ياليدين
+                        (الاستلام من المكتب). يلتزم الزبون بالتوجه لمكتب مايسترو
                         في ولايته لاستلام طرده فور وصوله.
                       </p>
                     </div>

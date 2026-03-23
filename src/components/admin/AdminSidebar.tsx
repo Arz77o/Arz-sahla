@@ -26,19 +26,19 @@ export const AdminSidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
-    { name: 'لوحة التحكم', path: '/admin', icon: LayoutDashboard },
-    { name: 'الطلبات', path: '/admin/orders', icon: ShoppingCart },
-    { name: 'المنتجات', path: '/admin/products', icon: Package },
-    { name: 'الفئات', path: '/admin/categories', icon: Tags },
-    { name: 'العملاء', path: '/admin/customers', icon: Users },
-    { name: 'آلة حاسبة التسعير', path: '/admin/pricing-calculator', icon: Calculator },
-    { name: 'الإعدادات', path: '/admin/settings', icon: Settings },
+    { name: 'لوحة التحكم / Dashboard', path: '/admin', icon: LayoutDashboard },
+    { name: 'الطلبات / Orders', path: '/admin/orders', icon: ShoppingCart },
+    { name: 'المنتجات / Products', path: '/admin/products', icon: Package },
+    { name: 'الفئات / Categories', path: '/admin/categories', icon: Tags },
+    { name: 'العملاء / Customers', path: '/admin/customers', icon: Users },
+    { name: 'حاسبة التسعير / Pricing', path: '/admin/pricing-calculator', icon: Calculator },
+    { name: 'الإعدادات / Settings', path: '/admin/settings', icon: Settings },
   ];
 
   return (
     <>
       {/* Mobile Toggle Button (Floating) */}
-      <div className="lg:hidden fixed bottom-6 right-6 z-[60]">
+      <div className="lg:hidden fixed bottom-6 right-6 z-60">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="p-4 bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
@@ -56,12 +56,12 @@ export const AdminSidebar: React.FC = () => {
       )}
 
       <aside className={cn(
-        "bg-gray-900 text-white flex flex-col min-h-screen transition-all duration-300 z-50",
+        "bg-gray-950 text-white flex flex-col min-h-screen transition-all duration-300 z-50 border-l border-gray-800/80",
         "fixed inset-y-0 right-0 lg:static lg:w-64 w-72 lg:translate-x-0",
         isOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"
       )}>
         <div className="p-6 border-b border-gray-800 flex items-center justify-between shrink-0">
-          <Link to="/" className="text-2xl font-bold text-blue-500">Sahla Admin</Link>
+          <Link to="/" className="text-xl font-display font-bold text-blue-400 tracking-tight">Sahla Admin Panel</Link>
           <button
             onClick={() => setIsOpen(false)}
             className="lg:hidden text-gray-400 hover:text-white"
@@ -72,7 +72,7 @@ export const AdminSidebar: React.FC = () => {
 
         <div className="p-4 border-b border-gray-800 flex items-center justify-between group relative shrink-0">
           <div className="flex-1 overflow-hidden">
-            <div className="text-sm text-gray-400">مرحباً،</div>
+            <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Welcome / مرحبا</div>
             <div className="font-medium truncate text-[11px]">{user?.user_metadata?.full_name || user?.email}</div>
           </div>
           <div className="relative">
@@ -93,7 +93,7 @@ export const AdminSidebar: React.FC = () => {
 
             {/* Notifications Dropdown - Positioned left of sidebar on desktop */}
             {showNotifications && (
-              <div className="absolute top-full left-0 lg:left-auto lg:right-0 mt-4 w-80 bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-gray-100 text-gray-900 z-[100] animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
+              <div className="absolute top-full left-0 lg:left-auto lg:right-0 mt-4 w-80 bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-gray-100 text-gray-900 z-100 animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
                 <div className="p-5 bg-gray-100/50 border-b border-gray-100 flex items-center justify-between backdrop-blur-md">
                   <div className="flex items-center gap-2">
                     <span className="font-black text-sm">التنبيهات</span>
@@ -186,10 +186,10 @@ export const AdminSidebar: React.FC = () => {
                 logout();
                 setIsOpen(false);
               }}
-              className="flex items-center gap-3 px-3 py-2 w-full text-right rounded-md text-red-400 hover:bg-gray-800 transition-colors"
+            className="flex items-center gap-3 px-3 py-2 w-full text-right rounded-md text-red-400 hover:bg-gray-800 transition-colors text-xs font-bold uppercase tracking-widest"
             >
               <LogOut className="w-5 h-5" />
-              تسجيل الخروج
+              تسجيل الخروج / Sign out
             </button>
           </div>
         </div>

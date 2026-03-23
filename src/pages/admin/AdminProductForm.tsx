@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import {
   Loader2,
   Save,
-  ArrowRight,
   Image as ImageIcon,
   X,
   Star,
@@ -24,6 +23,7 @@ import { SEOMeta } from "../../components/shared/SEOMeta";
 import { supabaseAdmin } from "../../lib/supabase";
 import { formatAdminPreview } from "../../lib/pricing";
 import { Button } from "../../components/ui/button";
+import { AdminPageHeader } from "../../components/admin/AdminPageHeader";
 
 // ✅ No zodResolver — avoids all Zod v4 type inference conflicts.
 // We validate manually in onSubmit instead.
@@ -295,17 +295,20 @@ export default function AdminProductForm() {
         title={isEdit ? "تعديل منتج | الإدارة" : "إضافة منتج | الإدارة"}
       />
 
-      <div className="mb-8 flex items-center gap-3">
-        <Link
-          to="/admin/products"
-          className="text-gray-500 hover:text-gray-900"
-        >
-          <ArrowRight className="w-5 h-5" />
-        </Link>
-        <h1 className="text-2xl font-bold text-gray-900">
-          {isEdit ? "تعديل منتج" : "إضافة منتج جديد"}
-        </h1>
-      </div>
+      <AdminPageHeader
+        title={isEdit ? "تعديل منتج / Edit Product" : "إضافة منتج / New Product"}
+        subtitle="كتالوج المنتجات - Product Catalog"
+        kicker={isEdit ? "UPDATE MODE" : "CREATE MODE"}
+        breadcrumb={
+          <span className="inline-flex items-center gap-2">
+            <Link to="/admin/products" className="text-gray-500 hover:text-gray-900">
+              المنتجات / Products
+            </Link>
+            <span>/</span>
+            <span className="font-mono text-gray-500">{isEdit ? id : "NEW"}</span>
+          </span>
+        }
+      />
 
       <form
         onSubmit={handleSubmit(onSubmit)}

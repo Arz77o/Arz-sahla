@@ -35,7 +35,7 @@ export default function OrderSuccess() {
           // Track Purchase for GA4
           const isSuccessful =
             data.payment_method === 'cod' ||
-            (data.payment_method === 'chargily' && data.status === 'paid');
+            (data.payment_method === 'chargily' && data.status === 'confirmed');
 
           if (isSuccessful) {
             gtag.trackEcommerce('purchase', {

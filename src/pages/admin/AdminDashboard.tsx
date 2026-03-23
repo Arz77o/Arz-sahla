@@ -19,6 +19,7 @@ import { Button } from "../../components/ui/button";
 import { Link } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
+import { AdminPageHeader } from "../../components/admin/AdminPageHeader";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -68,7 +69,7 @@ export default function AdminDashboard() {
           supabaseAdmin
             .from("orders")
             .select("*", { count: "exact", head: true })
-            .eq("status", "paid"),
+            .eq("status", "confirmed"),
           supabaseAdmin
             .from("orders")
             .select("*", { count: "exact", head: true })
@@ -94,7 +95,7 @@ export default function AdminDashboard() {
         const { data: itemsData } = await (supabaseAdmin as any)
           .from("order_items")
           .select("quantity, unit_price_dzd, products(price_usd), orders!inner(status)")
-          .in("orders.status", ["paid", "processing", "shipped", "delivered"]);
+          .in("orders.status", ["confirmed", "processing", "shipped", "delivered"]);
 
         let totalProfit = 0;
         let purchaseCost = 0;
@@ -183,7 +184,7 @@ export default function AdminDashboard() {
             )
           )
         `)
-        .in("status", ["paid", "processing", "shipped", "delivered"])
+        .in("status", ["confirmed", "processing", "shipped", "delivered"])
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -275,31 +276,28 @@ export default function AdminDashboard() {
     <>
       <SEOMeta title="لوحة التحكم | الإدارة" />
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
-        <div>
-          <h1 className="text-3xl font-black text-gray-900 tracking-tight">
-            نطرة عامة
-          </h1>
-          <p className="text-gray-500 mt-1 font-medium">
-            متابعة سريعة لأداء Sahla DZ اليوم
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <Button
-            variant="outline"
-            className="bg-white border-gray-200 gap-2 rounded-xl"
-            onClick={handleExportExcel}
-          >
-            <Download className="w-4 h-4" />
-            تصدير البيانات
-          </Button>
-          <Link to="/admin/orders">
-            <Button className="bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-100 rounded-xl px-6">
-              إدارة الطلبات
+      <AdminPageHeader
+        title="نظرة عامة / Dashboard"
+        subtitle="متابعة سريعة لأداء Sahla DZ اليوم"
+        kicker="DAILY BUSINESS SNAPSHOT"
+        actions={
+          <>
+            <Button
+              variant="outline"
+              className="bg-white border-surface-high gap-2"
+              onClick={handleExportExcel}
+            >
+              <Download className="w-4 h-4" />
+              تصدير البيانات / Export
             </Button>
-          </Link>
-        </div>
-      </div>
+            <Link to="/admin/orders">
+              <Button className="bg-blue-600 hover:bg-blue-700 px-6">
+                إدارة الطلبات / Orders
+              </Button>
+            </Link>
+          </>
+        }
+      />
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
@@ -317,7 +315,7 @@ export default function AdminDashboard() {
           return (
             <div
               key={i}
-              className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm transition-all hover:border-blue-100 group"
+              className="bg-white p-6 border border-surface-high transition-all hover:border-blue-100 group"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 ${itemColorClass}`}>
@@ -341,7 +339,7 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 gap-8">
         {/* Top Products */}
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+        <div className="bg-white p-8 border border-surface-high">
           <div className="flex items-center justify-between mb-8">
             <h3 className="font-black text-gray-900 text-lg flex items-center gap-2">
               <Award className="w-5 h-5 text-amber-500" />

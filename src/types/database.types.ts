@@ -401,7 +401,7 @@ export type Database = {
       availability_reason: "not_found" | "seller_closed" | "out_of_stock";
       order_status:
         | "pending"
-        | "paid"
+        | "confirmed"
         | "processing"
         | "shipped"
         | "delivered"

@@ -9,7 +9,6 @@ import {
   DollarSign,
   UserCheck,
   UserX,
-  ArrowRight,
   MapPin,
   Clock,
   ExternalLink,
@@ -19,6 +18,7 @@ import { supabaseAdmin } from "../../lib/supabase";
 import { formatDZD } from "../../lib/pricing";
 import { Button } from "../../components/ui/button";
 import { toast } from "sonner";
+import { AdminPageHeader } from "../../components/admin/AdminPageHeader";
 
 export default function AdminCustomerDetail() {
   const { id } = useParams<{ id: string }>();
@@ -117,26 +117,23 @@ export default function AdminCustomerDetail() {
         title={`تفاصيل العميل: ${customer.full_name || customer.email} | الإدارة`}
       />
 
-      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Link
-            to="/admin/customers"
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <ArrowRight className="w-6 h-6 text-gray-500" />
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {customer.full_name || "عميل جوّال"}
-            </h1>
-            <p className="text-gray-500">
-              معرّف العميل:{" "}
-              <span className="font-mono text-xs">{customer.id}</span>
-            </p>
-          </div>
-        </div>
-
-        <div className="flex gap-3">
+      <AdminPageHeader
+        title={`${customer.full_name || "عميل جوّال"} / Customer Profile`}
+        subtitle={
+          `معرّف العميل: ${customer.id}`
+        }
+        kicker="CUSTOMER DETAIL"
+        breadcrumb={
+          <span className="inline-flex items-center gap-2">
+            <Link to="/admin/customers" className="text-gray-500 hover:text-gray-900">
+              العملاء / Customers
+            </Link>
+            <span>/</span>
+            <span className="font-mono text-gray-500 text-xs">{customer.id}</span>
+          </span>
+        }
+        actions={
+          <div className="flex gap-3">
           <Button
             variant={customer.is_active !== false ? "outline" : "default"}
             onClick={toggleStatus}
@@ -156,8 +153,9 @@ export default function AdminCustomerDetail() {
             )}
             {customer.is_active !== false ? "حظر الحساب" : "تفعيل الحساب"}
           </Button>
-        </div>
-      </div>
+          </div>
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Profile Card */}
@@ -323,7 +321,7 @@ export default function AdminCustomerDetail() {
                                   : order.status === "not_received" ||
                                       order.status === "cancelled"
                                     ? "bg-red-100 text-red-700"
-                                    : order.status === "paid"
+                                    : order.status === "confirmed"
                                       ? "bg-emerald-100 text-emerald-700"
                                       : "bg-gray-100 text-gray-600"
                             }`}

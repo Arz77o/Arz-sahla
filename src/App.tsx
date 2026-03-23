@@ -46,7 +46,7 @@ const PricingCalculator = lazy(() => import('./pages/admin/PricingCalculator'));
 const StoreLayout = () => (
   <div className="min-h-screen flex flex-col font-sans bg-gray-50">
     <Header />
-    <main className="flex-grow">
+    <main className="grow">
       <Suspense fallback={<PageLoader />}>
         <Outlet />
       </Suspense>
@@ -56,9 +56,9 @@ const StoreLayout = () => (
 );
 
 const AdminLayout = () => (
-  <div className="min-h-screen flex flex-col lg:flex-row font-sans bg-gray-100" dir="rtl">
+  <div className="min-h-screen flex flex-col lg:flex-row font-sans bg-surface-low" dir="rtl">
     <AdminSidebar />
-    <main className="flex-grow overflow-x-hidden p-4 md:p-8">
+    <main className="grow overflow-x-hidden p-4 md:p-8 lg:p-10">
       <Suspense fallback={<PageLoader />}>
         <Outlet />
       </Suspense>

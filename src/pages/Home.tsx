@@ -1,13 +1,59 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ShoppingBag, Truck, Headset, ShieldCheck } from "lucide-react";
+import {
+  ShoppingBag,
+  Truck,
+  Headset,
+  ShieldCheck,
+  Watch,
+  Smartphone,
+  Laptop,
+  Headphones,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { SEOMeta } from "../components/shared/SEOMeta";
 import { ProductCard } from "../components/store/ProductCard";
 import { Button } from "../components/ui/button";
 import { Reveal } from "../components/shared/Reveal";
 import { useProducts } from "../hooks/useProducts";
 import { useCategories } from "../hooks/useCategories";
+
+const slugIconMap: Record<string, string> = {
+  watches: "Watch",
+  watch: "Watch",
+  phones: "Smartphone",
+  phone: "Smartphone",
+  laptop: "Laptop",
+  laptops: "Laptop",
+  computer: "Laptop",
+  computers: "Laptop",
+  headset: "Headphones",
+  headsets: "Headphones",
+  audio: "Headphones",
+};
+
+const toPascalCase = (value: string): string =>
+  value
+    .trim()
+    .replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ""))
+    .replace(/^(.)/, (c) => c.toUpperCase());
+
+const iconByName: Record<string, LucideIcon> = {
+  ShoppingBag,
+  Watch,
+  Smartphone,
+  Laptop,
+  Headphones,
+};
+
+const getCategoryIcon = (iconName?: string | null, slug?: string): LucideIcon => {
+  const preferred = iconName?.trim() || (slug ? slugIconMap[slug.toLowerCase()] : undefined);
+  if (!preferred) return ShoppingBag;
+
+  const normalized = toPascalCase(preferred);
+  return iconByName[normalized] || ShoppingBag;
+};
 
 export default function Home() {
   const { i18n } = useTranslation();
@@ -89,21 +135,24 @@ export default function Home() {
             </div>
           </div>
           <div className="flex flex-wrap justify-start border-t border-r border-gray-200">
-            {categories.map((cat, i) => (
-              <Reveal key={cat.id} delay={i * 0.05 + 0.1} width="auto">
-                <Link
-                  to={`/products?category=${cat.slug}`}
-                  className="group flex flex-col items-center justify-center p-8 md:p-12 bg-white hover:bg-surface-high transition-all duration-300 w-full min-w-[160px] md:min-w-[200px] border-l border-b border-gray-200"
-                >
-                  <div className="w-12 h-12 text-gray-400 group-hover:text-primary transition-colors mb-4">
-                    <ShoppingBag className="w-full h-full stroke-1" />
-                  </div>
-                  <span className="text-xs font-bold text-gray-900 uppercase tracking-widest text-center">
-                    {isAr ? cat.name_ar : cat.name_en}
-                  </span>
-                </Link>
-              </Reveal>
-            ))}
+            {categories.map((cat, i) => {
+              const CategoryIcon = getCategoryIcon(cat.icon, cat.slug);
+              return (
+                <Reveal key={cat.id} delay={i * 0.05 + 0.1} width="auto">
+                  <Link
+                    to={`/products?category=${cat.slug}`}
+                    className="group flex flex-col items-center justify-center p-8 md:p-12 bg-white hover:bg-surface-high transition-all duration-300 w-full min-w-[160px] md:min-w-[200px] border-l border-b border-gray-200"
+                  >
+                    <div className="w-12 h-12 text-gray-400 group-hover:text-primary transition-colors mb-4">
+                      <CategoryIcon className="w-full h-full stroke-1" />
+                    </div>
+                    <span className="text-xs font-bold text-gray-900 uppercase tracking-widest text-center">
+                      {isAr ? cat.name_ar : cat.name_en}
+                    </span>
+                  </Link>
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </section>

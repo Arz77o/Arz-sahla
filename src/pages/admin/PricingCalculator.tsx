@@ -17,6 +17,7 @@ import {
 import { toast } from "sonner";
 import { SEOMeta } from "../../components/shared/SEOMeta";
 import { supabaseAdmin } from "../../lib/supabase";
+import { AdminPageHeader } from "../../components/admin/AdminPageHeader";
 
 interface WilayaFee {
   id: number;
@@ -169,19 +170,11 @@ export default function PricingCalculator() {
     <div className="space-y-8" dir="rtl">
       <SEOMeta title="آلة حاسبة التسعير | الإدارة" />
 
-      <div className="flex items-center gap-3">
-        <div className="p-3 bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-200">
-          <Calculator className="w-6 h-6" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-black text-gray-900">
-            آلة حاسبة التسعير
-          </h1>
-          <p className="text-sm text-gray-500 font-medium">
-            خطط لتسعير منتجاتك بذكاء لضمان الربحية
-          </p>
-        </div>
-      </div>
+      <AdminPageHeader
+        title="آلة حاسبة التسعير / Pricing Calculator"
+        subtitle="خطط لتسعير منتجاتك بذكاء لضمان الربحية"
+        kicker="PROFIT PLANNING TOOL"
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         {/* Left Column - Inputs */}
@@ -345,7 +338,7 @@ export default function PricingCalculator() {
                   </div>
                 </div>
 
-                <div className="p-6 rounded-[2rem] bg-emerald-50 border-2 border-emerald-100 flex flex-col items-center text-center space-y-2">
+                <div className="p-6 rounded-4xl bg-emerald-50 border-2 border-emerald-100 flex flex-col items-center text-center space-y-2">
                   <span className="text-xs font-bold text-emerald-700/60 uppercase tracking-widest">
                     سعر البيع المقترح
                   </span>
@@ -375,7 +368,7 @@ export default function PricingCalculator() {
                   </div>
                 </div>
 
-                <div className="p-6 rounded-[2rem] bg-orange-50 border-2 border-orange-100 flex flex-col items-center text-center space-y-2">
+                <div className="p-6 rounded-4xl bg-orange-50 border-2 border-orange-100 flex flex-col items-center text-center space-y-2">
                   <span className="text-xs font-bold text-orange-700/60 uppercase tracking-widest">
                     سعر البيع المقترح
                   </span>

@@ -6,6 +6,7 @@ import { formatDZD, calculatePriceDZD } from '../../lib/pricing';
 import { Button } from '../../components/ui/button';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useProducts, useDeleteProduct } from '../../hooks/useProducts';
+import { AdminPageHeader } from '../../components/admin/AdminPageHeader';
 
 export default function AdminProducts() {
   const { usd_to_dzd_rate, commission_rate } = useSettingsStore();
@@ -22,21 +23,21 @@ export default function AdminProducts() {
     <>
       <SEOMeta title="إدارة المنتجات | الإدارة" />
 
-      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">المنتجات</h1>
-          <p className="text-gray-500 mt-1">إضافة وتعديل وحذف المنتجات</p>
-        </div>
+      <AdminPageHeader
+        title="المنتجات / Products"
+        subtitle="إضافة وتعديل وحذف المنتجات"
+        kicker="PRODUCT CATALOG"
+        actions={
+          <Link to="/admin/products/new">
+            <Button className="bg-blue-600 hover:bg-blue-700 font-bold px-6">
+              <Plus className="w-5 h-5 ml-2" />
+              إضافة منتج جديد / New Product
+            </Button>
+          </Link>
+        }
+      />
 
-        <Link to="/admin/products/new">
-          <Button className="bg-blue-600 hover:bg-blue-700 font-bold px-6">
-            <Plus className="w-5 h-5 ml-2" />
-            إضافة منتج جديد
-          </Button>
-        </Link>
-      </div>
-
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-white border border-surface-high overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-right">
             <thead className="bg-gray-50 border-b border-gray-200">

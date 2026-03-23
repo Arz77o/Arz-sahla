@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { SEOMeta } from '../../components/shared/SEOMeta';
 import { Button } from '../../components/ui/button';
 import type { Database } from '../../types/database.types';
+import { AdminPageHeader } from '../../components/admin/AdminPageHeader';
 import { 
   useCategories, 
   useDeleteCategory, 
@@ -82,25 +83,25 @@ export default function AdminCategories() {
     <>
       <SEOMeta title="إدارة الفئات | الإدارة" />
       
-      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">الفئات</h1>
-          <p className="text-gray-500 mt-1">إدارة فئات المنتجات</p>
-        </div>
-        
-        {!isEditing && (
-          <Button onClick={() => setIsEditing(true)} className="bg-blue-600 hover:bg-blue-700 font-bold px-6">
-            <Plus className="w-5 h-5 ml-2" />
-            إضافة فئة جديدة
-          </Button>
-        )}
-      </div>
+      <AdminPageHeader
+        title="الفئات / Categories"
+        subtitle="إدارة فئات المنتجات"
+        kicker="CATEGORY SYSTEM"
+        actions={
+          !isEditing ? (
+            <Button onClick={() => setIsEditing(true)} className="bg-blue-600 hover:bg-blue-700 font-bold px-6">
+              <Plus className="w-5 h-5 ml-2" />
+              إضافة فئة جديدة / New Category
+            </Button>
+          ) : null
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Form */}
         {isEditing && (
           <div className="lg:col-span-1">
-            <form onSubmit={handleSave} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4 sticky top-24">
+            <form onSubmit={handleSave} className="bg-white p-6 border border-surface-high space-y-4 sticky top-24">
               <div className="flex justify-between items-center mb-4 border-b pb-2">
                 <h2 className="text-lg font-bold text-gray-900">
                   {editId ? 'تعديل فئة' : 'إضافة فئة جديدة'}
@@ -172,7 +173,7 @@ export default function AdminCategories() {
 
         {/* List */}
         <div className={isEditing ? 'lg:col-span-2' : 'lg:col-span-3'}>
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="bg-white border border-surface-high overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-right">
                 <thead className="bg-gray-50 border-b border-gray-200">

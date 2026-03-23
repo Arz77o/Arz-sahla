@@ -13,6 +13,7 @@ import { SEOMeta } from "../../components/shared/SEOMeta";
 import { supabaseAdmin } from "../../lib/supabase";
 import { formatDZD } from "../../lib/pricing";
 import { Button } from "../../components/ui/button";
+import { AdminPageHeader } from "../../components/admin/AdminPageHeader";
 
 export default function AdminOrderDetail() {
   const { id } = useParams<{ id: string }>();
@@ -66,7 +67,7 @@ export default function AdminOrderDetail() {
 طريقة التواصل: ${order.contact_preference === "whatsapp" ? "واتساب" : order.contact_preference === "email" ? "إيميل" : "إتصال هاتف"}
 العنوان: ${order.address}، ${order.commune}، ${order.wilaya}
 الرمز البريدي: ${order.zip_code}
-${order.Maystro_desk ? `مكتب ياليدين: ${order.Maystro_desk}` : ""}`;
+${order.Maystro_desk ? `مكتب مايسترو: ${order.Maystro_desk}` : ""}`;
 
     navigator.clipboard
       .writeText(addressText)
@@ -155,71 +156,72 @@ ${order.Maystro_desk ? `مكتب ياليدين: ${order.Maystro_desk}` : ""}`;
     <>
       <SEOMeta title={`تفاصيل الطلب #${order.id.split("-")[0]} | الإدارة`} />
 
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-3 mb-1">
+      <AdminPageHeader
+        title={`طلب / Order #${order.id.split("-")[0]}`}
+        subtitle={new Date(order.created_at).toLocaleString("ar-DZ")}
+        kicker="ORDER DETAIL"
+        breadcrumb={
+          <span className="inline-flex items-center gap-2">
             <Link
               to="/admin/orders"
               className="text-gray-500 hover:text-gray-900"
             >
-              الطلبات
+              الطلبات / Orders
             </Link>
-            <span className="text-gray-400">/</span>
-            <h1 className="text-2xl font-bold text-gray-900 font-mono">
+            <span>/</span>
+            <span className="font-mono text-gray-500">
               #{order.id.split("-")[0]}
-            </h1>
-          </div>
-          <p className="text-gray-500">
-            {new Date(order.created_at).toLocaleString("ar-DZ")}
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <div
-            className={`px-4 py-2 rounded-full text-sm font-bold ${
-              order.status === "delivered"
-                ? "bg-green-100 text-green-800"
-                : order.status === "shipped"
-                  ? "bg-blue-100 text-blue-800"
-                  : order.status === "not_received" ||
-                      order.status === "cancelled"
-                    ? "bg-red-100 text-red-800"
-                    : order.status === "paid"
-                      ? "bg-emerald-100 text-emerald-800"
-                      : order.status === "processing"
-                        ? "bg-indigo-100 text-indigo-800"
-                        : "bg-gray-100 text-gray-800"
-            }`}
-          >
-            {order.status === "pending"
-              ? "⭐ إنتظار التأكيد"
-              : order.status === "paid"
-                ? "✅ مدفوع"
-                : order.status === "processing"
-                  ? "⏳ قيد التنفيذ"
+            </span>
+          </span>
+        }
+        actions={
+          <div className="flex items-center gap-2">
+            <div
+              className={`px-4 py-2 rounded-full text-sm font-bold ${
+                order.status === "delivered"
+                  ? "bg-green-100 text-green-800"
                   : order.status === "shipped"
-                    ? "🚚 تم الشحن"
-                    : order.status === "delivered"
-                      ? "🎁 تم التسليم"
-                      : order.status === "not_received"
-                        ? "❌ غير مستلم"
-                        : order.status === "cancelled"
-                          ? "❌ ملغى"
-                          : order.status}
+                    ? "bg-blue-100 text-blue-800"
+                    : order.status === "not_received" ||
+                        order.status === "cancelled"
+                      ? "bg-red-100 text-red-800"
+                      : order.status === "confirmed"
+                        ? "bg-emerald-100 text-emerald-800"
+                        : order.status === "processing"
+                          ? "bg-indigo-100 text-indigo-800"
+                          : "bg-gray-100 text-gray-800"
+              }`}
+            >
+              {order.status === "pending"
+                ? "⭐ إنتظار التأكيد"
+                : order.status === "confirmed"
+                  ? "✅ تم التأكد"
+                  : order.status === "processing"
+                    ? "⏳ قيد التنفيذ"
+                    : order.status === "shipped"
+                      ? "🚚 تم الشحن"
+                      : order.status === "delivered"
+                        ? "🎁 تم التسليم"
+                        : order.status === "not_received"
+                          ? "❌ غير مستلم"
+                          : order.status === "cancelled"
+                            ? "❌ ملغى"
+                            : order.status}
+            </div>
+            <div
+              className={`px-4 py-2 rounded-full text-sm font-bold ${
+                order.payment_method === "cod"
+                  ? "bg-amber-100 text-amber-800"
+                  : "bg-blue-100 text-blue-800"
+              }`}
+            >
+              {order.payment_method === "cod"
+                ? "الدفع عند الاستلام (COD)"
+                : "دفع إلكتروني (Chargily)"}
+            </div>
           </div>
-          <div
-            className={`px-4 py-2 rounded-full text-sm font-bold ${
-              order.payment_method === "cod"
-                ? "bg-amber-100 text-amber-800"
-                : "bg-blue-100 text-blue-800"
-            }`}
-          >
-            {order.payment_method === "cod"
-              ? "الدفع عند الاستلام (COD)"
-              : "دفع إلكتروني (Chargily)"}
-          </div>
-        </div>
-      </div>
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Customer & Order Details */}
@@ -343,7 +345,7 @@ ${order.Maystro_desk ? `مكتب ياليدين: ${order.Maystro_desk}` : ""}`;
                   >
                     {/* Product header row */}
                     <div className="flex gap-4 items-center p-4 bg-gray-50">
-                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-white border border-gray-200 flex-shrink-0">
+                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-white border border-gray-200 shrink-0">
                         <img
                           src={
                             item.products?.images?.[0] ||
@@ -468,7 +470,7 @@ ${order.Maystro_desk ? `مكتب ياليدين: ${order.Maystro_desk}` : ""}`;
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
                 >
                   <option value="pending">إنتظار التأكيد (confirmation)</option>
-                  <option value="paid">مدفوع (Paid)</option>
+                  <option value="confirmed">تم التأكيد(Confirmed)</option>
                   <option value="processing">قيد التنفيذ (Processing)</option>
                   <option value="shipped">تم الشحن (Shipped)</option>
                   <option value="delivered">تم التسليم (Delivered)</option>
@@ -479,7 +481,7 @@ ${order.Maystro_desk ? `مكتب ياليدين: ${order.Maystro_desk}` : ""}`;
 
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                  🚚 رقم تتبع ياليدين
+                  🚚 رقم تتبع مايسترو
                 </label>
                 <input
                   type="text"
@@ -500,7 +502,7 @@ ${order.Maystro_desk ? `مكتب ياليدين: ${order.Maystro_desk}` : ""}`;
                   </a>
                 ) : (
                   <p className="text-xs text-gray-400">
-                    أضف رقم التتبع المقدم من ياليدين ليتمكن الزبون من التتبع.
+                    أضف رقم التتبع المقدم من مايسترو ليتمكن الزبون من التتبع.
                   </p>
                 )}
               </div>

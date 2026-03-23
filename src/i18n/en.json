@@ -36,7 +36,7 @@
   },
   "order": {
     "pending": "Pending",
-    "paid": "Paid",
+    "confirmed": "confirmed",
     "processing": "Preparing",
     "shipped": "Shipped",
     "delivered": "Delivered",
