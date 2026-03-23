@@ -38,10 +38,10 @@ export default function PricingCalculator() {
   const [selectedWilayaCode, setSelectedWilayaCode] = useState<number>(22); // Default Alger
   const [manualShippingFee, setManualShippingFee] = useState<number>(0);
   const [packagingFee, setPackagingFee] = useState<number>(100);
-  const [retourFee, setRetourFee] = useState<number>(350);
-  const [returnRateCOD, setReturnRateCOD] = useState<number>(20);
+  const [retourFee, setRetourFee] = useState<number>(130);
+  const [returnRateCOD, setReturnRateCOD] = useState<number>(30);
   const [returnRateChargily, setReturnRateChargily] = useState<number>(1);
-  const [profitMargin, setProfitMargin] = useState<number>(50);
+  const [profitMargin, setProfitMargin] = useState<number>(40);
   const [showAdvanced, setShowAdvanced] = useState<boolean>(false);
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export default function PricingCalculator() {
         if (settingsRes.data) {
           const s = settingsRes.data as any;
           const pm = s.payment_methods || {};
-          setProfitMargin(pm.default_profit_margin ?? 50);
+          setProfitMargin(pm.default_profit_margin ?? 40);
         }
       } catch (err: any) {
         console.error("Error fetching data:", err);

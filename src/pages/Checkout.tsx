@@ -24,7 +24,7 @@ const checkoutSchema = z.object({
   phone: z
     .string()
     .regex(/^(0)(5|6|7)[0-9]{8}$/, "رقم هاتف غير صالح (مثال: 0550123456)"),
-  address: z.string().optional(),
+  address: z.string().min(5, "العنوان بالتفصيل مطلوب"),
   paymentMethod: z.enum(["cod", "chargily"], {
     message: "يرجى اختيار طريقة الدفع",
   }),
@@ -56,7 +56,7 @@ export default function Checkout() {
         supabase.from("shipping_fees").select("*"),
         supabase.from("settings").select("*").single()
       ]);
-      
+
       if (feesRes.data) setShippingFeesConfig(feesRes.data);
       if (settingsRes.data) {
         const s = settingsRes.data as any;
@@ -145,7 +145,7 @@ export default function Checkout() {
   }, [wilayaName, normalBaseShipping, paymentMethod, setValue, storeSettings.free_shipping_threshold]);
 
   const baseShipping = paymentMethod === 'chargily' && isEligibleForFreeShipping ? 0 : normalBaseShipping;
-  
+
   // Final total is Product Price (Inclusive) + Shipping, rounded to nearest 10
   const rawTotal = getTotal(paymentMethod) + baseShipping;
   const finalTotal = Math.round(rawTotal / 10) * 10;
@@ -191,8 +191,8 @@ export default function Checkout() {
         order_id: order.id,
         product_id: item.product_id,
         quantity: item.quantity,
-        unit_price_dzd: (data.paymentMethod === 'chargily' && item.price_chargily && item.price_chargily > 0) 
-          ? item.price_chargily 
+        unit_price_dzd: (data.paymentMethod === 'chargily' && item.price_chargily && item.price_chargily > 0)
+          ? item.price_chargily
           : item.price_dzd,
         variant: item.variant || {},
       }));
@@ -291,7 +291,7 @@ export default function Checkout() {
                     <input
                       {...register("fullName")}
                       className={`w-full px-5 py-4 border transition-all font-medium text-gray-900 ${errors.fullName ? "border-red-500 bg-red-50" : "border-surface-high bg-surface-low focus:bg-white focus:border-primary"}`}
-                      placeholder="Jane Doe"
+                      placeholder={t("checkout.fullNamePlaceholder") || "Jane Doe"}
                     />
                     {errors.fullName && (
                       <p className="text-red-500 text-[10px] font-bold uppercase tracking-widest mt-2 px-1">
@@ -307,7 +307,7 @@ export default function Checkout() {
                     <input
                       {...register("phone")}
                       className={`w-full px-5 py-4 border transition-all font-medium text-gray-900 ${errors.phone ? "border-red-500 bg-red-50" : "border-surface-high bg-surface-low focus:bg-white focus:border-primary"}`}
-                      placeholder="0550123456"
+                      placeholder={t("checkout.phonePlaceholder") || "0550123456"}
                       dir="ltr"
                     />
                     {errors.phone && (
@@ -325,10 +325,10 @@ export default function Checkout() {
                     </label>
                     <select
                       {...register("wilaya")}
-                      className={`w-full px-5 py-4 border transition-all font-medium text-gray-900 appearance-none bg-no-repeat bg-[right_1.25rem_center] ${errors.wilaya ? "border-red-500 bg-red-50" : "border-surface-high bg-surface-low focus:bg-white focus:border-primary"}`}
+                      className={`w-full px-5 py-4 border transition-all font-medium text-gray-900 appearance-none bg-no-repeat ${isAr ? "bg-[left_1.25rem_center]" : "bg-[right_1.25rem_center]"} ${errors.wilaya ? "border-red-500 bg-red-50" : "border-surface-high bg-surface-low focus:bg-white focus:border-primary"}`}
                       style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")` }}
                     >
-                      <option value="">Choose State...</option>
+                      <option value="">{t("checkout.wilayaPlaceholder")}</option>
                       {WILAYAS.map((w) => (
                         <option
                           key={w.code}
@@ -352,7 +352,7 @@ export default function Checkout() {
                     <input
                       {...register("commune")}
                       className={`w-full px-5 py-4 border transition-all font-medium text-gray-900 ${errors.commune ? "border-red-500 bg-red-50" : "border-surface-high bg-surface-low focus:bg-white focus:border-primary"}`}
-                      placeholder="Municipality"
+                      placeholder={t("checkout.communePlaceholder")}
                     />
                     {errors.commune && (
                       <p className="text-red-500 text-[10px] font-bold uppercase tracking-widest mt-2 px-1">
@@ -363,106 +363,110 @@ export default function Checkout() {
 
                   <div className="md:col-span-2 space-y-3">
                     <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block">
-                      Detailed Address (Optional)
+                      {t("checkout.address")} *
                     </label>
                     <textarea
                       {...register("address")}
-                      className="w-full px-5 py-4 border border-surface-high bg-surface-low focus:bg-white focus:border-primary outline-none transition-all resize-none font-medium"
-                      placeholder="Street name, building number, apartment..."
+                      className={`w-full px-5 py-4 border transition-all resize-none font-medium text-gray-900 ${errors.address ? "border-red-500 bg-red-50" : "border-surface-high bg-surface-low focus:bg-white focus:border-primary"}`}
+                      placeholder={t("checkout.addressPlaceholder")}
                       rows={2}
                     />
+                    {errors.address && (
+                      <p className="text-red-500 text-[10px] font-bold uppercase tracking-widest mt-2 px-1">
+                        {errors.address.message}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <div className="space-y-6 mt-8 pt-8 border-t border-gray-100">
-                <div className="space-y-12 mt-12 pt-12 border-t border-surface-high">
-                  {/* Payment Method Selection */}
-                  <div className="space-y-6">
-                    <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-gray-900 flex items-center gap-3">
-                      <div className="w-1.5 h-1.5 bg-primary" />
-                      {t("checkout.paymentMethod")}
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <label
-                        className={`flex items-center gap-6 p-6 border transition-all cursor-pointer ${watch("paymentMethod") === "cod" ? "border-primary bg-primary/5 shadow-inner" : "border-surface-high bg-white hover:border-gray-300"}`}
-                      >
-                        <input
-                          type="radio"
-                          {...register("paymentMethod")}
-                          value="cod"
-                          className="w-5 h-5 accent-primary"
-                        />
-                        <div className="flex-1">
-                          <div className="text-xs font-bold uppercase tracking-widest text-gray-900 mb-1">
-                            {t("checkout.cod")}
-                          </div>
-                          <div className="text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
-                            {t("checkout.codDescription")}
-                          </div>
-                        </div>
-                      </label>
-                      <label
-                        className={`flex flex-col md:flex-row items-center gap-6 p-6 border transition-all ${
-                          !isEligibleForFreeShipping && wilayaName 
-                            ? "opacity-60 bg-gray-50 border-gray-200 cursor-not-allowed" 
-                            : watch("paymentMethod") === "chargily" 
-                              ? "border-primary bg-primary/5 shadow-inner cursor-pointer" 
-                              : "border-surface-high bg-white hover:border-gray-300 cursor-pointer"
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          {...register("paymentMethod")}
-                          value="chargily"
-                          disabled={!isEligibleForFreeShipping && !!wilayaName}
-                          className="w-5 h-5 accent-primary"
-                        />
-                        <div className="flex-1">
-                          <div className="text-xs font-bold uppercase tracking-widest text-gray-900 mb-1 flex items-center gap-2">
-                            {t("checkout.online")}
-                            {!isEligibleForFreeShipping && wilayaName && (
-                              <span className="text-[8px] bg-amber-100 text-amber-700 px-1.5 py-0.5 font-bold uppercase tracking-[0.2em]">COD Only</span>
-                            )}
-                          </div>
-                          <div className="text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
-                            {!isEligibleForFreeShipping && wilayaName 
-                              ? "عذراً، الدفع الإلكتروني غير متاح لولايتكم" 
-                              : t("checkout.onlineDescription")}
-                          </div>
-                        </div>
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* Contact Preference */}
-                  <div className="space-y-6">
-                    <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-gray-900 flex items-center gap-3">
-                      <div className="w-1.5 h-1.5 bg-primary" />
-                      {t("checkout.contactPreference")} *
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-surface-high border border-surface-high">
-                      {[
-                        { id: "phone", icon: Phone, label: t("checkout.phoneCall") },
-                        { id: "whatsapp", icon: MessageSquare, label: t("checkout.whatsapp") },
-                        { id: "telegram", icon: Send, label: t("checkout.telegram") },
-                      ].map((item) => (
+                  <div className="space-y-12 mt-12 pt-12 border-t border-surface-high">
+                    {/* Payment Method Selection */}
+                    <div className="space-y-6">
+                      <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-gray-900 flex items-center gap-3">
+                        <div className="w-1.5 h-1.5 bg-primary" />
+                        {t("checkout.paymentMethod")}
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <label
-                          key={item.id}
-                          className={`flex flex-col items-center gap-4 p-6 cursor-pointer transition-all ${watch("contactPreference") === item.id ? "bg-primary text-white" : "bg-white text-gray-500 hover:bg-surface-low hover:text-gray-900"}`}
+                          className={`flex items-center gap-6 p-6 border transition-all cursor-pointer ${watch("paymentMethod") === "cod" ? "border-primary bg-primary/5 shadow-inner" : "border-surface-high bg-white hover:border-gray-300"}`}
                         >
                           <input
                             type="radio"
-                            {...register("contactPreference")}
-                            value={item.id}
-                            className="sr-only"
+                            {...register("paymentMethod")}
+                            value="cod"
+                            className="w-5 h-5 accent-primary"
                           />
-                          <item.icon className={`w-5 h-5 ${watch("contactPreference") === item.id ? "text-white" : "text-gray-400"}`} />
-                          <span className="text-[10px] font-bold uppercase tracking-widest">{item.label}</span>
+                          <div className="flex-1">
+                            <div className="text-xs font-bold uppercase tracking-widest text-gray-900 mb-1">
+                              {t("checkout.cod")}
+                            </div>
+                            <div className="text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
+                              {t("checkout.codDescription")}
+                            </div>
+                          </div>
                         </label>
-                      ))}
+                        <label
+                          className={`flex flex-col md:flex-row items-center gap-6 p-6 border transition-all ${!isEligibleForFreeShipping && wilayaName
+                              ? "opacity-60 bg-gray-50 border-gray-200 cursor-not-allowed"
+                              : watch("paymentMethod") === "chargily"
+                                ? "border-primary bg-primary/5 shadow-inner cursor-pointer"
+                                : "border-surface-high bg-white hover:border-gray-300 cursor-pointer"
+                            }`}
+                        >
+                          <input
+                            type="radio"
+                            {...register("paymentMethod")}
+                            value="chargily"
+                            disabled={!isEligibleForFreeShipping && !!wilayaName}
+                            className="w-5 h-5 accent-primary"
+                          />
+                          <div className="flex-1">
+                            <div className="text-xs font-bold uppercase tracking-widest text-gray-900 mb-1 flex items-center gap-2">
+                              {t("checkout.online")}
+                              {!isEligibleForFreeShipping && wilayaName && (
+                                <span className="text-[8px] bg-amber-100 text-amber-700 px-1.5 py-0.5 font-bold uppercase tracking-[0.2em]">COD Only</span>
+                              )}
+                            </div>
+                            <div className="text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
+                              {!isEligibleForFreeShipping && wilayaName
+                                ? "عذراً، الدفع الإلكتروني غير متاح لولايتكم"
+                                : t("checkout.onlineDescription")}
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Contact Preference */}
+                    <div className="space-y-6">
+                      <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-gray-900 flex items-center gap-3">
+                        <div className="w-1.5 h-1.5 bg-primary" />
+                        {t("checkout.contactPreference")} *
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-surface-high border border-surface-high">
+                        {[
+                          { id: "phone", icon: Phone, label: t("checkout.phoneCall") },
+                          { id: "whatsapp", icon: MessageSquare, label: t("checkout.whatsapp") },
+                          { id: "telegram", icon: Send, label: t("checkout.telegram") },
+                        ].map((item) => (
+                          <label
+                            key={item.id}
+                            className={`flex flex-col items-center gap-4 p-6 cursor-pointer transition-all ${watch("contactPreference") === item.id ? "bg-primary text-white" : "bg-white text-gray-500 hover:bg-surface-low hover:text-gray-900"}`}
+                          >
+                            <input
+                              type="radio"
+                              {...register("contactPreference")}
+                              value={item.id}
+                              className="sr-only"
+                            />
+                            <item.icon className={`w-5 h-5 ${watch("contactPreference") === item.id ? "text-white" : "text-gray-400"}`} />
+                            <span className="text-[10px] font-bold uppercase tracking-widest">{item.label}</span>
+                          </label>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
                 </div>
 
                 {/* Terms and Conditions Checkbox */}
@@ -561,11 +565,11 @@ export default function Checkout() {
                     Shipping
                   </span>
                   <span className="text-sm font-bold text-gray-900">
-                    {paymentMethod === 'chargily' 
-                      ? t("checkout.freeShipping") 
+                    {paymentMethod === 'chargily'
+                      ? t("checkout.freeShipping")
                       : (displayShippingFee === 0 && !wilayaName
-                          ? t("إختر الولاية")
-                          : formatDZD(displayShippingFee))}
+                        ? t("إختر الولاية")
+                        : formatDZD(displayShippingFee))}
                   </span>
                 </div>
                 <div className="pt-10 border-t border-surface-high flex justify-between items-end">
