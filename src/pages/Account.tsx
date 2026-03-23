@@ -268,7 +268,7 @@ export default function Account() {
                     <Search className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
                     <input
                       value={searchQuery}
-                      onChange={(e)confirmedsetSearchQuery(e.target.value)}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search by Ref / ID / Tracking"
                       className="w-full border border-surface-high bg-surface-low focus:bg-white focus:border-primary transition-all pr-10 pl-3 py-2.5 text-sm"
                       dir="ltr"
