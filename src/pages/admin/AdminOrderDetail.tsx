@@ -195,13 +195,13 @@ ${order.Maystro_desk ? `مكتب مايسترو: ${order.Maystro_desk}` : ""}`;
               {order.status === "pending"
                 ? "⭐ إنتظار التأكيد"
                 : order.status === "confirmed"
-                  ? "✅ تم التأكد"
+                  ? "✅ تم التأكيد"
                   : order.status === "processing"
                     ? "⏳ قيد التنفيذ"
                     : order.status === "shipped"
                       ? "🚚 تم الشحن"
                       : order.status === "delivered"
-                        ? "🎁 تم التسليم"
+                        ? "🎁 جاهز للاستلام"
                         : order.status === "not_received"
                           ? "❌ غير مستلم"
                           : order.status === "cancelled"
@@ -469,13 +469,13 @@ ${order.Maystro_desk ? `مكتب مايسترو: ${order.Maystro_desk}` : ""}`;
                   onChange={(e) => setStatus(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
                 >
-                  <option value="pending">إنتظار التأكيد (confirmation)</option>
-                  <option value="confirmed">تم التأكيد(Confirmed)</option>
-                  <option value="processing">قيد التنفيذ (Processing)</option>
-                  <option value="shipped">تم الشحن (Shipped)</option>
-                  <option value="delivered">تم التسليم (Delivered)</option>
-                  <option value="not_received">غير مستلم (Not Received)</option>
-                  <option value="cancelled">ملغى (Cancelled)</option>
+                  <option value="pending">إنتظار التأكيد</option>
+                  <option value="confirmed">تم التأكيد</option>
+                  <option value="processing">قيد التنفيذ</option>
+                  <option value="shipped">تم الشحن</option>
+                  <option value="delivered">جاهز للاستلام</option>
+                  <option value="not_received">غير مستلم</option>
+                  <option value="cancelled">ملغى</option>
                 </select>
               </div>
 

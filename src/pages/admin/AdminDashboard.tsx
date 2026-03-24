@@ -11,6 +11,7 @@ import {
   CheckCircle,
   XCircle,
   ArrowDownRight,
+  Truck,
 } from "lucide-react";
 import { SEOMeta } from "../../components/shared/SEOMeta";
 import { supabaseAdmin } from "../../lib/supabase";
@@ -27,8 +28,11 @@ export default function AdminDashboard() {
     purchaseCost: 0,
     totalProfit: 0,
     totalCustomers: 0,
-    pendingFulfillment: 0,
-    confirmedOrders: 0,
+    pendingCount: 0,
+    confirmedCount: 0,
+    processingCount: 0,
+    shippedCount: 0,
+    deliveredCount: 0,
     cancelledOrders: 0,
     returnedOrders: 0,
   });
@@ -43,21 +47,17 @@ export default function AdminDashboard() {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const firstDayOfMonth = new Date(
-          today.getFullYear(),
-          today.getMonth(),
-          1,
-        );
-
         // 1. Basic Stats
         const [
           { count: todayCount },
           { count: customersCount },
           { count: pendingCount },
           { count: confirmedCount },
+          { count: processingCount },
+          { count: shippedCount },
+          { count: deliveredCount },
           { count: cancelledCount },
           { count: returnedCount },
-          { data: settingsData },
         ] = await Promise.all([
           supabaseAdmin
             .from("orders")
@@ -69,11 +69,23 @@ export default function AdminDashboard() {
           supabaseAdmin
             .from("orders")
             .select("*", { count: "exact", head: true })
+            .eq("status", "pending"),
+          supabaseAdmin
+            .from("orders")
+            .select("*", { count: "exact", head: true })
             .eq("status", "confirmed"),
           supabaseAdmin
             .from("orders")
             .select("*", { count: "exact", head: true })
-            .in("status", ["processing", "shipped", "delivered"]),
+            .eq("status", "processing"),
+          supabaseAdmin
+            .from("orders")
+            .select("*", { count: "exact", head: true })
+            .eq("status", "shipped"),
+          supabaseAdmin
+            .from("orders")
+            .select("*", { count: "exact", head: true })
+            .eq("status", "delivered"),
           supabaseAdmin
             .from("orders")
             .select("*", { count: "exact", head: true })
@@ -82,16 +94,9 @@ export default function AdminDashboard() {
             .from("orders")
             .select("*", { count: "exact", head: true })
             .eq("status", "not_received"),
-          supabaseAdmin
-            .from("settings")
-            .select("profit_per_usd, usd_to_dzd_rate")
-            .single(),
         ]);
 
-        // Note: Exchange rate is no longer used for cost calculation as all prices are in DZD
-        // price_usd field is repurposed to store cost price in DZD.
-
-        // 1.1 Calculate Costs and Profits from Order Items (for delivered/shipped/processing/paid)
+        // 1.1 Calculate Costs and Profits from Order Items (for confirmed/processing/shipped/delivered)
         const { data: itemsData } = await (supabaseAdmin as any)
           .from("order_items")
           .select("quantity, unit_price_dzd, products(price_usd), orders!inner(status)")
@@ -114,8 +119,11 @@ export default function AdminDashboard() {
           purchaseCost: purchaseCost,
           totalProfit: totalProfit,
           totalCustomers: customersCount || 0,
-          pendingFulfillment: pendingCount || 0,
-          confirmedOrders: confirmedCount || 0,
+          pendingCount: pendingCount || 0,
+          confirmedCount: confirmedCount || 0,
+          processingCount: processingCount || 0,
+          shippedCount: shippedCount || 0,
+          deliveredCount: deliveredCount || 0,
           cancelledOrders: cancelledCount || 0,
           returnedOrders: returnedCount || 0,
         });
@@ -241,15 +249,40 @@ export default function AdminDashboard() {
     },
     {
       label: "بانتظار التأكيد",
-      value: stats.pendingFulfillment,
+      value: stats.pendingCount,
       icon: Clock,
       color: "amber",
     },
     {
       label: "الطلبات المؤكدة",
-      value: stats.confirmedOrders,
+      value: stats.confirmedCount,
       icon: CheckCircle,
+      color: "emerald",
+    },
+    {
+      label: "قيد التنفيذ",
+      value: stats.processingCount,
+      icon: Activity,
+      color: "indigo",
+    },
+    {
+      label: "في الشحن",
+      value: stats.shippedCount,
+      icon: Truck,
+      color: "blue",
+    },
+    {
+      label: "الطلبيات المستلمة",
+      value: stats.deliveredCount,
+      icon: Package,
       color: "green",
+    },
+    {
+      label: "الأرباح المتوقعة",
+      value: stats.totalProfit,
+      icon: TrendingUp,
+      color: "emerald",
+      isPrice: true,
     },
     {
       label: "طلبات ملغاة",
@@ -260,15 +293,8 @@ export default function AdminDashboard() {
     {
       label: "غير مستلمة (Retour)",
       value: stats.returnedOrders,
-      icon: Package,
+      icon: ArrowDownRight,
       color: "gray",
-    },
-    {
-      label: "الأرباح المتوقعة",
-      value: stats.totalProfit,
-      icon: TrendingUp,
-      color: "emerald",
-      isPrice: true,
     },
   ];
 
@@ -309,6 +335,7 @@ export default function AdminDashboard() {
             red: "bg-red-50 text-red-600",
             gray: "bg-gray-50 text-gray-600",
             emerald: "bg-emerald-50 text-emerald-600",
+            indigo: "bg-indigo-50 text-indigo-600",
           };
           const itemColorClass = colorClasses[card.color] || "bg-gray-50 text-gray-600";
 

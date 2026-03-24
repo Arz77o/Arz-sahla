@@ -439,7 +439,7 @@ export default function Account() {
                             )}
 
                             <a
-                              href={`https://wa.me/213000000000?text=${supportMessage(order.id)}`}
+                              href={`https://wa.me/213774422923?text=${supportMessage(order.id)}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-green-700 border border-green-200 px-4 py-2.5 hover:bg-green-50 transition-all"

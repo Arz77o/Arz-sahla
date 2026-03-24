@@ -108,8 +108,6 @@ export default function ProductDetail() {
       quantity: quantity,
       stock_limit: product.stock_quantity,
     });
-
-    toast.success(t("product.added_to_cart"));
   };
 
   return (

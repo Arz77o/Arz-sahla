@@ -83,13 +83,13 @@ export default function OrderTracking() {
       case "pending":
         return 1;
       case "confirmed":
-        return 1;
-      case "processing":
         return 2;
-      case "shipped":
+      case "processing":
         return 3;
-      case "delivered":
+      case "shipped":
         return 4;
+      case "delivered":
+        return 5;
       case "not_received":
         return -1;
       case "cancelled":
@@ -101,11 +101,11 @@ export default function OrderTracking() {
 
   const currentStep = order ? getStatusStep(order.status) : 0;
   const statusLabelMap: Record<string, string> = {
-    confirmed: "تم التأكد",
-    processing: "جاري التنفيذ",
+    pending: "إنتظار التأكيد",
+    confirmed: "تم التأكيد",
+    processing: "قيد التنفيذ",
     shipped: "تم الشحن",
-    delivered: "تم التسليم",
-    pending: "انتظار التأكيد",
+    delivered: "جاهز للاستلام",
     not_received: "غير مستلم",
     cancelled: "ملغى",
   };
@@ -189,16 +189,15 @@ export default function OrderTracking() {
               </div>
               <div className="flex flex-col items-end">
                 <span
-                  className={`inline-flex items-center px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] ${
-                    order.status === "delivered"
-                      ? "bg-green-500 text-white"
-                      : order.status === "shipped"
-                        ? "bg-primary text-white"
-                        : order.status === "not_received" ||
-                            order.status === "cancelled"
-                          ? "bg-red-500 text-white"
-                          : "bg-amber-100 text-amber-800"
-                  }`}
+                  className={`inline-flex items-center px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] ${order.status === "delivered"
+                    ? "bg-green-500 text-white"
+                    : order.status === "shipped"
+                      ? "bg-primary text-white"
+                      : order.status === "not_received" ||
+                        order.status === "cancelled"
+                        ? "bg-red-500 text-white"
+                        : "bg-amber-100 text-amber-800"
+                    }`}
                 >
                   {statusLabelMap[order.status] || "قيد المعالجة"}
                 </span>
@@ -207,11 +206,10 @@ export default function OrderTracking() {
 
             <div className="grid grid-cols-1 gap-4 mb-10">
               <div
-                className={`p-6 border flex flex-col justify-between group transition-all text-center ${
-                  order.tracking_number
-                    ? "bg-primary/5 border-primary/20 hover:border-primary/40"
-                    : "bg-surface-low border-surface-high italic"
-                }`}
+                className={`p-6 border flex flex-col justify-between group transition-all text-center ${order.tracking_number
+                  ? "bg-primary/5 border-primary/20 hover:border-primary/40"
+                  : "bg-surface-low border-surface-high italic"
+                  }`}
               >
                 <div className="flex items-center justify-between mb-3 border-b border-surface-high pb-3">
                   <span
@@ -264,77 +262,95 @@ export default function OrderTracking() {
 
             <div className="space-y-4">
               <div
-                className={`border p-5 md:p-6 flex items-start gap-4 ${
-                  currentStep >= 1
-                    ? "border-primary/30 bg-primary/5"
-                    : "border-surface-high bg-white"
-                }`}
+                className={`border p-5 md:p-6 flex items-start gap-4 ${currentStep >= 1
+                  ? "border-primary/30 bg-primary/5"
+                  : "border-surface-high bg-white"
+                  }`}
               >
                 <div
-                  className={`w-11 h-11 flex items-center justify-center shrink-0 ${
-                    currentStep >= 1
-                      ? "bg-primary text-white"
-                      : "bg-surface-low text-gray-400"
-                  }`}
-                >
-                  <CheckCircle2 className="w-5 h-5" />
-                </div>
-                <div className="text-right">
-                  <h4 className="text-sm font-bold text-gray-900 uppercase tracking-widest">
-                    تم استلام الطلب
-                  </h4>
-                  <p className="text-sm text-gray-500 mt-2">
-                    لقد استلمنا طلبك بنجاح وهو قيد المراجعة الأولية.
-                  </p>
-                </div>
-              </div>
-
-              <div
-                className={`border p-5 md:p-6 flex items-start gap-4 ${
-                  currentStep >= 2
-                    ? "border-primary/30 bg-primary/5"
-                    : "border-surface-high bg-white"
-                }`}
-              >
-                <div
-                  className={`w-11 h-11 flex items-center justify-center shrink-0 ${
-                    currentStep >= 2
-                      ? "bg-primary text-white"
-                      : "bg-surface-low text-gray-400"
-                  }`}
+                  className={`w-11 h-11 flex items-center justify-center shrink-0 ${currentStep >= 1
+                    ? "bg-primary text-white"
+                    : "bg-surface-low text-gray-400"
+                    }`}
                 >
                   <Clock className="w-5 h-5" />
                 </div>
                 <div className="text-right">
                   <h4 className="text-sm font-bold text-gray-900 uppercase tracking-widest">
-                    تأكيد الطلب
+                    إنتظار التأكيد
                   </h4>
                   <p className="text-sm text-gray-500 mt-2">
-                    تم تأكيد طلبك هاتفياً أو تلقائياً وجاري تحضيره للتغليف.
+                    لقد استلمنا طلبك بنجاح وهو في قائمة الانتظار للمراجعة يرجى منك التأكيد أولا على الطلبية قبل شحنها .
                   </p>
                 </div>
               </div>
 
               <div
-                className={`border p-5 md:p-6 ${
-                  currentStep >= 3
-                    ? "border-primary/30 bg-primary/5"
-                    : "border-surface-high bg-white"
-                }`}
+                className={`border p-5 md:p-6 flex items-start gap-4 ${currentStep >= 2
+                  ? "border-primary/30 bg-primary/5"
+                  : "border-surface-high bg-white"
+                  }`}
+              >
+                <div
+                  className={`w-11 h-11 flex items-center justify-center shrink-0 ${currentStep >= 2
+                    ? "bg-primary text-white"
+                    : "bg-surface-low text-gray-400"
+                    }`}
+                >
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+                <div className="text-right">
+                  <h4 className="text-sm font-bold text-gray-900 uppercase tracking-widest">
+                    تم التأكيد
+                  </h4>
+                  <p className="text-sm text-gray-500 mt-2">
+                    تم تأكيد بيانات طلبك بنجاح و تم التواصل معك للتأكد من إستلام الطلبية .
+                  </p>
+                </div>
+              </div>
+
+              <div
+                className={`border p-5 md:p-6 flex items-start gap-4 ${currentStep >= 3
+                  ? "border-primary/30 bg-primary/5"
+                  : "border-surface-high bg-white"
+                  }`}
+              >
+                <div
+                  className={`w-11 h-11 flex items-center justify-center shrink-0 ${currentStep >= 3
+                    ? "bg-primary text-white"
+                    : "bg-surface-low text-gray-400"
+                    }`}
+                >
+                  <Package className="w-5 h-5" />
+                </div>
+                <div className="text-right">
+                  <h4 className="text-sm font-bold text-gray-900 uppercase tracking-widest">
+                    قيد التنفيذ
+                  </h4>
+                  <p className="text-sm text-gray-500 mt-2">
+                    جاري تحضير طلبك، تغليفه، وتجهيزه لتسليمه لشركة الشحن.
+                  </p>
+                </div>
+              </div>
+
+              <div
+                className={`border p-5 md:p-6 ${currentStep >= 4
+                  ? "border-primary/30 bg-primary/5"
+                  : "border-surface-high bg-white"
+                  }`}
               >
                 <div className="flex items-start gap-4">
                   <div
-                    className={`w-11 h-11 flex items-center justify-center shrink-0 ${
-                      currentStep >= 3
-                        ? "bg-primary text-white"
-                        : "bg-surface-low text-gray-400"
-                    }`}
+                    className={`w-11 h-11 flex items-center justify-center shrink-0 ${currentStep >= 4
+                      ? "bg-primary text-white"
+                      : "bg-surface-low text-gray-400"
+                      }`}
                   >
                     <Truck className="w-5 h-5" />
                   </div>
                   <div className="text-right">
                     <h4 className="text-sm font-bold text-gray-900 uppercase tracking-widest">
-                      تم الشحن (Maystro)
+                      تم الشحن
                     </h4>
                     <p className="text-sm text-gray-500 mt-2 mb-3">
                       طلبك الآن مع شركة الشحن وهو في طريقه إلى مكتب الولاية
@@ -343,7 +359,7 @@ export default function OrderTracking() {
                   </div>
                 </div>
 
-                {order.tracking_number && currentStep >= 3 && (
+                {order.tracking_number && currentStep >= 4 && (
                   <div className="mt-3 bg-white border border-surface-high p-4 text-right mr-[3.75rem]">
                     <div className="text-xs text-primary font-medium mb-1">
                       🚚 رقم تتبع Maystro:
@@ -364,27 +380,25 @@ export default function OrderTracking() {
               </div>
 
               <div
-                className={`border p-5 md:p-6 flex items-start gap-4 ${
-                  currentStep >= 4
-                    ? "border-green-200 bg-green-50/60"
-                    : "border-surface-high bg-white"
-                }`}
+                className={`border p-5 md:p-6 flex items-start gap-4 ${currentStep >= 5
+                  ? "border-green-200 bg-green-50/60"
+                  : "border-surface-high bg-white"
+                  }`}
               >
                 <div
-                  className={`w-11 h-11 flex items-center justify-center shrink-0 ${
-                    currentStep >= 4
-                      ? "bg-green-500 text-white"
-                      : "bg-surface-low text-gray-400"
-                  }`}
+                  className={`w-11 h-11 flex items-center justify-center shrink-0 ${currentStep >= 5
+                    ? "bg-green-500 text-white"
+                    : "bg-surface-low text-gray-400"
+                    }`}
                 >
                   <Home className="w-5 h-5" />
                 </div>
                 <div className="text-right">
                   <h4 className="text-sm font-bold text-gray-900 uppercase tracking-widest">
-                    جاهز للاستلام / تم التسليم
+                    جاهز للاستلام
                   </h4>
                   <p className="text-sm text-gray-500 mt-2">
-                    الطلب وصل لمكتب الشحن (Stop Desk) أو تم استلامه بنجاح.
+                    لقد وصل الطرد إلى مكتب الشحن (Stop Desk) في ولايتك، يمكنك استلامه الآن.
                   </p>
                 </div>
               </div>

@@ -77,9 +77,9 @@ export default function AdminOrders() {
     { id: "all", label: "الكل" },
     { id: "pending", label: "⏳ إنتظار التأكيد" },
     { id: "confirmed", label: "✅ تم التأكيد" },
-    { id: "processing", label: "📦 تنفيذ" },
+    { id: "processing", label: "⚙️ تنفيذ" },
     { id: "shipped", label: "🚚 شحن" },
-    { id: "delivered", label: "🤝 مستلم" },
+    { id: "delivered", label: "🎁 جاهز للاستلام" },
     { id: "not_received", label: "🚨 غير مستلم" },
     { id: "cancelled", label: "❌ ملغى" },
   ];
