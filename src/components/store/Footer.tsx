@@ -10,7 +10,14 @@ export const Footer: React.FC = () => {
     <footer className="bg-surface-high text-gray-600 py-16 mt-20 border-t border-gray-200/50">
       <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12 text-right">
         <div className="space-y-4">
-          <h3 className="text-xl font-display font-bold text-gray-900 tracking-tighter">Sahla DZ</h3>
+          <div className="flex items-baseline gap-0 select-none" dir="ltr">
+            <span className="font-display font-black text-gray-900 text-xl tracking-tight uppercase leading-none">
+              SAHLA
+            </span>
+            <span className="font-display font-light text-gray-900 text-base tracking-tight uppercase leading-none">
+              dz.
+            </span>
+          </div>
           <p className="text-sm leading-relaxed">
             {t('footer.about')}
           </p>

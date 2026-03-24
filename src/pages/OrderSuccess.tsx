@@ -64,7 +64,7 @@ export default function OrderSuccess() {
 
   return (
     <>
-      <SEOMeta title="تأكيد الاستحواذ — Sahla DZ" />
+      <SEOMeta title="تأكيد الاستحواذ — SAHLA dz." />
       <div className="bg-white min-h-screen">
         <div className="container mx-auto px-4 py-16 md:py-32 max-w-5xl">
           {/* Header Section */}
@@ -88,7 +88,7 @@ export default function OrderSuccess() {
             <div className="lg:col-span-7 space-y-12">
               <div className="space-y-6">
                 <h2 className="text-3xl font-display font-bold text-gray-900 tracking-tight leading-tight">
-                  شكراً لتسوقك من Sahla DZ. <br/> تم تأكيد استلام طلبك بنجاح.
+                  شكراً لتسوقك من SAHLA dz. <br/> تم تأكيد استلام طلبك بنجاح.
                 </h2>
                 <p className="text-gray-400 text-sm leading-relaxed max-w-md uppercase tracking-widest font-bold">
                   Your acquisition has been logged. Our curators will verify the details and contact you within 24 hours via WhatsApp or Phone for final fulfillment.

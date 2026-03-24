@@ -126,7 +126,7 @@ export default function Login() {
 
           <div className="mt-32 pt-8 border-t border-surface-high text-center">
             <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-gray-200">
-              Sahla DZ — Security Protocol 2026
+              SAHLA dz. — Security Protocol 2026
             </span>
           </div>
         </div>

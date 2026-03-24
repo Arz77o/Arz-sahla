@@ -147,7 +147,7 @@ export default function ProductDetail() {
                 product.stock_quantity > 0
                   ? 'https://schema.org/InStock'
                   : 'https://schema.org/OutOfStock',
-              seller: { '@type': 'Organization', name: 'Sahla DZ' },
+              seller: { '@type': 'Organization', name: 'SAHLA dz.' },
             },
             aggregateRating:
               product.avg_rating > 0

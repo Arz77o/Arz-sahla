@@ -9,10 +9,9 @@ import {
   useCategories, 
   useDeleteCategory, 
   useUpdateCategory, 
-  useCreateCategory 
+  useCreateCategory,
+  Category 
 } from '../../hooks/useCategories';
-
-type Category = Database['public']['Tables']['categories']['Row'];
 
 export default function AdminCategories() {
   const { data: categories = [], isLoading: loading } = useCategories();

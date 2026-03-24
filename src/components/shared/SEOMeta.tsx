@@ -1,7 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
-const SITE_NAME = 'Sahla DZ';
+const SITE_NAME = 'SAHLA dz.';
 const SITE_URL = 'https://arz-sahla.pages.dev';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 const DEFAULT_DESCRIPTION =

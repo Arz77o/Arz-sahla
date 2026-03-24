@@ -15,8 +15,13 @@ export const Header: React.FC = () => {
   return (
     <header className="glass-header w-full">
       <div className="container mx-auto px-4 h-20 flex items-center justify-between">
-        <Link to="/" className="text-2xl font-display font-bold text-primary tracking-tighter">
-          Sahla DZ
+        <Link to="/" className="flex items-baseline gap-0 select-none" dir="ltr" aria-label="SAHLA dz. — الصفحة الرئيسية">
+          <span className="font-display font-black text-gray-900 text-2xl tracking-tight uppercase leading-none">
+            SAHLA
+          </span>
+          <span className="font-display font-light text-gray-900 text-lg tracking-tight uppercase leading-none">
+            dz.
+          </span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">

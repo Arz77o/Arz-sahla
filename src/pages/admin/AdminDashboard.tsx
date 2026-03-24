@@ -304,7 +304,7 @@ export default function AdminDashboard() {
 
       <AdminPageHeader
         title="نظرة عامة / Dashboard"
-        subtitle="متابعة سريعة لأداء Sahla DZ اليوم"
+        subtitle="متابعة سريعة لأداء SAHLA dz. اليوم"
         kicker="DAILY BUSINESS SNAPSHOT"
         actions={
           <>

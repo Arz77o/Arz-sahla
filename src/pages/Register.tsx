@@ -172,7 +172,7 @@ export default function Register() {
 
           <div className="mt-24 pt-8 border-t border-surface-high text-center">
             <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-gray-200">
-              Sahla DZ — Registration Protocol 2026
+              SAHLA dz. — Registration Protocol 2026
             </span>
           </div>
         </div>

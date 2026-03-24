@@ -24,7 +24,7 @@ export default function Terms() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
               <div>
                 <h1 className="text-6xl md:text-9xl font-display font-bold text-gray-900 tracking-tighter leading-none mb-6">
-                  Sahla DZ
+                  SAHLA dz.
                 </h1>
                 <p className="text-sm font-bold uppercase tracking-[0.3em] text-primary italic">
                   الشروط والأحكام — سياسة الإرجاع والاستبدال
@@ -63,7 +63,7 @@ export default function Terms() {
                       اسم المتجر
                     </span>
                     <span className="font-display font-bold text-gray-900 text-xl tracking-tight">
-                      Sahla DZ
+                      SAHLA dz.
                     </span>
                   </div>
                   <div className="p-8 bg-white">
@@ -313,7 +313,7 @@ export default function Terms() {
                   </p>
                 </div>
                 <div className="mt-20 font-display font-bold text-gray-300 text-xs uppercase tracking-[0.5em]">
-                  Sahla DZ — Architectural Archive 2026
+                  SAHLA dz. — Architectural Archive 2026
                 </div>
               </section>
             </div>
