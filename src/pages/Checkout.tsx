@@ -165,7 +165,7 @@ export default function Checkout() {
         unit_price_dzd: (data.paymentMethod === 'chargily' && item.price_chargily && item.price_chargily > 0) 
             ? item.price_chargily 
             : item.price_dzd,
-        variant: item.variant as any,
+        variant: item.variant || {},
       }));
 
       const { error: itemsError } = await supabase
