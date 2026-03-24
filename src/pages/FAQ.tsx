@@ -60,7 +60,27 @@ export default function FAQ() {
                   <div className="text-4xl font-display font-bold text-primary/20 leading-none underline decoration-2 underline-offset-8">02.</div>
                   <h2 className="text-2xl font-display font-bold text-gray-900 uppercase tracking-tight italic">Acquisition & Payment</h2>
                 </div>
+
                 <div className="space-y-px bg-surface-high border border-surface-high">
+                  {/* Video Tutorial Card */}
+                  <div className="bg-primary/5 p-8 md:p-10 border-b border-surface-high">
+                    <h3 className="text-lg font-display font-bold text-gray-900 mb-6 tracking-tight flex items-center gap-3">
+                      <span className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[10px]">
+                        <span className="animate-ping absolute w-8 h-8 rounded-full bg-primary/40 -z-10" />
+                        ▶
+                      </span>
+                      كيف أدفع بالبطاقة الذهبية (شرح فيديو)
+                    </h3>
+                    <div className="aspect-video w-full bg-gray-900 shadow-xl overflow-hidden group relative">
+                       {/* Placeholder for iframe or actual video */}
+                       <video
+                         src="/e-dahabia-tutorial.webm"
+                         className="w-full h-full"
+                         controls
+                         playsInline
+                       />
+                    </div>
+                  </div>
                   {[
                     { q: "ما هي طرق الدفع المتوفرة؟", a: "نوفر الدفع عند الاستلام (COD) والدفع الإلكتروني عبر البطاقة الذهبية أو CIB." },
                     { q: "كيف أتأكد من نجاح طلبي؟", a: "ستصلك رسالة تأكيد عبر WhatsApp أو عبر الاتصال الهاتفي خلال 24 ساعة." },
