@@ -108,15 +108,61 @@ export default function ProductDetail() {
       quantity: quantity,
       stock_limit: product.stock_quantity,
     });
+
+    // Track add_to_cart in GA4
+    gtag.trackEcommerce('add_to_cart', {
+      currency: 'DZD',
+      value: priceDZD * quantity,
+      items: [{
+        item_id: product.id,
+        item_name: name,
+        price: priceDZD,
+        quantity,
+      }],
+    });
   };
+
 
   return (
     <>
       <SEOMeta
         title={name}
-        description={description?.substring(0, 150)}
+        description={description?.substring(0, 155)}
         image={selectedImage}
+        ogType="product"
+        schemas={[
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            name,
+            description: description?.substring(0, 500),
+            image: selectedImage ? [selectedImage] : undefined,
+            sku: product.id,
+            offers: {
+              '@type': 'Offer',
+              url: typeof window !== 'undefined' ? window.location.href : '',
+              priceCurrency: 'DZD',
+              price: priceDZD,
+              availability:
+                product.stock_quantity > 0
+                  ? 'https://schema.org/InStock'
+                  : 'https://schema.org/OutOfStock',
+              seller: { '@type': 'Organization', name: 'Sahla DZ' },
+            },
+            aggregateRating:
+              product.avg_rating > 0
+                ? {
+                    '@type': 'AggregateRating',
+                    ratingValue: product.avg_rating.toFixed(1),
+                    reviewCount: product.reviews?.length ?? 1,
+                    bestRating: '5',
+                    worstRating: '1',
+                  }
+                : undefined,
+          },
+        ]}
       />
+
 
       <div className="container mx-auto px-4 py-12 md:py-20 lg:py-32">
         {/* Main Product Info Card */}

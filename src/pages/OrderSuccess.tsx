@@ -33,21 +33,25 @@ export default function OrderSuccess() {
           setOrder(data);
 
           // Track Purchase for GA4
-          const isSuccessful =
-            data.payment_method === 'cod' ||
-            (data.payment_method === 'chargily' && data.status === 'confirmed');
+          // COD: track immediately (order is confirmed on placement)
+          // Chargily: track when user lands on success page after redirect
+          // (Chargily redirects to /order/success after payment, so we track both)
+          const shouldTrack = data.payment_method === 'cod' || data.payment_method === 'chargily';
 
-          if (isSuccessful) {
+          if (shouldTrack) {
             gtag.trackEcommerce('purchase', {
               transaction_id: data.id,
               value: data.total_dzd,
               currency: 'DZD',
+              shipping: data.shipping_fee ?? 0,
               items: (data as any).order_items?.map((item: any) => ({
                 item_id: item.product_id,
-                quantity: item.quantity || 1
-              })) || []
+                quantity: item.quantity || 1,
+                price: item.unit_price_dzd || 0,
+              })) || [],
             });
           }
+
         }
       } catch (error) {
         console.error("Error fetching order:", error);
