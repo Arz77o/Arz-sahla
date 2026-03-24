@@ -52,7 +52,6 @@
     "wilayaPlaceholder": "إختر الولاية...",
     "commune": "البلدية",
     "communePlaceholder": "اكتب اسم بلديتك...",
-    "zipCode": "الرمز البريدي",
     "phone": "رقم الهاتف",
     "paymentMethod": "طريقة الدفع",
     "cod": "الدفع عند الاستلام (COD)",
@@ -64,7 +63,6 @@
     "contactPreference": "كيف نؤكد طلبك؟",
     "phoneCall": "إتصال هاتفي",
     "whatsapp": "رسالة واتساب",
-    "telegram": "رسالة تيليقرام",
     "email": "رسالة إيميل",
     "pay": "تأكيد الطلب",
     "freeShipping": "الشحن مجاني"

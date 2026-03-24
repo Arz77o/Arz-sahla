@@ -203,11 +203,18 @@ export default function AdminOrders() {
                       {order.order_items[0]?.count || 0} منتج
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-medium ${order.payment_method === "cod" ? "bg-amber-100 text-amber-800" : "bg-blue-100 text-blue-800"}`}
-                      >
-                        {order.payment_method === "cod" ? "COD" : "Online"}
-                      </span>
+                      <div className="flex flex-col gap-1 items-center">
+                        <span
+                          className={`px-2 py-1 rounded text-xs font-medium w-fit ${order.payment_method === "cod" ? "bg-amber-100 text-amber-800" : "bg-blue-100 text-blue-800"}`}
+                        >
+                          {order.payment_method === "cod" ? "COD" : "Online"}
+                        </span>
+                        {order.payment_method === "chargily" && (
+                          <span className={`text-[9px] font-bold uppercase ${order.status === "pending" ? "text-red-500" : "text-green-600"}`}>
+                            {order.status === "pending" ? "Unpaid (Awaiting)" : "Paid ✓"}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       مكتب

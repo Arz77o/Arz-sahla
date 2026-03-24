@@ -52,7 +52,6 @@
     "wilayaPlaceholder": "Choose Wilaya...",
     "commune": "Commune",
     "communePlaceholder": "Type your commune name...",
-    "zipCode": "Zip Code",
     "phone": "Phone Number",
     "paymentMethod": "Payment Method",
     "cod": "Cash on Delivery (COD)",
@@ -64,7 +63,6 @@
     "contactPreference": "How should we confirm your order?",
     "phoneCall": "Phone Call",
     "whatsapp": "WhatsApp Message",
-    "telegram": "Telegram Message",
     "email": "Email Message",
     "pay": "Confirm Order",
     "freeShipping": "Free Shipping"

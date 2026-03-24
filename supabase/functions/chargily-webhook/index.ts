@@ -63,7 +63,7 @@ serve(async (req) => {
       // Update order status
       const { error: updateError } = await supabaseClient
         .from('orders')
-        .update({ status: 'paid', chargily_ref: chargilyRef })
+        .update({ status: 'confirmed', chargily_ref: chargilyRef })
         .eq('id', orderId)
 
       if (updateError) {

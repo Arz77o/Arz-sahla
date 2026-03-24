@@ -26,11 +26,10 @@ const checkoutSchema = z.object({
     .string()
     .regex(/^(0)(5|6|7)[0-9]{8}$/, "رقم هاتف غير صالح (مثال: 0550123456)"),
   address: z.string().min(5, "العنوان بالتفصيل مطلوب"),
-  zipCode: z.string().min(1, "الرمز البريدي مطلوب"),
   paymentMethod: z.enum(["cod", "chargily"], {
     message: "يرجى اختيار طريقة الدفع",
   }),
-  contactPreference: z.enum(["phone", "whatsapp", "telegram"], {
+  contactPreference: z.enum(["phone", "whatsapp"], {
     message: "يرجى اختيار طريقة التواصل المفضلة",
   }),
   termsAccepted: z.boolean().refine((val) => val === true, {
@@ -53,7 +52,7 @@ export default function Checkout() {
   const [shippingFeesConfig, setShippingFeesConfig] = useState<any[]>([]);
   const [storeSettings, setStoreSettings] = useState({ free_shipping_threshold: 800 });
 
-  const PAYMENT_GUIDE_VIDEO_URL = "/e-dahabia-tutorial.webm"; 
+  const PAYMENT_GUIDE_VIDEO_URL = "/e-dahabia-tutorial.webm";
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -103,7 +102,6 @@ export default function Checkout() {
       address: "",
       wilaya: "",
       commune: "",
-      zipCode: "00000",
       paymentMethod: "cod",
       contactPreference: "phone",
       termsAccepted: false,
@@ -117,11 +115,9 @@ export default function Checkout() {
   const termsAccepted = watch("termsAccepted");
 
   const subtotal = getTotal(paymentMethod);
-  const isEligibleForFreeShipping = subtotal >= storeSettings.free_shipping_threshold;
-  
   const getShippingFee = () => {
-    if (isEligibleForFreeShipping) return 0;
-    if (!wilayaCode) return 0;
+    // Show default 800 DZ even if no wilaya is selected, to ensure it "appears" in calculations
+    if (!wilayaCode) return 800;
     const feeConfig = shippingFeesConfig.find(f => f.wilaya_code.toString() === wilayaCode);
     return feeConfig ? feeConfig.desk_fee : 800;
   };
@@ -146,11 +142,13 @@ export default function Checkout() {
           wilaya: wilayaName,
           commune: data.commune,
           address: data.address,
-          zip_code: data.zipCode,
+          zip_code: "00000",
+          shipping_fee: displayShippingFee,
           total_dzd: finalTotal,
           payment_method: data.paymentMethod,
           contact_preference: data.contactPreference,
           status: "pending",
+          admin_note: data.paymentMethod === "chargily" ? "⏳ في انتظار الدفع عبر شارجيلي" : null,
           terms_accepted: data.termsAccepted,
         } as any) // Use as any to bypass some strict TS mismatches if any
         .select()
@@ -162,9 +160,9 @@ export default function Checkout() {
         order_id: order.id,
         product_id: item.product_id,
         quantity: item.quantity,
-        unit_price_dzd: (data.paymentMethod === 'chargily' && item.price_chargily && item.price_chargily > 0) 
-            ? item.price_chargily 
-            : item.price_dzd,
+        unit_price_dzd: (data.paymentMethod === 'chargily' && item.price_chargily && item.price_chargily > 0)
+          ? item.price_chargily
+          : item.price_dzd,
         variant: item.variant || {},
       }));
 
@@ -202,7 +200,6 @@ export default function Checkout() {
         }
       }
 
-      clearCart();
       navigate(`/order/success?order_id=${order.id}`);
     } catch (error: any) {
       toast.error(error.message || "حدث خطأ ما");
@@ -212,8 +209,13 @@ export default function Checkout() {
     }
   };
 
+  React.useEffect(() => {
+    if (!isSubmitting && items.length === 0) {
+      navigate("/cart");
+    }
+  }, [items.length, navigate, isSubmitting]);
+
   if (items.length === 0) {
-    navigate("/cart");
     return null;
   }
 
@@ -244,7 +246,7 @@ export default function Checkout() {
                 <div className="space-y-12">
                   <div className="space-y-16">
                     <div className="space-y-8">
-                       <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-gray-900 flex items-center gap-3">
+                      <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-gray-900 flex items-center gap-3">
                         <div className="w-1.5 h-1.5 bg-primary" />
                         البيانات الشخصية
                       </h3>
@@ -265,6 +267,9 @@ export default function Checkout() {
                             className="w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all tracking-tighter"
                             placeholder="0550 12 34 56"
                           />
+                          <p className="text-[10px] text-amber-600 font-medium leading-relaxed">
+                            الرقم الهاتفي الذي تدخله هو الذي سوف نتصل بك به ونرسل إليك رسالة في الواتساب، لذا يرجى التأكد.
+                          </p>
                           {errors.phone && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.phone.message}</p>}
                         </div>
                       </div>
@@ -276,7 +281,7 @@ export default function Checkout() {
                         عنوان التوصيل (مكتب مايسترو)
                       </h3>
                       <div className="space-y-8">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                           <div className="space-y-3">
                             <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t("checkout.wilaya")}</label>
                             <select
@@ -299,15 +304,6 @@ export default function Checkout() {
                             />
                             {errors.commune && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.commune.message}</p>}
                           </div>
-                          <div className="space-y-3">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">الرمز البريدي</label>
-                            <input
-                              {...register("zipCode")}
-                              className="w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all"
-                              placeholder="16000"
-                            />
-                            {errors.zipCode && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.zipCode.message}</p>}
-                          </div>
                         </div>
                         <div className="space-y-3">
                           <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t("checkout.address")}</label>
@@ -329,11 +325,10 @@ export default function Checkout() {
                       </h3>
                       <div className="space-y-4">
                         <label
-                          className={`flex flex-col md:flex-row items-center gap-6 p-6 border transition-all ${
-                            watch("paymentMethod") === "cod"
+                          className={`flex flex-col md:flex-row items-center gap-6 p-6 border transition-all ${watch("paymentMethod") === "cod"
                               ? "border-primary bg-primary/5 shadow-inner"
                               : "border-surface-high bg-white hover:border-gray-300"
-                          } cursor-pointer`}
+                            } cursor-pointer`}
                         >
                           <input
                             type="radio"
@@ -351,46 +346,36 @@ export default function Checkout() {
                           </div>
                         </label>
                         <label
-                          className={`flex flex-col md:flex-row items-center gap-6 p-6 border transition-all ${!isEligibleForFreeShipping && wilayaName
-                              ? "opacity-60 bg-gray-50 border-gray-200 cursor-not-allowed"
-                              : watch("paymentMethod") === "chargily"
-                                ? "border-primary bg-primary/5 shadow-inner cursor-pointer"
-                                : "border-surface-high bg-white hover:border-gray-300 cursor-pointer"
+                          className={`flex flex-col md:flex-row items-center gap-6 p-6 border transition-all ${watch("paymentMethod") === "chargily"
+                            ? "border-primary bg-primary/5 shadow-inner cursor-pointer"
+                            : "border-surface-high bg-white hover:border-gray-300 cursor-pointer"
                             }`}
                         >
                           <input
                             type="radio"
                             {...register("paymentMethod")}
                             value="chargily"
-                            disabled={!isEligibleForFreeShipping && !!wilayaName}
                             className="w-5 h-5 accent-primary"
                           />
                           <div className="flex-1">
                             <div className="text-xs font-bold uppercase tracking-widest text-gray-900 mb-1 flex items-center gap-2">
                               {t("checkout.online")}
-                              {!isEligibleForFreeShipping && wilayaName && (
-                                <span className="text-[8px] bg-amber-100 text-amber-700 px-1.5 py-0.5 font-bold uppercase tracking-[0.2em]">COD Only</span>
-                              )}
                             </div>
                             <div className="text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
-                                {!isEligibleForFreeShipping && wilayaName
-                                ? "عذراً، الدفع الإلكتروني غير متاح لولايتكم"
-                                : t("checkout.onlineDescription")}
+                              {t("checkout.onlineDescription")}
                             </div>
-                            {(!isEligibleForFreeShipping && wilayaName) ? null : (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  setIsShowingVideo(true);
-                                }}
-                                className="mt-4 flex items-center gap-2 text-[10px] font-bold text-primary hover:underline uppercase tracking-widest decoration-2 underline-offset-4"
-                              >
-                                <Play className="w-3 h-3 fill-primary" />
-                                شاهد كيفية الدفع بالبطاقة؟
-                              </button>
-                            )}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setIsShowingVideo(true);
+                              }}
+                              className="mt-4 flex items-center gap-2 text-[10px] font-bold text-primary hover:underline uppercase tracking-widest decoration-2 underline-offset-4"
+                            >
+                              <Play className="w-3 h-3 fill-primary" />
+                              شاهد كيفية الدفع بالبطاقة؟
+                            </button>
                           </div>
                         </label>
                       </div>
@@ -401,11 +386,10 @@ export default function Checkout() {
                         <div className="w-1.5 h-1.5 bg-primary" />
                         {t("checkout.contactPreference")} *
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-surface-high border border-surface-high">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-surface-high border border-surface-high">
                         {[
                           { id: "phone", icon: Phone, label: t("checkout.phoneCall") },
                           { id: "whatsapp", icon: MessageSquare, label: t("checkout.whatsapp") },
-                          { id: "telegram", icon: Send, label: t("checkout.telegram") },
                         ].map((item) => (
                           <label
                             key={item.id}
@@ -497,15 +481,15 @@ export default function Checkout() {
 
                 <div className="space-y-4 mb-10 pt-10 border-t border-surface-high">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="font-bold uppercase tracking-widest text-gray-400 text-[10px]">Subtotal</span>
+                    <span className="font-bold uppercase tracking-widest text-gray-400 text-[10px]">{t("cart.total")} (Items)</span>
                     <span className="font-bold">{formatDZD(subtotal)}</span>
                   </div>
                   <div className="flex justify-between items-center text-xs">
-                    <span className="font-bold uppercase tracking-widest text-gray-400 text-[10px]">Shipping</span>
-                    <span className="font-bold">{paymentMethod === 'chargily' ? 'Free' : formatDZD(displayShippingFee)}</span>
+                    <span className="font-bold uppercase tracking-widest text-primary text-[10px]">سعر الشحن</span>
+                    <span className="font-bold text-primary">{paymentMethod === 'chargily' ? formatDZD(0) : formatDZD(displayShippingFee)}</span>
                   </div>
                   <div className="pt-10 border-t border-surface-high flex justify-between items-end">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">Total DZD</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">الإجمالي</span>
                     <span className="text-4xl font-display font-bold text-primary tracking-tighter">{formatDZD(finalTotal)}</span>
                   </div>
                 </div>
@@ -530,9 +514,9 @@ export default function Checkout() {
         </div>
       </div>
 
-      <VideoModal 
-        isOpen={isShowingVideo} 
-        onClose={() => setIsShowingVideo(false)} 
+      <VideoModal
+        isOpen={isShowingVideo}
+        onClose={() => setIsShowingVideo(false)}
         videoUrl={PAYMENT_GUIDE_VIDEO_URL}
         title="شرح كيفية الدفع بالبطاقة الذهبية / CIB"
       />
