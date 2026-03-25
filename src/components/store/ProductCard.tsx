@@ -45,6 +45,8 @@ export const ProductCard = React.memo<ProductCardProps>(({ product }) => {
               product.images?.[0] || "https://picsum.photos/seed/sahla/400/400"
             }
             alt={name}
+            width={400}
+            height={400}
             loading="lazy"
             decoding="async"
             className="object-cover w-full h-full grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"

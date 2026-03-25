@@ -181,6 +181,10 @@ export default function ProductDetail() {
                       "https://picsum.photos/seed/sahla/800/800"
                     }
                     alt={name}
+                    width={800}
+                    height={800}
+                    fetchPriority="high"
+                    loading="eager"
                     className="w-full h-full object-cover grayscale-[10%] hover:grayscale-0 transition-all duration-700"
                   />
                 </div>
@@ -199,6 +203,9 @@ export default function ProductDetail() {
                         <img
                           src={img}
                           alt=""
+                          width={96}
+                          height={96}
+                          loading="lazy"
                           className="w-full h-full object-cover"
                         />
                       </button>

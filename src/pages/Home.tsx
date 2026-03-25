@@ -114,6 +114,10 @@ export default function Home() {
                 <img
                   src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000&auto=format&fit=crop"
                   alt="Featured Product"
+                  width="1000"
+                  height="667"
+                  fetchPriority="high"
+                  loading="eager"
                   className="w-full h-auto object-cover shadow-2xl grayscale-[30%] hover:grayscale-0 transition-all duration-700"
                 />
               </div>
