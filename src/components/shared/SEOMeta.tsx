@@ -1,11 +1,12 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
-const SITE_NAME = 'SAHLA dz.';
-const SITE_URL = 'https://arz-sahla.pages.dev';
+const SITE_NAME = 'Sahla DZ';
+const SITE_URL = 'https://sahladz.store';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 const DEFAULT_DESCRIPTION =
   'متجركم الأول للإلكترونيات والإكسسوارات في الجزائر — أسعار تنافسية، جودة عالية، وتوصيل سريع لجميع ولايات الجزائر.';
+const DEFAULT_KEYWORDS = 'تسوق, الجزائر, إلكترونيات, إكسسوارات, متجر إلكتروني, Sahla DZ, sahladz, sahla dz';
 
 interface SEOMetaProps {
   /** Page title — will be appended with " | Sahla DZ" */
@@ -75,6 +76,8 @@ export const SEOMeta: React.FC<SEOMetaProps> = ({
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
       <meta name="robots" content="index, follow" />
+      <meta name="keywords" content={DEFAULT_KEYWORDS} />
+      <meta name="author" content="ARz Studio" />
       <link rel="canonical" href={url} />
 
       {/* ── Open Graph ── */}
