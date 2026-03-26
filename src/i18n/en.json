@@ -23,6 +23,7 @@
   "product": {
     "available": "In Stock",
     "outOfStock": "Out of Stock",
+    "problemSolved": "Problem Solved",
     "addToCart": "Add to Cart",
     "inCart": "✓ In Cart",
     "brand": "Authentic",

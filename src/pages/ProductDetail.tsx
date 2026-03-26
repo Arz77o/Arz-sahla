@@ -54,12 +54,9 @@ export default function ProductDetail() {
       navigate("/products");
     }
   }, [loading, product, navigate]);
-  const name = product ? (isAr ? product.name_ar : product.name_en) : "";
-  const description = product
-    ? isAr
-      ? product.description_ar
-      : product.description_en
-    : "";
+  const name = product ? product.name_ar : "";
+  const description = product ? product.description_ar : "";
+  const problemSolved = product ? product.problem_solved_ar : "";
   const priceDZD = product
     ? calculatePriceDZD(
       product.price_usd,
@@ -355,21 +352,38 @@ export default function ProductDetail() {
         </div>
 
         {/* Details Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mt-12">
-          {/* Left Block (Description & Reviews) */}
-          <div className="lg:col-span-2 space-y-12">
-            {/* Description Box */}
-            <Reveal width="100%" delay={0.1}>
-              <div className="bg-white border border-surface-high p-8 md:p-14">
-                <h2 className="text-2xl font-display font-bold text-gray-900 mb-10 tracking-tighter flex items-center gap-4">
-                  {t("product.description")}
-                  <div className="h-px bg-surface-high flex-grow" />
-                </h2>
-                <div className="prose max-w-none text-gray-500 leading-relaxed text-base md:text-lg whitespace-pre-line">
-                  {description || t("no_description")}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-12">
+          {/* Left Block (Description & Problem Solved & Reviews) */}
+          <div className="lg:col-span-8 space-y-12">
+            <div className="space-y-12">
+              {/* Description Box */}
+              <Reveal width="100%" delay={0.1}>
+                <div className="bg-white border border-surface-high p-8 md:p-14">
+                  <h2 className="text-2xl font-display font-bold text-gray-900 mb-10 tracking-tighter flex items-center gap-4">
+                    {t("product.description")}
+                    <div className="h-px bg-surface-high flex-grow" />
+                  </h2>
+                  <div className="prose max-w-none text-gray-500 leading-relaxed text-base md:text-lg whitespace-pre-line overflow-hidden" dir="auto">
+                    {description || t("no_description")}
+                  </div>
                 </div>
-              </div>
-            </Reveal>
+              </Reveal>
+
+              {/* Problem Solved Box */}
+              {problemSolved && (
+                <Reveal width="100%" delay={0.15}>
+                  <div className="bg-white border border-surface-high p-8 md:p-14 border-l-4 border-l-primary">
+                    <h2 className="text-2xl font-display font-bold text-gray-900 mb-10 tracking-tighter flex items-center gap-4">
+                      {t("product.problemSolved")}
+                      <div className="h-px bg-surface-high flex-grow" />
+                    </h2>
+                    <div className="prose max-w-none text-gray-900 leading-relaxed text-base md:text-lg whitespace-pre-line overflow-hidden" dir="auto">
+                      {problemSolved}
+                    </div>
+                  </div>
+                </Reveal>
+              )}
+            </div>
 
             {/* Reviews Box */}
             <Reveal width="100%" delay={0.2}>
@@ -462,7 +476,7 @@ export default function ProductDetail() {
           </div>
 
           {/* Right Block (Sidebar) */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-4">
             <Reveal width="100%" delay={0.3} y={40}>
               <div className="bg-primary p-10 text-white sticky top-32 overflow-hidden shadow-2xl">
                 <div className="relative z-10 space-y-12">

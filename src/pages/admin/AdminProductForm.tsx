@@ -29,9 +29,7 @@ import { AdminPageHeader } from "../../components/admin/AdminPageHeader";
 // We validate manually in onSubmit instead.
 interface ProductFormValues {
   name_ar: string;
-  name_en: string;
   description_ar: string;
-  description_en: string;
   price_usd: number;
   price_dzd: number;
   price_chargily: number;
@@ -39,11 +37,12 @@ interface ProductFormValues {
   category_id: string;
   avg_rating: number;
   is_published: boolean;
+  problem_solved_ar: string;
 }
 
-import { 
-  useProduct, 
-  useUpdateProduct, 
+import {
+  useProduct,
+  useUpdateProduct,
   useCreateProduct,
   useCreateReview,
   useDeleteReview
@@ -85,9 +84,7 @@ export default function AdminProductForm() {
   } = useForm<ProductFormValues>({
     defaultValues: {
       name_ar: "",
-      name_en: "",
       description_ar: "",
-      description_en: "",
       price_usd: 0,
       price_dzd: 0,
       price_chargily: 0,
@@ -95,6 +92,7 @@ export default function AdminProductForm() {
       category_id: "",
       avg_rating: 5,
       is_published: false,
+      problem_solved_ar: "",
     },
   });
 
@@ -104,9 +102,7 @@ export default function AdminProductForm() {
     if (product) {
       reset({
         name_ar: product.name_ar || "",
-        name_en: product.name_en || "",
         description_ar: product.description_ar || "",
-        description_en: product.description_en || "",
         price_usd: product.price_usd || 0,
         price_dzd: product.price_dzd || 0,
         price_chargily: product.price_chargily || 0,
@@ -114,6 +110,7 @@ export default function AdminProductForm() {
         category_id: product.category_id || "",
         avg_rating: product.avg_rating ?? 5,
         is_published: product.is_published ?? false,
+        problem_solved_ar: product.problem_solved_ar || "",
       });
       setImages(product.images || []);
       setVariants(product.variants || []);
@@ -164,11 +161,7 @@ export default function AdminProductForm() {
     // Manual validation
     let hasError = false;
     if (!data.name_ar || data.name_ar.trim().length < 1) {
-      setError("name_ar", { message: "الاسم (عربي) مطلوب" });
-      hasError = true;
-    }
-    if (!data.name_en || data.name_en.trim().length < 1) {
-      setError("name_en", { message: "الاسم (إنجليزي) مطلوب" });
+      setError("name_ar", { message: "اسم المنتج مطلوب" });
       hasError = true;
     }
     if (!data.category_id) {
@@ -189,9 +182,7 @@ export default function AdminProductForm() {
 
     const dbPayload = {
       name_ar: data.name_ar.trim(),
-      name_en: data.name_en.trim(),
       description_ar: data.description_ar?.trim() || null,
-      description_en: data.description_en?.trim() || null,
       price_usd: Number(data.price_usd),
       price_dzd: Number(data.price_dzd),
       price_chargily: Number(data.price_chargily),
@@ -199,6 +190,7 @@ export default function AdminProductForm() {
       category_id: data.category_id || null,
       avg_rating: Number(data.avg_rating),
       is_published: data.is_published,
+      problem_solved_ar: data.problem_solved_ar?.trim() || null,
       images: images,
       variants: variants,
     };
@@ -220,9 +212,9 @@ export default function AdminProductForm() {
       toast.error("يرجى كتابة تعليق");
       return;
     }
-    
+
     const user = (await supabaseAdmin.auth.getUser()).data.user;
-    
+
     createReviewMutation.mutate({
       product_id: id,
       rating: newReview.rating,
@@ -255,7 +247,7 @@ export default function AdminProductForm() {
       const filePath = `reviews/${fileName}`;
 
       const { error: uploadError } = await supabaseAdmin.storage
-        .from("products") 
+        .from("products")
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
@@ -323,10 +315,10 @@ export default function AdminProductForm() {
               المعلومات الأساسية
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                  الاسم (عربي) <span className="text-red-500">*</span>
+                  اسم المنتج <span className="text-red-500">*</span>
                 </label>
                 <input
                   {...register("name_ar")}
@@ -339,31 +331,15 @@ export default function AdminProductForm() {
                   </p>
                 )}
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                  الاسم (إنجليزي) <span className="text-red-500">*</span>
-                </label>
-                <input
-                  {...register("name_en")}
-                  placeholder="e.g. Wireless Bluetooth Headphones"
-                  className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${errors.name_en ? "border-red-500 bg-red-50" : "border-gray-200"}`}
-                  dir="ltr"
-                />
-                {errors.name_en && (
-                  <p className="text-red-500 text-xs">
-                    {errors.name_en.message}
-                  </p>
-                )}
-              </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">
-                الوصف (عربي)
+                الوصف
               </label>
               <textarea
                 {...register("description_ar")}
-                rows={4}
+                rows={5}
                 placeholder="اكتب وصفًا تفصيليًا للمنتج يظهر للعملاء..."
                 className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
               />
@@ -371,14 +347,13 @@ export default function AdminProductForm() {
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">
-                الوصف (إنجليزي)
+                يحل مشكلة المنتج
               </label>
               <textarea
-                {...register("description_en")}
+                {...register("problem_solved_ar")}
                 rows={4}
-                placeholder="Write a detailed product description in English..."
+                placeholder="ما هي يحل مشكلة هذا المنتج؟"
                 className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
-                dir="ltr"
               />
             </div>
 

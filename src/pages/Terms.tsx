@@ -79,7 +79,7 @@ export default function Terms() {
                       منطقة التوصيل
                     </span>
                     <span className="font-display font-bold text-gray-900 tracking-tight text-lg">
-                      جميع ولايات الجزائر الـ 58
+                      جميع ولايات الجزائر الـ 54
                     </span>
                   </div>
                   <div className="p-8 bg-white">
@@ -262,7 +262,7 @@ export default function Terms() {
                           action: "استبدال أو استرجاع كامل",
                         },
                         { title: "منتج مختلف تماماً", action: "تصحيح فوري" },
-                        { title: "ضمان تشغيل", action: "صلاحية 7 أيام" },
+                        { title: "ضمان تشغيل", action: "صلاحية 5 أيام" },
                       ].map((item, i) => (
                         <div key={i} className="bg-white p-6">
                           <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-1">
@@ -283,7 +283,7 @@ export default function Terms() {
                     </h3>
                     <div className="space-y-4">
                       {[
-                        "تجاوز فترة 7 أيام",
+                        "تجاوز فترة 5 أيام",
                         "فتح العلبة الأصلية أو إتلافها",
                         "تغيير الرأي الشخصي",
                         "كسر ناتج عن سوء الاستخدام",

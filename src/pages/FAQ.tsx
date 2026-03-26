@@ -43,7 +43,7 @@ export default function FAQ() {
                 </div>
                 <div className="space-y-px bg-surface-high border border-surface-high">
                   {[
-                    { q: "كم يستغرق التوصيل؟", a: "يستغرق التوصيل من 2 إلى 7 أيام عمل لجميع ولايات الجزائر الـ 58." },
+                    { q: "كم يستغرق التوصيل؟", a: "يستغرق التوصيل من 2 إلى 5 أيام عمل لجميع ولايات الجزائر الـ 54." },
                     { q: "أين أستلم طردي؟", a: "يتم تسليم الطرود عبر خدمة Stop Desk (الاستلام من مكتب شركة الشحن) في ولايتك." },
                     { q: "هل هناك رسوم إضافية؟", a: "لا توجد رسوم خفية. تدفع فقط السعر الإجمالي الموضح في الطلب." }
                   ].map((item, i) => (
@@ -72,13 +72,13 @@ export default function FAQ() {
                       كيف أدفع بالبطاقة الذهبية (شرح فيديو)
                     </h3>
                     <div className="aspect-video w-full bg-gray-900 shadow-xl overflow-hidden group relative">
-                       {/* Placeholder for iframe or actual video */}
-                       <video
-                         src="/e-dahabia-tutorial.webm"
-                         className="w-full h-full"
-                         controls
-                         playsInline
-                       />
+                      {/* Placeholder for iframe or actual video */}
+                      <video
+                        src="/e-dahabia-tutorial.webm"
+                        className="w-full h-full"
+                        controls
+                        playsInline
+                      />
                     </div>
                   </div>
                   {[

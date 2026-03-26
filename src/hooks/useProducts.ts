@@ -5,17 +5,19 @@ import { toast } from 'sonner';
 export interface Product {
   id: string;
   name_ar: string;
-  name_en: string;
+  name_en?: string | null;
   description_ar: string | null;
-  description_en: string | null;
-  price_dzd: number;
+  description_en?: string | null;
+  problem_solved_ar: string | null;
+  problem_solved_en?: string | null;
+  price_dzd: number | null;
   price_usd: number;
   price_chargily: number | null;
   images: string[];
   category_id: string;
   avg_rating: number;
   is_published: boolean;
-  stock_quantity: number;
+  stock_quantity: number | null;
   variants: any[];
   categories?: {
     name_ar: string;
@@ -42,7 +44,7 @@ export function useProducts(categoryId?: string, includeHidden = false) {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data as Product[];
+      return data as unknown as Product[];
     },
     staleTime: 1000 * 60 * 5,
   });
@@ -59,7 +61,7 @@ export function useProduct(id: string) {
         .single();
       
       if (error) throw error;
-      return data as Product & { reviews: any[] };
+      return data as unknown as Product & { reviews: any[] };
     },
     enabled: !!id,
     staleTime: 1000 * 60 * 5,

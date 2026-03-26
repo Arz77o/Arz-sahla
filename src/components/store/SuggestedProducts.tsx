@@ -31,7 +31,7 @@ export function SuggestedProducts() {
       
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
         {suggested.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard key={product.id} product={product} showQuickAdd={true} />
         ))}
       </div>
     </div>

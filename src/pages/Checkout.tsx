@@ -326,8 +326,8 @@ export default function Checkout() {
                       <div className="space-y-4">
                         <label
                           className={`flex flex-col md:flex-row items-center gap-6 p-6 border transition-all ${watch("paymentMethod") === "cod"
-                              ? "border-primary bg-primary/5 shadow-inner"
-                              : "border-surface-high bg-white hover:border-gray-300"
+                            ? "border-primary bg-primary/5 shadow-inner"
+                            : "border-surface-high bg-white hover:border-gray-300"
                             } cursor-pointer`}
                         >
                           <input
@@ -436,7 +436,7 @@ export default function Checkout() {
                     </label>
                     <p className="text-xs text-gray-400 leading-relaxed uppercase tracking-wider font-medium">
                       أؤكد أن معلومات التواصل صحيحة وأنني مستعد لاستقبال المنتج
-                      في غضون 2-7 أيام عمل.
+                      في غضون 2-5 أيام عمل.
                     </p>
                     {errors.termsAccepted && (
                       <p className="text-red-500 text-[10px] font-bold uppercase tracking-widest mt-3 px-1">
