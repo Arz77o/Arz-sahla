@@ -78,7 +78,7 @@ export const Footer: React.FC = () => {
         </div>
       </div>
       <div className="container mx-auto px-4 mt-16 pt-8 border-t border-gray-200/50 text-center text-xs tracking-wide">
-        &copy; {new Date().getFullYear()} Sahla DZ. {t('footer.rights')}
+        &copy; {new Date().getFullYear()} SAHLA DZ. {t('footer.rights')}
       </div>
     </footer>
   );

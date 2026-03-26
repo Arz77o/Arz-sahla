@@ -109,7 +109,7 @@ export default function AdminDashboard() {
           const sellingPrice = item.unit_price_dzd || 0;
           const costPrice = item.products?.price_usd || 0;
           const qty = item.quantity || 0;
-          
+
           totalProfit += qty * (sellingPrice - costPrice);
           purchaseCost += qty * costPrice;
         });
@@ -304,7 +304,7 @@ export default function AdminDashboard() {
 
       <AdminPageHeader
         title="نظرة عامة / Dashboard"
-        subtitle="متابعة سريعة لأداء SAHLA dz. اليوم"
+        subtitle="متابعة سريعة لأداء SAHLA DZ. اليوم"
         kicker="DAILY BUSINESS SNAPSHOT"
         actions={
           <>

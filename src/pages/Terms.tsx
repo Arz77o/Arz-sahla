@@ -24,7 +24,7 @@ export default function Terms() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
               <div>
                 <h1 className="text-6xl md:text-9xl font-display font-bold text-gray-900 tracking-tighter leading-none mb-6">
-                  SAHLA dz.
+                  SAHLA DZ.
                 </h1>
                 <p className="text-sm font-bold uppercase tracking-[0.3em] text-primary italic">
                   الشروط والأحكام — سياسة الإرجاع والاستبدال
@@ -63,7 +63,7 @@ export default function Terms() {
                       اسم المتجر
                     </span>
                     <span className="font-display font-bold text-gray-900 text-xl tracking-tight">
-                      SAHLA dz.
+                      SAHLA DZ.
                     </span>
                   </div>
                   <div className="p-8 bg-white">
@@ -71,7 +71,7 @@ export default function Terms() {
                       نوع النشاط
                     </span>
                     <span className="font-display font-bold text-gray-900 tracking-tight text-lg">
-                      بيئة إلكترونية — بيع منتجات إلكترونيات وإكسسوارات
+                      بيئة إلكترونية — بيع منتجات مبتكرة وحلول ذكية
                     </span>
                   </div>
                   <div className="p-8 bg-white">
@@ -309,11 +309,11 @@ export default function Terms() {
                   </p>
                   <p className="text-gray-400 text-xs uppercase tracking-[0.2em] leading-loose max-w-sm mx-auto">
                     By proceeding, you confirm full adherence to our curated
-                    trading standards and architectural service protocols.
+                    trading standards and quality service protocols.
                   </p>
                 </div>
                 <div className="mt-20 font-display font-bold text-gray-300 text-xs uppercase tracking-[0.5em]">
-                  SAHLA dz. — Architectural Archive 2026
+                  SAHLA DZ. — Smart Solutions 2026
                 </div>
               </section>
             </div>

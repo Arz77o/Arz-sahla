@@ -17,7 +17,8 @@
     "remove": "Remove",
     "total": "Total",
     "checkout": "Proceed to Checkout",
-    "secure": "Secure payment via Chargily"
+    "secure": "Secure payment via Chargily",
+    "suggestedTitle": "Frequently bought together"
   },
   "product": {
     "available": "In Stock",
@@ -66,5 +67,9 @@
     "email": "Email Message",
     "pay": "Confirm Order",
     "freeShipping": "Free Shipping"
+  },
+  "footer": {
+    "about": "Your premier destination for innovative and smart products in Algeria — quality, comfort, and secure delivery.",
+    "rights": "All rights reserved."
   }
 }

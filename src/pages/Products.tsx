@@ -51,7 +51,7 @@ export default function Products() {
                   Catalog
                 </h1>
                 <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">
-                  {products.length} CURATED ARCHIVAL PIECES
+                  {products.length} CURATED SMART SOLUTIONS
                 </p>
               </div>
               <div className="flex gap-4">
@@ -98,7 +98,7 @@ export default function Products() {
 
                 <div className="p-8 bg-surface-low border border-surface-high">
                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
-                    Our catalog is updated weekly with new architectural pieces focused on functionality and minimalist design.
+                    Our catalog is updated weekly with new innovative products focused on convenience and smart utility.
                   </p>
                 </div>
               </div>
@@ -120,7 +120,7 @@ export default function Products() {
                 <div className="flex justify-center items-center h-96">
                   <div className="space-y-6 text-center">
                     <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto stroke-1" />
-                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-300">Synchronizing Archive...</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-300">Synchronizing Catalog...</p>
                   </div>
                 </div>
               ) : products.length > 0 ? (

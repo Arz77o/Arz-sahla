@@ -15,7 +15,7 @@ export const Header: React.FC = () => {
   return (
     <header className="glass-header w-full">
       <div className="container mx-auto px-4 h-20 flex items-center justify-between">
-        <Link to="/" className="flex items-baseline gap-0 select-none" dir="ltr" aria-label="SAHLA dz. — الصفحة الرئيسية">
+        <Link to="/" className="flex items-baseline gap-0 select-none" dir="ltr" aria-label="SAHLA DZ. — الصفحة الرئيسية">
           <span className="font-display font-black text-gray-900 text-2xl tracking-tight uppercase leading-none">
             SAHLA
           </span>

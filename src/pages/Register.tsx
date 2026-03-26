@@ -24,7 +24,7 @@ export default function Register() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const returnTo = searchParams.get('returnTo') || '/account';
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -51,7 +51,7 @@ export default function Register() {
       });
 
       if (error) throw error;
-      
+
       toast.success('تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.');
       navigate(`/login?returnTo=${encodeURIComponent(returnTo)}`);
     } catch (error: any) {
@@ -84,7 +84,7 @@ export default function Register() {
                   <div className="absolute inset-y-0 right-0 flex items-center pointer-events-none">
                     <User className="h-4 w-4 text-gray-400 stroke-1" />
                   </div>
-                  <input 
+                  <input
                     type="text"
                     {...register('fullName')}
                     className="w-full pl-0 pr-8 py-4 bg-transparent text-gray-900 font-display font-medium text-lg outline-none placeholder:text-gray-200"
@@ -101,7 +101,7 @@ export default function Register() {
                   <div className="absolute inset-y-0 right-0 flex items-center pointer-events-none">
                     <Phone className="h-4 w-4 text-gray-400 stroke-1" />
                   </div>
-                  <input 
+                  <input
                     type="text"
                     {...register('phone')}
                     className="w-full pl-0 pr-8 py-4 bg-transparent text-gray-900 font-display font-medium text-lg outline-none placeholder:text-gray-200"
@@ -119,7 +119,7 @@ export default function Register() {
                   <div className="absolute inset-y-0 right-0 flex items-center pointer-events-none">
                     <Mail className="h-4 w-4 text-gray-400 stroke-1" />
                   </div>
-                  <input 
+                  <input
                     type="email"
                     {...register('email')}
                     className="w-full pl-0 pr-8 py-4 bg-transparent text-gray-900 font-display font-medium text-lg outline-none placeholder:text-gray-200"
@@ -137,7 +137,7 @@ export default function Register() {
                   <div className="absolute inset-y-0 right-0 flex items-center pointer-events-none">
                     <Lock className="h-4 w-4 text-gray-400 stroke-1" />
                   </div>
-                  <input 
+                  <input
                     type="password"
                     {...register('password')}
                     className="w-full pl-0 pr-8 py-4 bg-transparent text-gray-900 font-display font-medium text-lg outline-none placeholder:text-gray-200"
@@ -150,14 +150,14 @@ export default function Register() {
             </div>
 
             <div className="flex flex-col gap-6 pt-6">
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full h-16 text-lg font-bold uppercase tracking-widest"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin stroke-1" /> : t('nav.register')}
               </Button>
-              
+
               <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-gray-400 italic">
                 <Link to="/" className="flex items-center gap-2 hover:text-primary">
                   <ArrowLeft className="w-3 h-3" />
@@ -172,7 +172,7 @@ export default function Register() {
 
           <div className="mt-24 pt-8 border-t border-surface-high text-center">
             <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-gray-200">
-              SAHLA dz. — Registration Protocol 2026
+              SAHLA DZ. — Registration Protocol 2026
             </span>
           </div>
         </div>

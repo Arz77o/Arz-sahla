@@ -7,6 +7,7 @@ import { useCartStore } from '../store/cartStore';
 import { useAuthStore } from '../store/authStore';
 import { formatDZD } from '../lib/pricing';
 import { Button } from '../components/ui/button';
+import { SuggestedProducts } from '../components/store/SuggestedProducts';
 
 export default function Cart() {
   const { t, i18n } = useTranslation();
@@ -36,7 +37,7 @@ export default function Cart() {
             {t('cart.empty')}
           </h1>
           <p className="text-gray-400 mb-12 max-w-md mx-auto text-sm font-medium uppercase tracking-widest leading-relaxed">
-            Your architectural journey starts with a single selection.
+            Your journey to a more comfortable life starts here.
           </p>
           <Link to="/products">
             <Button size="lg" className="h-16 px-12 text-lg font-bold tracking-tighter uppercase tracking-widest">
@@ -178,6 +179,11 @@ export default function Cart() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Suggested Products Section */}
+        <div className="max-w-7xl mx-auto w-full">
+          <SuggestedProducts />
         </div>
       </div>
     </>

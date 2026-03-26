@@ -74,18 +74,17 @@ export default function Home() {
             <div className="md:w-1/2 text-right">
               <Reveal delay={0.1}>
                 <span className="inline-block bg-primary/10 text-primary text-[10px] font-bold tracking-[0.2em] uppercase px-4 py-1.5 mb-6">
-                  Premium Shopping
+                  Choose your comfort first
                 </span>
               </Reveal>
               <Reveal delay={0.2}>
                 <h1 className="text-5xl md:text-7xl font-display font-bold text-gray-900 mb-8 leading-[1.1] tracking-tighter">
-                  تسوق ببساطة <br /> للجميع.
+                  راحتك تبدأ <br /> من هنا.
                 </h1>
               </Reveal>
               <Reveal delay={0.3}>
                 <p className="text-lg md:text-xl text-gray-500 mb-10 leading-relaxed max-w-xl ml-auto">
-                  مجموعات مختارة بعناية من أفضل المنتجات العالمية، تصلك إلى مكتب
-                  Maystro في ولايتك بكل سهولة وأمان.
+                  نكتشف لك أحدث الحلول المبتكرة التي تحل مشاكلك اليومية وتوفر لك الراحة التي تستحقها، لتصلك أينما كنت بكل سهولة.
                 </p>
               </Reveal>
               <Reveal delay={0.4}>
@@ -133,7 +132,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-4">
             <div className="text-right">
               <h2 className="text-3xl font-display font-bold text-gray-900">
-                تسوق حسب الفئة
+                تسوق حسب مشكلتك
               </h2>
               <div className="w-12 h-1 bg-primary mt-4 ml-auto" />
             </div>
@@ -167,7 +166,7 @@ export default function Home() {
           <div className="flex flex-row-reverse justify-between items-end mb-16">
             <div className="text-right">
               <h2 className="text-3xl font-display font-bold text-gray-900">
-                أحدث المنتجات
+                أحدث الحلول
               </h2>
               <p className="text-sm text-gray-400 mt-2">
                 مجموعتنا الجديدة وصلت لتوها

@@ -64,7 +64,7 @@ export default function OrderSuccess() {
 
   return (
     <>
-      <SEOMeta title="تأكيد الاستحواذ — SAHLA dz." />
+      <SEOMeta title="تأكيد الطلب — SAHLA DZ." />
       <div className="bg-white min-h-screen">
         <div className="container mx-auto px-4 py-16 md:py-32 max-w-5xl">
           {/* Header Section */}
@@ -75,7 +75,7 @@ export default function OrderSuccess() {
                   Success
                 </h1>
                 <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary italic">
-                  ORDER CONFIRMED & LOGGED IN ARCHIVE
+                  ORDER CONFIRMED & READY FOR DELIVERY
                 </p>
               </div>
               <div className="w-20 h-20 bg-surface-low border border-surface-high flex items-center justify-center text-green-600">
@@ -88,10 +88,10 @@ export default function OrderSuccess() {
             <div className="lg:col-span-7 space-y-12">
               <div className="space-y-6">
                 <h2 className="text-3xl font-display font-bold text-gray-900 tracking-tight leading-tight">
-                  شكراً لتسوقك من SAHLA dz. <br/> تم تأكيد استلام طلبك بنجاح.
+                  شكراً لتسوقك من SAHLA DZ. <br /> تم تأكيد استلام طلبك بنجاح.
                 </h2>
                 <p className="text-gray-400 text-sm leading-relaxed max-w-md uppercase tracking-widest font-bold">
-                  Your acquisition has been logged. Our curators will verify the details and contact you within 24 hours via WhatsApp or Phone for final fulfillment.
+                  Your order has been received. Our team will verify the details and contact you within 24 hours via WhatsApp or Phone for final confirmation and delivery.
                 </p>
               </div>
 
@@ -100,14 +100,14 @@ export default function OrderSuccess() {
                   <div className="border border-surface-high p-8 hover:bg-primary transition-all group-hover:border-primary">
                     <Package className="w-6 h-6 mb-6 text-primary group-hover:text-white stroke-1" />
                     <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900 group-hover:text-white mb-2">تتبع الشحنة</h3>
-                    <p className="text-[10px] text-gray-400 group-hover:text-white/60">Follow the journey of your archival piece.</p>
+                    <p className="text-[10px] text-gray-400 group-hover:text-white/60">Follow the journey of your order.</p>
                   </div>
                 </Link>
                 <Link to="/products" className="group">
                   <div className="border border-surface-high p-8 hover:bg-surface-low transition-all">
                     <ArrowRight className="w-6 h-6 mb-6 text-gray-400 stroke-1" />
                     <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900 mb-2">مواصلة التسوق</h3>
-                    <p className="text-[10px] text-gray-400">Expand your personal architectural archive.</p>
+                    <p className="text-[10px] text-gray-400">Discover more innovative products.</p>
                   </div>
                 </Link>
               </div>
@@ -115,8 +115,8 @@ export default function OrderSuccess() {
 
             <aside className="lg:col-span-5">
               <div className="bg-surface-low p-8 md:p-12 border border-surface-high sticky top-24">
-                <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 mb-10">Order Summary Log</h3>
-                
+                <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 mb-10">Order Summary</h3>
+
                 {loading ? (
                   <div className="py-12 flex justify-center">
                     <Loader2 className="w-8 h-8 animate-spin text-primary stroke-1" />
@@ -141,7 +141,7 @@ export default function OrderSuccess() {
                     </div>
 
                     <div className="pt-10 border-t border-surface-high">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-2">Total Value Acquired</span>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-2">Total Value</span>
                       <span className="text-4xl font-display font-bold text-primary tracking-tighter">
                         {formatDZD(order.total_dzd)}
                       </span>
