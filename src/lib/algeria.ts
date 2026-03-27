@@ -34,7 +34,7 @@ export const WILAYAS = [
   { code: 33, name_ar: "إليزي", name_en: "Illizi", unsupported: true },
   { code: 34, name_ar: "برج بوعريريج", name_en: "Bordj Bou Arreridj" },
   { code: 35, name_ar: "بومرداس", name_en: "Boumerdes" },
-  { code: 36, name_ar: "الطارف", name_en: "El Tarf" },
+  { code: 36, name_ar: "الطارف", name_en: "El Tarf", unsupported: true },
   { code: 37, name_ar: "تندوف", name_en: "Tindouf", unsupported: true },
   { code: 38, name_ar: "تيسمسيلت", name_en: "Tissemsilt" },
   { code: 39, name_ar: "الوادي", name_en: "El Oued", unsupported: true },
