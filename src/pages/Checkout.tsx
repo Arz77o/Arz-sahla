@@ -59,10 +59,8 @@ export default function Checkout() {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      const [feesRes, settingsRes] = await Promise.all([
-        supabase.from("shipping_fees").select("*"),
-        supabase.from("settings").select("*").single()
-      ]);
+      const feesRes = await supabase.from("shipping_fees").select("*");
+      const settingsRes = await supabase.from("settings").select("*").single();
 
       if (feesRes.data) setShippingFeesConfig(feesRes.data);
       if (settingsRes.data) {
@@ -164,20 +162,23 @@ export default function Checkout() {
         .single();
 
       if (orderError) throw orderError;
+      if (!order) throw new Error("لم يتم إنشاء الطلب");
+      
+      const orderId = order.id;
 
       const orderItems = items.map((item) => ({
-        order_id: order.id,
+        order_id: orderId,
         product_id: item.product_id,
         quantity: item.quantity,
         unit_price_dzd: (data.paymentMethod === 'chargily' && item.price_chargily && item.price_chargily > 0)
           ? item.price_chargily
           : item.price_dzd,
-        variant: item.variant || {},
+        variant: item.variant ? (item.variant as any) : null,
       }));
 
       const { error: itemsError } = await supabase
         .from("order_items")
-        .insert(orderItems);
+        .insert(orderItems as any);
 
       if (itemsError) throw itemsError;
 
@@ -196,7 +197,7 @@ export default function Checkout() {
       if (data.paymentMethod === "chargily") {
         const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
           body: {
-            order_id: order.id,
+            order_id: orderId,
             total_dzd: finalTotal,
             site_url: window.location.origin
           }
@@ -209,7 +210,7 @@ export default function Checkout() {
         }
       }
 
-      navigate(`/order/success?order_id=${order.id}`);
+      navigate(`/order/success?order_id=${orderId}`);
     } catch (error: any) {
       toast.error(error.message || "حدث خطأ ما");
       console.error(error);
@@ -287,7 +288,7 @@ export default function Checkout() {
                     <div className="space-y-8">
                       <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-gray-900 flex items-center gap-3">
                         <div className="w-1.5 h-1.5 bg-primary" />
-                        عنوان التوصيل (مكتب مايسترو)
+                        عنوان التوصيل (مكتب DHD Express)
                       </h3>
                       <div className="space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

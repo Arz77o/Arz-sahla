@@ -536,10 +536,10 @@ export default function Account() {
                               </div>
                               <div className="bg-white p-4 border border-surface-high">
                                 <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400 mb-2">
-                                  Maystro Desk
+                                  DHD Express Desk
                                 </p>
                                 <p className="text-sm font-bold text-gray-900">
-                                  {order.Maystro_desk || "—"}
+                                  {order.DHD Express_desk || "—"}
                                 </p>
                               </div>
                               <div className="bg-white p-4 border border-surface-high">

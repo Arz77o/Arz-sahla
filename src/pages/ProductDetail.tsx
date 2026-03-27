@@ -192,8 +192,8 @@ export default function ProductDetail() {
                         key={idx}
                         onClick={() => setSelectedImage(img)}
                         className={`w-24 h-24 border transition-all flex-shrink-0 ${selectedImage === img
-                            ? "border-primary ring-1 ring-primary"
-                            : "border-surface-high hover:border-gray-400"
+                          ? "border-primary ring-1 ring-primary"
+                          : "border-surface-high hover:border-gray-400"
                           }`}
                       >
                         <img
@@ -219,8 +219,8 @@ export default function ProductDetail() {
                   <div className="flex items-center gap-6 mb-10">
                     <span
                       className={`inline-block px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] ${outOfStock
-                          ? "bg-red-50 text-red-700"
-                          : "bg-primary/10 text-primary"
+                        ? "bg-red-50 text-red-700"
+                        : "bg-primary/10 text-primary"
                         }`}
                     >
                       {outOfStock
@@ -282,8 +282,8 @@ export default function ProductDetail() {
                                     })
                                   }
                                   className={`flex-grow px-6 py-3 text-xs font-bold uppercase tracking-widest transition-all ${active
-                                      ? "bg-primary text-white"
-                                      : "bg-white text-gray-500 hover:text-gray-900 hover:bg-surface-low"
+                                    ? "bg-primary text-white"
+                                    : "bg-white text-gray-500 hover:text-gray-900 hover:bg-surface-low"
                                     }`}
                                 >
                                   {opt}
@@ -332,8 +332,8 @@ export default function ProductDetail() {
                   <Button
                     size="lg"
                     className={`w-full h-20 text-xl font-display font-bold tracking-tighter ${inCart
-                        ? "bg-gray-900 hover:bg-black"
-                        : "bg-primary hover:bg-primary-dim"
+                      ? "bg-gray-900 hover:bg-black"
+                      : "bg-primary hover:bg-primary-dim"
                       }`}
                     onClick={handleAddToCart}
                     disabled={outOfStock}
@@ -490,10 +490,10 @@ export default function ProductDetail() {
                       </span>
                       <div className="space-y-2">
                         <p className="font-bold uppercase tracking-widest text-[11px] leading-tight">
-                          Maystro Express
+                          DHD Express
                         </p>
                         <p className="text-xs text-white/60 leading-relaxed">
-                          توصيل سريع ومضمون إلى أقرب مكتب مايسترو في ولايتك.
+                          توصيل سريع ومضمون إلى أقرب مكتب DHD Express في ولايتك.
                         </p>
                       </div>
                     </li>
