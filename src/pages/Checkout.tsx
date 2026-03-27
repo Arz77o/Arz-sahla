@@ -20,7 +20,10 @@ import { VideoModal } from "../components/shared/VideoModal";
 
 const checkoutSchema = z.object({
   fullName: z.string().min(3, "الاسم الكامل مطلوب"),
-  wilaya: z.string().min(1, "يرجى اختيار الولاية"),
+  wilaya: z.string().min(1, "يرجى اختيار الولاية").refine((val) => {
+    const w = WILAYAS.find(wil => wil.code.toString() === val);
+    return w && !w.unsupported;
+  }, { message: "نأسف، هذه الولاية غير مدعومة للتوصيل حالياً" }),
   commune: z.string().min(2, "اسم البلدية مطلوب"),
   phone: z
     .string()
@@ -132,6 +135,12 @@ export default function Checkout() {
     }
 
     setIsSubmitting(true);
+    const selectedWilaya = WILAYAS.find(w => w.code.toString() === data.wilaya);
+    if (selectedWilaya?.unsupported) {
+      toast.error("نأسف، هذه الولاية غير مدعومة حالياً");
+      setIsSubmitting(false);
+      return;
+    }
     try {
       const { data: order, error: orderError } = await supabase
         .from("orders")
@@ -293,6 +302,11 @@ export default function Checkout() {
                                 <option key={w.code} value={w.code}>{isAr ? w.name_ar : w.name_en}</option>
                               ))}
                             </select>
+                            {!wilayaCode && (
+                              <p className="text-[10px] text-gray-500 font-medium mt-2 leading-relaxed italic opacity-80">
+                                * {isAr ? "نعتذر، التوصيل متاح حالياً لولايات الشمال فقط (35 ولاية)." : "Notice: Delivery currently restricted to Northern regions only."}
+                              </p>
+                            )}
                             {errors.wilaya && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.wilaya.message}</p>}
                           </div>
                           <div className="space-y-3">
