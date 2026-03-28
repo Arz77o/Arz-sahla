@@ -5,7 +5,7 @@ const SITE_NAME = 'Sahla DZ';
 const SITE_URL = 'https://sahladz.store';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 const DEFAULT_DESCRIPTION =
-  'متجركم الأول للإلكترونيات والإكسسوارات في الجزائر — أسعار تنافسية، جودة عالية، وتوصيل سريع لجميع ولايات الجزائر.';
+  'متجركم الأول للإلكترونيات والإكسسوارات في الجزائر — أسعار تنافسية، جودة عالية، وتوصيل سريع ل30 ولاية جزائرية.';
 const DEFAULT_KEYWORDS = 'تسوق, الجزائر, إلكترونيات, إكسسوارات, متجر إلكتروني, Sahla DZ, sahladz, sahla dz';
 
 interface SEOMetaProps {

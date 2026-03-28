@@ -215,7 +215,7 @@ export default function OrderTracking() {
                   <span
                     className={`text-[10px] font-black uppercase tracking-widest ${order.tracking_number ? "text-primary" : "text-gray-400"}`}
                   >
-                    🚚 رقم تتبع الطرد - DHD Express
+                    🚚 رقم تتبع الطرد - Maystro Delivery
                   </span>
                   <Truck
                     className={`w-5 h-5 ${order.tracking_number ? "text-primary" : "text-gray-300"}`}
@@ -240,13 +240,13 @@ export default function OrderTracking() {
                         <Copy className="w-5 h-5" />
                       </button>
                       <a
-                        href="https://platform.dhd-dz.com/suivi/"
+                        href="https://maystro-delivery.com/trackingSD.html"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 px-4 py-3 bg-primary text-white font-bold hover:bg-primary-dim transition-all"
                       >
                         <ExternalLink className="w-5 h-5" />
-                        تتبع على DHD Express
+                        تتبع على Maystro Delivery
                       </a>
                     </div>
                   )}
@@ -254,7 +254,7 @@ export default function OrderTracking() {
                 {order.tracking_number && (
                   <p className="text-xs text-primary mt-4 font-bold flex items-center justify-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    ادخل هذا الرقم في موقع DHD Express لتتبع طردك
+                    ادخل هذا الرقم في موقع Maystro Delivery لتتبع طردك
                   </p>
                 )}
               </div>
@@ -362,18 +362,18 @@ export default function OrderTracking() {
                 {order.tracking_number && currentStep >= 4 && (
                   <div className="mt-3 bg-white border border-surface-high p-4 text-right mr-[3.75rem]">
                     <div className="text-xs text-primary font-medium mb-1">
-                      🚚 رقم تتبع DHD Express:
+                      🚚 رقم تتبع Maystro Delivery:
                     </div>
                     <div className="font-mono font-bold text-gray-900 text-lg mb-3">
                       {order.tracking_number}
                     </div>
                     <a
-                      href="https://platform.dhd-dz.com/suivi/"
+                      href="https://maystro-delivery.com/trackingSD.html"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-primary hover:text-primary-dim font-medium underline"
                     >
-                      تتبع طردك على موقع DHD Express &larr;
+                      تتبع طردك على موقع Maystro Delivery &larr;
                     </a>
                   </div>
                 )}

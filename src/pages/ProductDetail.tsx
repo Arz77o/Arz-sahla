@@ -483,10 +483,10 @@ export default function ProductDetail() {
                       </span>
                       <div className="space-y-2">
                         <p className="font-bold uppercase tracking-widest text-[11px] leading-tight">
-                          DHD Express
+                          Maystro Delivery
                         </p>
                         <p className="text-xs text-white/60 leading-relaxed">
-                          توصيل سريع ومضمون إلى أقرب مكتب DHD Express في ولايتك.
+                          توصيل سريع ومضمون إلى أقرب مكتب Maystro Delivery في ولايتك.
                         </p>
                       </div>
                     </li>

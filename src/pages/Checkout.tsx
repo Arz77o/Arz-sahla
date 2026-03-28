@@ -287,7 +287,7 @@ export default function Checkout() {
                     <div className="space-y-8">
                       <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-gray-900 flex items-center gap-3">
                         <div className="w-1.5 h-1.5 bg-primary" />
-                        عنوان التوصيل (مكتب DHD Express)
+                        عنوان التوصيل (مكتب Maystro Delivery)
                       </h3>
                       <div className="space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -304,7 +304,7 @@ export default function Checkout() {
                             </select>
                             {!wilayaCode && (
                               <p className="text-[10px] text-gray-500 font-medium mt-2 leading-relaxed italic opacity-80">
-                                * {isAr ? "نعتذر، التوصيل متاح حالياً لولايات الشمال فقط (35 ولاية)." : "Notice: Delivery currently restricted to Northern regions only."}
+                                * {isAr ? "نعتذر، التوصيل متاح حالياً لولايات الشمال فقط (30 ولاية)." : "Notice: Delivery currently restricted to Northern regions only."}
                               </p>
                             )}
                             {errors.wilaya && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.wilaya.message}</p>}

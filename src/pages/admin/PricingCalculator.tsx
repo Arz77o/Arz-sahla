@@ -32,8 +32,8 @@ export default function PricingCalculator() {
   const [wilayas, setWilayas] = useState<WilayaFee[]>([]);
   const [loadingWilayas, setLoadingWilayas] = useState(true);
   const [buyPrice, setBuyPrice] = useState<number>(1000);
-  const [shippingType, setShippingType] = useState<"DHD Express" | "manual">(
-    "DHD Express",
+  const [shippingType, setShippingType] = useState<"Maystro Delivery" | "manual">(
+    "Maystro Delivery",
   );
   const [deliveryType] = useState<"home" | "desk">("desk"); // Hardcoded to desk as requested
   const [selectedWilayaCode, setSelectedWilayaCode] = useState<number>(22); // Default Alger
@@ -149,8 +149,8 @@ export default function PricingCalculator() {
       (w) => w.wilaya_code === selectedWilayaCode,
     );
     const selectedZoneName =
-      shippingType === "DHD Express"
-        ? `${selectedWilayaCode} - ${selectedWilaya?.wilaya_name} (DHD Express Desk)`
+      shippingType === "Maystro Delivery"
+        ? `${selectedWilayaCode} - ${selectedWilaya?.wilaya_name} (Maystro Delivery Desk)`
         : "بدون شحن";
 
     const text = `المنتج: ${buyPrice.toLocaleString("ar-DZ")} دج

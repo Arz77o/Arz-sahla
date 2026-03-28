@@ -66,7 +66,7 @@ export default function AdminOrderDetail() {
 الهاتف: ${order.phone}
 طريقة التواصل: ${order.contact_preference === "whatsapp" ? "واتساب" : order.contact_preference === "email" ? "إيميل" : "إتصال هاتف"}
 العنوان: ${order.address}، ${order.commune}، ${order.wilaya}
-${order.maystro_desk ? `مكتب DHD Express: ${order.maystro_desk
+${order.maystro_desk ? `مكتب Maystro Delivery: ${order.maystro_desk
         }` : ""}`;
 
     navigator.clipboard
@@ -303,7 +303,7 @@ ${order.maystro_desk ? `مكتب DHD Express: ${order.maystro_desk
                   {order.maystro_desk && (
                     <div className="p-3 bg-amber-50 border border-amber-100 rounded-lg">
                       <div className="text-xs text-amber-700 mb-1 font-bold">
-                        مكتب DHD Express المحدد:
+                        مكتب Maystro Delivery المحدد:
                       </div>
                       <div className="text-amber-900 font-bold">
                         {order.maystro_desk}
@@ -451,7 +451,7 @@ ${order.maystro_desk ? `مكتب DHD Express: ${order.maystro_desk
 
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                  🚚 رقم تتبع DHD Express
+                  🚚 رقم تتبع Maystro Delivery
                 </label>
                 <input
                   type="text"
@@ -463,16 +463,16 @@ ${order.maystro_desk ? `مكتب DHD Express: ${order.maystro_desk
                 />
                 {trackingNumber ? (
                   <a
-                    href="https://platform.dhd-dz.com/suivi/"
+                    href="https://maystro-delivery.com/trackingSD.html"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 text-xs text-blue-600 hover:text-blue-800 font-medium mt-1"
                   >
-                    ↗️ تتبع الطرد على موقع DHD Express
+                    ↗️ تتبع الطرد على موقع Maystro Delivery
                   </a>
                 ) : (
                   <p className="text-xs text-gray-400">
-                    أضف رقم التتبع المقدم من DHD Express ليتمكن الزبون من التتبع.
+                    أضف رقم التتبع المقدم من Maystro Delivery ليتمكن الزبون من التتبع.
                   </p>
                 )}
               </div>

@@ -79,7 +79,7 @@ export default function Terms() {
                       منطقة التوصيل
                     </span>
                     <span className="font-display font-bold text-gray-900 tracking-tight text-lg">
-                      جميع ولايات الجزائر
+                      30 ولاية جزائرية
                     </span>
                   </div>
                   <div className="p-8 bg-white">
@@ -138,10 +138,10 @@ export default function Terms() {
                       <p>
                         نعتمد حصرياً على خدمة{" "}
                         <span className="font-bold text-gray-900">
-                          DHD Express
+                          Maystro Delivery
                         </span>{" "}
                         بنظام <span className="italic">Stop Desk</span>{" "}
-                        (الاستلام من المكتب). يلتزم الزبون بالتوجه لمكتب DHD Express
+                        (الاستلام من المكتب). يلتزم الزبون بالتوجه لمكتب Maystro Delivery
                         في ولايته لاستلام طرده فور وصوله.
                       </p>
                     </div>
