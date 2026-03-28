@@ -84,7 +84,7 @@ export default function Home() {
               </Reveal>
               <Reveal delay={0.3}>
                 <p className="text-lg md:text-xl text-gray-500 mb-10 leading-relaxed max-w-xl ml-auto">
-                  نكتشف لك أحدث الحلول المبتكرة التي تحل مشاكلك اليومية وتوفر لك الراحة التي تستحقها، لتصلك أينما كنت بكل سهولة.
+                  نكتشف لك Latest Solutions المبتكرة التي تحل مشاكلك اليومية وتوفر لك الراحة التي تستحقها، لتصلك أينما كنت بكل سهولة.
                 </p>
               </Reveal>
               <Reveal delay={0.4}>
@@ -166,7 +166,7 @@ export default function Home() {
           <div className="flex flex-row-reverse justify-between items-end mb-16">
             <div className="text-right">
               <h2 className="text-3xl font-display font-bold text-gray-900">
-                أحدث الحلول
+                Latest Solutions
               </h2>
               <p className="text-sm text-gray-400 mt-2">
                 مجموعتنا الجديدة وصلت لتوها

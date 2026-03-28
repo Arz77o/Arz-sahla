@@ -2,14 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Edit, Trash2, Loader2, Star } from 'lucide-react';
 import { SEOMeta } from '../../components/shared/SEOMeta';
-import { formatDZD, calculatePriceDZD } from '../../lib/pricing';
+import { formatDZD } from '../../lib/pricing';
 import { Button } from '../../components/ui/button';
-import { useSettingsStore } from '../../store/settingsStore';
 import { useProducts, useDeleteProduct } from '../../hooks/useProducts';
 import { AdminPageHeader } from '../../components/admin/AdminPageHeader';
 
 export default function AdminProducts() {
-  const { usd_to_dzd_rate, commission_rate } = useSettingsStore();
 
   const { data: products = [], isLoading: loading } = useProducts(undefined, true);
   const deleteMutation = useDeleteProduct();
@@ -83,10 +81,10 @@ export default function AdminProducts() {
                       {product.categories?.name_ar || '—'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500" dir="ltr">
-                      {formatDZD(product.price_usd)}
+                      {formatDZD(product.price_dzd)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-600" dir="ltr">
-                      {formatDZD(product.price_dzd || calculatePriceDZD(product.price_usd, usd_to_dzd_rate, commission_rate))}
+                      {formatDZD(product.price_chargily || product.price_dzd)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${(product.stock_quantity ?? 0) <= 0 ? 'bg-red-100 text-red-800' :

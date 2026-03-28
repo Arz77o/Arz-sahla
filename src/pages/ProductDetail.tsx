@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ShoppingCart, Star, Loader2, X } from "lucide-react";
 import { SEOMeta } from "../components/shared/SEOMeta";
-import { formatDZD, calculatePriceDZD } from "../lib/pricing";
+import { formatDZD } from "../lib/pricing";
 import { useCartStore } from "../store/cartStore";
 import { useSettingsStore } from "../store/settingsStore";
 import { Button } from "../components/ui/button";
@@ -57,14 +57,7 @@ export default function ProductDetail() {
   const name = product ? product.name_ar : "";
   const description = product ? product.description_ar : "";
   const problemSolved = product ? product.problem_solved_ar : "";
-  const priceDZD = product
-    ? calculatePriceDZD(
-      product.price_usd,
-      usd_to_dzd_rate,
-      commission_rate,
-      product.price_dzd,
-    )
-    : 0;
+  const priceDZD = product?.price_dzd ?? 0;
   const inCart = product ? isInCart(product.id) : false;
   const outOfStock = product ? product.stock_quantity <= 0 : false;
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Star } from "lucide-react";
-import { formatDZD, calculatePriceDZD } from "../../lib/pricing";
+import { formatDZD } from "../../lib/pricing";
 import { useTranslation } from "react-i18next";
 import { useSettingsStore } from "../../store/settingsStore";
 import { Reveal } from "../shared/Reveal";
@@ -15,7 +15,6 @@ interface ProductCardProps {
     id: string;
     name_ar: string;
     name_en: string;
-    price_usd: number;
     price_dzd: number;
     price_chargily: number;
     images: string[];
@@ -32,12 +31,7 @@ export const ProductCard = React.memo<ProductCardProps>(({ product, showQuickAdd
   const isAr = i18n.language === "ar";
   const name = product.name_ar;
   
-  const priceDZD = calculatePriceDZD(
-    product.price_usd,
-    usd_to_dzd_rate,
-    commission_rate,
-    product.price_dzd,
-  );
+  const priceDZD = product.price_dzd ?? 0;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();

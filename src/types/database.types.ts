@@ -113,9 +113,8 @@ export type Database = {
           tracking_number: string | null;
           user_id: string;
           wilaya: string;
-          "DHD Express_desk": string | null;
-zip_code: string;
-contact_preference: string;
+          "maystro_desk": string | null;
+          contact_preference: string;
         };
 Insert: {
   address: string;
@@ -135,8 +134,7 @@ Insert: {
   tracking_number ?: string | null;
   user_id: string;
   wilaya: string;
-          "DHD Express_desk" ?: string | null;
-  zip_code: string;
+          "maystro_desk" ?: string | null;
   contact_preference ?: string;
 };
 Update: {
@@ -157,8 +155,7 @@ Update: {
   tracking_number ?: string | null;
   user_id ?: string;
   wilaya ?: string;
-          "DHD Express_desk" ?: string | null;
-  zip_code ?: string;
+          "maystro_desk" ?: string | null;
   contact_preference ?: string;
 };
 Relationships: [
@@ -186,7 +183,6 @@ products: {
     name_ar: string;
     name_en: string | null;
     price_dzd: number | null;
-    price_usd: number;
     price_chargily: number | null;
     problem_solved_ar: string | null;
     problem_solved_en: string | null;
@@ -207,7 +203,6 @@ products: {
     name_ar: string;
     name_en ?: string | null;
     price_dzd ?: number | null;
-    price_usd: number;
     price_chargily ?: number | null;
     problem_solved_ar ?: string | null;
     problem_solved_en ?: string | null;
@@ -228,7 +223,6 @@ products: {
     name_ar ?: string;
     name_en ?: string | null;
     price_dzd ?: number | null;
-    price_usd ?: number;
     price_chargily ?: number | null;
     problem_solved_ar ?: string | null;
     problem_solved_en ?: string | null;

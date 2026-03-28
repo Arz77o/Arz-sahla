@@ -149,7 +149,6 @@ export default function Checkout() {
           wilaya: wilayaName,
           commune: data.commune,
           address: data.address,
-          zip_code: "00000",
           shipping_fee: displayShippingFee,
           total_dzd: finalTotal,
           payment_method: data.paymentMethod,

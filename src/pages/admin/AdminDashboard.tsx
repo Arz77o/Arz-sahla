@@ -96,23 +96,23 @@ export default function AdminDashboard() {
             .eq("status", "not_received"),
         ]);
 
-        // 1.1 Calculate Costs and Profits from Order Items (for confirmed/processing/shipped/delivered)
+        // No cost data available (price_usd column removed from DB)
+        // Only revenue tracking is now possible
         const { data: itemsData } = await (supabaseAdmin as any)
           .from("order_items")
-          .select("quantity, unit_price_dzd, products(price_usd), orders!inner(status)")
+          .select("quantity, unit_price_dzd, orders!inner(status)")
           .in("orders.status", ["confirmed", "processing", "shipped", "delivered"]);
 
-        let totalProfit = 0;
+        let totalRevenue = 0;
         let purchaseCost = 0;
 
         (itemsData as any[])?.forEach((item: any) => {
           const sellingPrice = item.unit_price_dzd || 0;
-          const costPrice = item.products?.price_usd || 0;
           const qty = item.quantity || 0;
-
-          totalProfit += qty * (sellingPrice - costPrice);
-          purchaseCost += qty * costPrice;
+          totalRevenue += qty * sellingPrice;
         });
+
+        const totalProfit = totalRevenue;
 
         setStats({
           todayOrders: todayCount || 0,
@@ -166,10 +166,7 @@ export default function AdminDashboard() {
     try {
       toast.loading("جاري تحضير التقرير...");
 
-      const { data: settingsData } = await supabaseAdmin
-        .from("settings")
-        .select("profit_per_usd, usd_to_dzd_rate")
-        .single();
+      // No longer need setting query for usd_to_dzd as cost price was removed
 
       // Note: All prices are treated as DZD. price_usd field stores the cost price in DZD.
 
@@ -187,8 +184,7 @@ export default function AdminDashboard() {
             quantity,
             unit_price_dzd,
             products (
-              name_ar,
-              price_usd
+              name_ar
             )
           )
         `)
@@ -204,7 +200,7 @@ export default function AdminDashboard() {
 
       const reportData = orders.flatMap((order: any) =>
         order.order_items.map((item: any) => {
-          const costDZD = item.products?.price_usd || 0;
+          const costDZD = 0; // No cost column in DB
           const sellingPrice = item.unit_price_dzd || 0;
           const profitDZD = sellingPrice - costDZD;
 

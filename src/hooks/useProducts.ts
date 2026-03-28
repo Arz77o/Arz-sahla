@@ -11,7 +11,6 @@ export interface Product {
   problem_solved_ar: string | null;
   problem_solved_en?: string | null;
   price_dzd: number | null;
-  price_usd: number;
   price_chargily: number | null;
   images: string[];
   category_id: string;
@@ -89,7 +88,10 @@ export function useUpdateProduct() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...payload }: Partial<Product> & { id: string }) => {
-      const { error } = await supabaseAdmin.from('products').update(payload).eq('id', id);
+      // Remove joined/relational fields that are not actual DB columns
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { categories, reviews, ...cleanPayload } = payload as any;
+      const { error } = await supabaseAdmin.from('products').update(cleanPayload).eq('id', id);
       if (error) throw error;
     },
     onSuccess: (_, variables) => {

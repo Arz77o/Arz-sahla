@@ -240,7 +240,7 @@ export default function OrderTracking() {
                         <Copy className="w-5 h-5" />
                       </button>
                       <a
-                        href="https://www.DHD Express-delivery.com/trackingSD.html"
+                        href="https://platform.dhd-dz.com/suivi/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 px-4 py-3 bg-primary text-white font-bold hover:bg-primary-dim transition-all"
@@ -368,7 +368,7 @@ export default function OrderTracking() {
                       {order.tracking_number}
                     </div>
                     <a
-                      href="https://www.DHD Express-delivery.com/trackingSD.html"
+                      href="https://platform.dhd-dz.com/suivi/"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-primary hover:text-primary-dim font-medium underline"

@@ -21,7 +21,6 @@ import {
 import { toast } from "sonner";
 import { SEOMeta } from "../../components/shared/SEOMeta";
 import { supabaseAdmin } from "../../lib/supabase";
-import { formatAdminPreview } from "../../lib/pricing";
 import { Button } from "../../components/ui/button";
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader";
 
@@ -30,7 +29,6 @@ import { AdminPageHeader } from "../../components/admin/AdminPageHeader";
 interface ProductFormValues {
   name_ar: string;
   description_ar: string;
-  price_usd: number;
   price_dzd: number;
   price_chargily: number;
   stock_quantity: number;
@@ -85,7 +83,6 @@ export default function AdminProductForm() {
     defaultValues: {
       name_ar: "",
       description_ar: "",
-      price_usd: 0,
       price_dzd: 0,
       price_chargily: 0,
       stock_quantity: 0,
@@ -96,14 +93,13 @@ export default function AdminProductForm() {
     },
   });
 
-  const priceUsd = watch("price_usd");
+  const priceDzd = watch("price_dzd");
 
   useEffect(() => {
     if (product) {
       reset({
         name_ar: product.name_ar || "",
         description_ar: product.description_ar || "",
-        price_usd: product.price_usd || 0,
         price_dzd: product.price_dzd || 0,
         price_chargily: product.price_chargily || 0,
         stock_quantity: product.stock_quantity || 0,
@@ -168,9 +164,9 @@ export default function AdminProductForm() {
       setError("category_id", { message: "الفئة مطلوبة" });
       hasError = true;
     }
-    const price = Number(data.price_usd);
+    const price = Number(data.price_dzd);
     if (!price || price <= 0) {
-      setError("price_usd", { message: "السعر يجب أن يكون أكبر من 0" });
+      setError("price_dzd", { message: "سعر البيع يجب أن يكون أكبر من 0" });
       hasError = true;
     }
     const rating = Number(data.avg_rating);
@@ -183,7 +179,6 @@ export default function AdminProductForm() {
     const dbPayload = {
       name_ar: data.name_ar.trim(),
       description_ar: data.description_ar?.trim() || null,
-      price_usd: Number(data.price_usd),
       price_dzd: Number(data.price_dzd),
       price_chargily: Number(data.price_chargily),
       stock_quantity: Number(data.stock_quantity),
@@ -196,7 +191,9 @@ export default function AdminProductForm() {
     };
 
     if (isEdit) {
-      updateMutation.mutate({ id: id!, ...dbPayload });
+      updateMutation.mutate({ id: id!, ...dbPayload }, {
+        onSuccess: () => navigate('/admin/products'),
+      });
     } else {
       createMutation.mutate(dbPayload, {
         onSuccess: () => navigate("/admin/products")
@@ -644,32 +641,6 @@ export default function AdminProductForm() {
                 )}
               </div>
 
-              {/* Price USD / Purchase Price */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                  💰 سعر التكلفة
-                </label>
-                <div
-                  dir="ltr"
-                  className={`flex rounded-lg border-2 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 ${errors.price_usd ? "border-red-500" : "border-gray-200"}`}
-                >
-                  <span className="flex items-center px-3 bg-amber-100 text-amber-700 text-sm font-bold">
-                    DZD
-                  </span>
-                  <input
-                    type="number"
-                    step="0.01"
-                    {...register("price_usd", { valueAsNumber: true })}
-                    className="flex-1 px-3 py-2.5 outline-none bg-white"
-                    dir="ltr"
-                  />
-                </div>
-                {errors.price_usd && (
-                  <p className="text-red-500 text-xs">
-                    {errors.price_usd.message}
-                  </p>
-                )}
-              </div>
 
               {/* Price Chargily */}
               <div className="space-y-2">
@@ -721,14 +692,12 @@ export default function AdminProductForm() {
               </div>
             </div>
 
-            {priceUsd > 0 && (
+            {priceDzd > 0 && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <p className="text-sm text-green-800">
                   <CheckCircle2 className="w-4 h-4 inline text-green-600 mr-1" />
-                  <strong>الربح المتوقع:</strong>{" "}
-                  {priceUsd > 0
-                    ? `${(watch("price_dzd") - priceUsd).toLocaleString()} DZD`
-                    : "بدون حساب"}
+                  <strong>سعر البيع:</strong>{" "}
+                  {priceDzd.toLocaleString()} DZD
                 </p>
               </div>
             )}

@@ -218,9 +218,6 @@ export default function AdminCustomerDetail() {
                 <div className="text-sm text-gray-600">
                   {orders[0].commune}، {orders[0].wilaya}
                 </div>
-                <div className="text-sm text-gray-500 font-mono" dir="ltr">
-                  {orders[0].zip_code}
-                </div>
                 <div className="pt-2 flex items-center gap-2 text-blue-600 font-bold text-xs">
                   <span className="w-2 h-2 rounded-full bg-blue-500"></span>
                   تم استخدامه في الطلب #{orders[0].id.split("-")[0]}

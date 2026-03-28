@@ -539,7 +539,7 @@ export default function Account() {
                                   DHD Express Desk
                                 </p>
                                 <p className="text-sm font-bold text-gray-900">
-                                  {order.DHD Express_desk || "—"}
+                                  {order.maystro_desk || "—"}
                                 </p>
                               </div>
                               <div className="bg-white p-4 border border-surface-high">
