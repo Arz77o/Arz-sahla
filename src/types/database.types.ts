@@ -249,6 +249,9 @@ reviews: {
     product_id: string;
     rating: number;
     user_id: string;
+    status: string;
+    admin_note: string | null;
+    full_name: string | null;
   };
   Insert: {
     comment ?: string | null;
@@ -259,6 +262,9 @@ reviews: {
     product_id: string;
     rating: number;
     user_id: string;
+    status ?: string;
+    admin_note ?: string | null;
+    full_name ?: string | null;
   };
   Update: {
     comment ?: string | null;
@@ -269,6 +275,9 @@ reviews: {
     product_id ?: string;
     rating ?: number;
     user_id ?: string;
+    status ?: string;
+    admin_note ?: string | null;
+    full_name ?: string | null;
   };
   Relationships: [
     {

@@ -12,7 +12,8 @@ import {
   Dot,
   Menu,
   X,
-  Calculator
+  Calculator,
+  Star
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { cn } from '../../lib/utils';
@@ -31,6 +32,7 @@ export const AdminSidebar: React.FC = () => {
     { name: 'المنتجات / Products', path: '/admin/products', icon: Package },
     { name: 'الفئات / Categories', path: '/admin/categories', icon: Tags },
     { name: 'العملاء / Customers', path: '/admin/customers', icon: Users },
+    { name: 'التقييمات / Reviews', path: '/admin/reviews', icon: Star },
     { name: 'حاسبة التسعير / Pricing', path: '/admin/pricing-calculator', icon: Calculator },
     { name: 'الإعدادات / Settings', path: '/admin/settings', icon: Settings },
   ];

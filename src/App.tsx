@@ -43,6 +43,7 @@ const AdminCategories = lazy(() => import('./pages/admin/AdminCategories'));
 const AdminCustomers = lazy(() => import('./pages/admin/AdminCustomers'));
 const AdminCustomerDetail = lazy(() => import('./pages/admin/AdminCustomerDetail'));
 const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
+const AdminReviews = lazy(() => import('./pages/admin/AdminReviews'));
 const PricingCalculator = lazy(() => import('./pages/admin/PricingCalculator'));
 
 const StoreLayout = () => (
@@ -108,6 +109,7 @@ function App() {
             <Route path="categories" element={<AdminCategories />} />
             <Route path="customers" element={<AdminCustomers />} />
             <Route path="customers/:id" element={<AdminCustomerDetail />} />
+            <Route path="reviews" element={<AdminReviews />} />
             <Route path="settings" element={<AdminSettings />} />
             <Route path="pricing-calculator" element={<PricingCalculator />} />
           </Route>

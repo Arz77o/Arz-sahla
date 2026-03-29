@@ -128,7 +128,10 @@ export function useCreateReview() {
     mutationFn: async (payload: any) => {
       const { data, error } = await supabaseAdmin
         .from('reviews')
-        .insert(payload)
+        .insert({
+          ...payload,
+          status: 'pending', // ✅ جديد: التقييم الجديد يبدأ بحالة "قيد المراجعة"
+        })
         .select()
         .single();
       if (error) throw error;
@@ -136,7 +139,7 @@ export function useCreateReview() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['product', variables.product_id] });
-      toast.success('تم إضافة التقييم بنجاح');
+      toast.success('شكراً على تقييمك! سيتم نشره بعد المراجعة ⏳');
     },
     onError: (error: any) => {
       toast.error(error.message || 'فشل إضافة التقييم');

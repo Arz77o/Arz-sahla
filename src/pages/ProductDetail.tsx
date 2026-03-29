@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ShoppingCart, Star, Loader2, X } from "lucide-react";
+import { ShoppingCart, Star, Loader2, X, Send, ImagePlus, Trash2 } from "lucide-react";
 import { SEOMeta } from "../components/shared/SEOMeta";
 import { formatDZD } from "../lib/pricing";
 import { useCartStore } from "../store/cartStore";
 import { useSettingsStore } from "../store/settingsStore";
+import { useAuthStore } from "../store/authStore";
 import { Button } from "../components/ui/button";
 import { toast } from "sonner";
 import { Reveal } from "../components/shared/Reveal";
@@ -22,9 +23,11 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { usd_to_dzd_rate, commission_rate } = useSettingsStore();
+  const { user } = useAuthStore();
   const isAr = i18n.language === "ar";
 
   const { data: product, isLoading: loading } = useProduct(slug || "");
+  const createReview = useCreateReview();
 
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [selectedVariant, setSelectedVariant] = useState<{
@@ -33,6 +36,12 @@ export default function ProductDetail() {
   } | null>(null);
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
+
+  // ✅ نموذج التقييم الجديد
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewImages, setReviewImages] = useState<string[]>([]); // 📸 صور التقييم
 
   const { addItem, isInCart } = useCartStore();
 
@@ -112,6 +121,80 @@ export default function ProductDetail() {
     });
   };
 
+  const handleCreateReview = () => {
+    if (!user) {
+      toast.error("يجب تسجيل الدخول أولاً");
+      navigate("/login");
+      return;
+    }
+
+    if (!reviewComment.trim()) {
+      toast.error("اكتب تعليقاً من فضلك");
+      return;
+    }
+
+    // جلب اسم العميل من user_metadata
+    const customerName = user.user_metadata?.full_name || user.email || "عميل";
+
+    createReview.mutate({
+      product_id: product.id,
+      user_id: user.id,
+      rating: reviewRating,
+      comment: reviewComment,
+      order_id: null, // يمكن تحسين هذا لاحقاً
+      full_name: customerName, // ✅ إضافة اسم العميل
+      images: reviewImages.length > 0 ? reviewImages : null, // 📸 إضافة الصور
+    });
+
+    // Reset form
+    setReviewRating(5);
+    setReviewComment("");
+    setReviewImages([]);
+    setShowReviewForm(false);
+  };
+
+  // 📸 معالجة رفع الصور
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []) as File[];
+    const remainingSlots = 3 - reviewImages.length;
+    
+    if (files.length > remainingSlots) {
+      toast.error(`يمكنك إضافة ${remainingSlots} صور فقط`);
+      return;
+    }
+
+    files.forEach((file: File) => {
+      if (!file.type.startsWith("image/")) {
+        toast.error("يجب اختيار صور فقط");
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("حجم الصورة يجب أن لا يتجاوز 5 MB");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64 = event.target?.result as string;
+        setReviewImages((prev) => {
+          if (prev.length < 3) {
+            return [...prev, base64];
+          }
+          return prev;
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Reset input
+    e.target.value = "";
+  };
+
+  // حذف صورة من القائمة
+  const removeImage = (index: number) => {
+    setReviewImages((prev) => prev.filter((_, i) => i !== index));
+  };
 
   return (
     <>
@@ -400,9 +483,141 @@ export default function ProductDetail() {
                   </div>
                 </div>
 
+                {/* ✅ نموذج التقييم الجديد */}
+                {!showReviewForm ? (
+                  <div className="py-12 text-center border-2 border-dashed border-surface-high hover:border-primary transition-colors cursor-pointer" onClick={() => setShowReviewForm(true)}>
+                    <p className="text-gray-500 font-bold uppercase tracking-widest mb-4">هل جربت هذا المنتج؟</p>
+                    <Button size="sm" variant="outline" className="rounded-none border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-all uppercase tracking-widest text-[10px] font-bold px-8">
+                      اكتب تقييمك 
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="bg-surface-low border border-surface-high p-8 mb-12 animate-in fade-in slide-in-from-top-4 duration-500">
+                    <h3 className="text-xl font-display font-bold text-gray-900 mb-8 uppercase tracking-tight flex items-center gap-4">
+                      اكتب تقييمك
+                      <div className="h-px bg-surface-high flex-grow" />
+                    </h3>
+                    
+                    {/* النجوم للتقييم */}
+                    <div className="mb-8">
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">كم نجمة تعطيه؟</p>
+                      <div className="flex gap-3">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            onClick={() => setReviewRating(star)}
+                            className="focus:outline-none transition-transform hover:scale-110"
+                          >
+                            <Star
+                              className={`w-8 h-8 cursor-pointer transition-colors ${
+                                star <= reviewRating
+                                  ? "fill-primary text-primary"
+                                  : "text-gray-200"
+                              }`}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-[10px] font-bold text-primary mt-3 uppercase tracking-widest">{reviewRating} / 5 نجوم</p>
+                    </div>
+
+                    {/* حقل التعليق */}
+                    <div className="mb-8">
+                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-4">ما رأيك في المنتج؟</label>
+                      <textarea
+                        value={reviewComment}
+                        onChange={(e) => setReviewComment(e.target.value)}
+                        placeholder="مثال: المنتج جودته عالية جداً والتغليف رائع..."
+                        className="w-full bg-white px-5 py-4 border border-surface-high focus:outline-none focus:border-primary resize-vertical text-gray-900 placeholder:text-gray-300 transition-colors"
+                        rows={5}
+                      />
+                      <div className="flex justify-end mt-2">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{reviewComment.length} / 500 حرف</p>
+                      </div>
+                    </div>
+
+                    {/* إضافة صور */}
+                    <div className="mb-10">
+                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-4">
+                        📸 أضف صور (اختياري - حد أقصى 3)
+                      </label>
+                      <div className="border border-dashed border-surface-high p-6 bg-white/50 hover:bg-white hover:border-primary transition-all group flex flex-col items-center justify-center gap-3">
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          disabled={reviewImages.length >= 3}
+                          className="hidden"
+                          id="review-images-input"
+                        />
+                        <label
+                          htmlFor="review-images-input"
+                          className={`flex flex-col items-center gap-2 cursor-pointer w-full h-full py-4 ${
+                            reviewImages.length >= 3 ? "opacity-50 cursor-not-allowed" : ""
+                          }`}
+                        >
+                          <ImagePlus className="w-6 h-6 text-gray-400 group-hover:text-primary transition-colors" />
+                          <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest group-hover:text-gray-900 transition-colors">
+                            اختر صور أو اسحبها هنا ({reviewImages.length}/3)
+                          </span>
+                        </label>
+                      </div>
+
+                      {/* عرض الصور المختارة */}
+                      {reviewImages.length > 0 && (
+                        <div className="mt-6 grid grid-cols-3 gap-4">
+                          {reviewImages.map((image, index) => (
+                            <div key={index} className="relative group aspect-square">
+                              <img
+                                src={image}
+                                alt={`صورة ${index + 1}`}
+                                className="w-full h-full object-cover border border-surface-high grayscale hover:grayscale-0 transition-all duration-500"
+                              />
+                              <button
+                                onClick={() => removeImage(index)}
+                                className="absolute top-2 right-2 bg-red-500 text-white p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* الأزرار */}
+                    <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-surface-high">
+                      <Button
+                        size="lg"
+                        onClick={handleCreateReview}
+                        disabled={createReview.isPending}
+                        className="bg-primary hover:bg-primary-dim text-white flex-1 h-14 rounded-none font-display font-bold uppercase tracking-widest text-xs"
+                      >
+                        <Send className="w-4 h-4 mr-2" />
+                        {createReview.isPending ? "جاري الإرسال..." : "إرسال التقييم"}
+                      </Button>
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        className="flex-1 h-14 rounded-none font-display font-bold uppercase tracking-widest text-xs border-surface-high hover:bg-white text-gray-400 hover:text-gray-900"
+                        onClick={() => {
+                          setShowReviewForm(false);
+                          setReviewComment("");
+                          setReviewRating(5);
+                          setReviewImages([]);
+                        }}
+                      >
+                        إلغاء
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+
                 <div className="space-y-16">
-                  {product.reviews && product.reviews.length > 0 ? (
-                    product.reviews.map((r: any) => (
+                  {product.reviews && product.reviews.filter((r: any) => r.status === 'approved').length > 0 ? (
+                    product.reviews.filter((r: any) => r.status === 'approved').map((r: any) => (
                       <div key={r.id} className="group">
                         <div className="flex justify-between items-start mb-6">
                           <div className="flex items-center gap-6">

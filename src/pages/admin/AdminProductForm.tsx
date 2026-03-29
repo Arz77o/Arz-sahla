@@ -42,8 +42,6 @@ import {
   useProduct,
   useUpdateProduct,
   useCreateProduct,
-  useCreateReview,
-  useDeleteReview
 } from "../../hooks/useProducts";
 import { useCategories } from "../../hooks/useCategories";
 
@@ -62,13 +60,7 @@ export default function AdminProductForm() {
   const [images, setImages] = useState<string[]>([]);
   const [imageUrlInput, setImageUrlInput] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const [newReview, setNewReview] = useState({
-    rating: 5,
-    comment: "",
-    images: [] as string[],
-    imageUrl: "",
-    isUploadingReviewImage: false,
-  });
+
   const [variants, setVariants] = useState<{ group: string; options: string[] }[]>([]);
   const [variantInput, setVariantInput] = useState<{ [key: number]: string }>({});
 
@@ -201,74 +193,7 @@ export default function AdminProductForm() {
     }
   };
 
-  const createReviewMutation = useCreateReview();
-  const deleteReviewMutation = useDeleteReview(id || "");
 
-  const handleAddReview = async () => {
-    if (!newReview.comment.trim()) {
-      toast.error("يرجى كتابة تعليق");
-      return;
-    }
-
-    const user = (await supabaseAdmin.auth.getUser()).data.user;
-
-    createReviewMutation.mutate({
-      product_id: id,
-      rating: newReview.rating,
-      comment: newReview.comment,
-      images: newReview.images,
-      user_id: user?.id,
-    }, {
-      onSuccess: () => {
-        setNewReview({
-          rating: 5,
-          comment: "",
-          images: [],
-          imageUrl: "",
-          isUploadingReviewImage: false,
-        });
-      }
-    });
-  };
-
-  const handleReviewImageUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setNewReview((prev) => ({ ...prev, isUploadingReviewImage: true }));
-    try {
-      const fileExt = file.name.split(".").pop();
-      const fileName = `review_${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
-      const filePath = `reviews/${fileName}`;
-
-      const { error: uploadError } = await supabaseAdmin.storage
-        .from("products")
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const {
-        data: { publicUrl },
-      } = supabaseAdmin.storage.from("products").getPublicUrl(filePath);
-
-      setNewReview((prev) => ({
-        ...prev,
-        images: [...prev.images, publicUrl],
-        isUploadingReviewImage: false,
-      }));
-      toast.success("تم رفع صورة التقييم");
-    } catch (error: any) {
-      toast.error(error.message || "فشل رفع الصورة");
-      setNewReview((prev) => ({ ...prev, isUploadingReviewImage: false }));
-    }
-  };
-
-  const handleDeleteReview = async (reviewId: string) => {
-    if (!window.confirm("حذف هذا التقييم؟")) return;
-    deleteReviewMutation.mutate(reviewId);
-  };
 
   if (loading) {
     return (
@@ -710,7 +635,7 @@ export default function AdminProductForm() {
           <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4 sticky top-24">
             <h2 className="text-lg font-bold text-gray-900 mb-4 border-b pb-3 flex items-center gap-2">
               <Eye className="w-5 h-5 text-purple-600" />
-              معاينة المنتج ({product?.reviews?.length || 0} تقييم)
+              معاينة المنتج (Preview)
             </h2>
 
             <div className="space-y-4">
@@ -830,233 +755,7 @@ export default function AdminProductForm() {
         </div>
       </form>
 
-      {/* ── Reviews Management Section ── */}
-      {isEdit && (
-        <div className="mt-12 space-y-8">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900 italic">
-              آراء وتقييمات العملاء (Reviews)
-            </h2>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-              <span>{(product?.reviews?.length || 0)} تقييم مضاف</span>
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Add New Review Form */}
-            <div className="lg:col-span-1">
-              <div className="bg-white p-6 rounded-xl border border-blue-100 shadow-sm space-y-4 sticky top-24">
-                <h3 className="font-bold text-gray-900 border-b pb-2 flex items-center gap-2">
-                  <Star className="w-5 h-5 text-blue-600" />
-                  إضافة تقييم جديد
-                </h3>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-xs font-bold text-gray-500 block mb-1">
-                      التقييم (1-5)
-                    </label>
-                    <div className="flex gap-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          type="button"
-                          onClick={() =>
-                            setNewReview({ ...newReview, rating: star })
-                          }
-                          className={`w-8 h-8 rounded flex items-center justify-center transition-colors ${newReview.rating >= star
-                            ? "bg-amber-100 text-amber-600"
-                            : "bg-gray-100 text-gray-400"
-                            }`}
-                        >
-                          <Star
-                            className={`w-4 h-4 ${newReview.rating >= star ? "fill-current" : ""}`}
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-bold text-gray-500 block mb-1">
-                      التعليق
-                    </label>
-                    <textarea
-                      value={newReview.comment}
-                      onChange={(e) =>
-                        setNewReview({ ...newReview, comment: e.target.value })
-                      }
-                      className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
-                      rows={3}
-                      placeholder="اكتب التقييم هنا..."
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-bold text-gray-500 block mb-1">
-                      صور التقييم (رابط أو رفع ملف)
-                    </label>
-                    <div className="flex gap-1 mb-2">
-                      <input
-                        type="url"
-                        value={newReview.imageUrl}
-                        onChange={(e) =>
-                          setNewReview({
-                            ...newReview,
-                            imageUrl: e.target.value,
-                          })
-                        }
-                        className="flex-1 px-3 py-2 text-xs rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono"
-                        placeholder="رابط الصورة..."
-                        dir="ltr"
-                      />
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => {
-                          if (!newReview.imageUrl) return;
-                          setNewReview({
-                            ...newReview,
-                            images: [...newReview.images, newReview.imageUrl],
-                            imageUrl: "",
-                          });
-                        }}
-                      >
-                        أضف
-                      </Button>
-                      <div className="relative">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleReviewImageUpload}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                          disabled={newReview.isUploadingReviewImage}
-                        />
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          disabled={newReview.isUploadingReviewImage}
-                        >
-                          {newReview.isUploadingReviewImage ? (
-                            <Loader2 className="w-3 h-3 animate-spin" />
-                          ) : (
-                            <ImageIcon className="w-3 h-3" />
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-4 gap-2">
-                      {newReview.images.map((img, i) => (
-                        <div
-                          key={i}
-                          className="relative aspect-square rounded-md overflow-hidden bg-gray-100 group"
-                        >
-                          <img
-                            src={img}
-                            className="w-full h-full object-cover"
-                          />
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setNewReview({
-                                ...newReview,
-                                images: newReview.images.filter(
-                                  (_, idx) => idx !== i,
-                                ),
-                              })
-                            }
-                            className="absolute inset-0 bg-red-500/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <Button
-                    className="w-full bg-blue-600 hover:bg-blue-700 font-bold"
-                    onClick={handleAddReview}
-                    disabled={createReviewMutation.isPending || !newReview.comment}
-                  >
-                    {createReviewMutation.isPending ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      "نشر التقييم في المتجر"
-                    )}
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* List of Reviews */}
-            <div className="lg:col-span-2 space-y-4">
-              {(!product?.reviews || product.reviews.length === 0) ? (
-                <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl py-12 text-center text-gray-400">
-                  لا توجد تقييمات مضافة لهذا المنتج حتى الآن.
-                </div>
-              ) : (
-                product.reviews.map((review: any) => (
-                  <div
-                    key={review.id}
-                    className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm"
-                  >
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex gap-4">
-                        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-500">
-                          {review.full_name?.[0] || "U"}
-                        </div>
-                        <div>
-                          <div className="flex gap-1 mb-1">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`w-3 h-3 ${i < review.rating ? "fill-amber-400 text-amber-400" : "text-gray-200"}`}
-                              />
-                            ))}
-                          </div>
-                          <p className="text-gray-900 font-medium text-sm">
-                            {review.comment}
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleDeleteReview(review.id)}
-                        className="text-gray-400 hover:text-red-500 transition-colors"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                    {review.images && review.images.length > 0 && (
-                      <div className="flex gap-2 flex-wrap">
-                        {review.images.map((img: string, i: number) => (
-                          <div
-                            key={i}
-                            className="w-16 h-16 rounded-lg overflow-hidden border border-gray-100"
-                          >
-                            <img
-                              src={img}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    <div className="mt-4 text-[10px] text-gray-400 font-mono italic">
-                      ID: {review.id} | Date:{" "}
-                      {new Date(review.created_at).toLocaleDateString()}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }
