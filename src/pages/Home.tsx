@@ -79,12 +79,12 @@ export default function Home() {
               </Reveal>
               <Reveal delay={0.2}>
                 <h1 className="text-5xl md:text-7xl font-display font-bold text-gray-900 mb-8 leading-[1.1] tracking-tighter">
-                  راحتك تبدأ <br /> من هنا.
+                  مع Sahla DZ<br /> راحتك تهمنا
                 </h1>
               </Reveal>
               <Reveal delay={0.3}>
                 <p className="text-lg md:text-xl text-gray-500 mb-10 leading-relaxed max-w-xl ml-auto">
-                  نكتشف لك Latest Solutions المبتكرة التي تحل مشاكلك اليومية وتوفر لك الراحة التي تستحقها، لتصلك أينما كنت بكل سهولة.
+                  نكتشف لك الحلول المبتكرة التي تحل مشاكلك اليومية وتوفر لك الراحة التي تستحقها، لتصلك أينما كنت بكل سهولة.
                 </p>
               </Reveal>
               <Reveal delay={0.4}>

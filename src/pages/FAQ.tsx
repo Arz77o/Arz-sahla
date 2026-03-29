@@ -95,7 +95,7 @@ export default function FAQ() {
               </section>
 
               <div className="p-12 bg-surface-low border border-surface-high text-center">
-                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 mb-6 font-medium">Still have inquiries?</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 mb-6 font-medium">?Still have inquiries</p>
                 <div className="text-lg font-display font-bold text-gray-900 tracking-tight italic">
                   Contact our support via WhatsApp for immediate assistance.
                 </div>
