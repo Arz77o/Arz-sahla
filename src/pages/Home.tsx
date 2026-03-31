@@ -79,7 +79,7 @@ export default function Home() {
               </Reveal>
               <Reveal delay={0.2}>
                 <h1 className="text-5xl md:text-7xl font-display font-bold text-gray-900 mb-8 leading-[1.1] tracking-tighter">
-                  مع Sahla DZ<br /> راحتك تهمنا
+                  Sahla DZ المتجر الذي يفهم مشكلتك <br /> قبل أن يبيع لك الحل
                 </h1>
               </Reveal>
               <Reveal delay={0.3}>

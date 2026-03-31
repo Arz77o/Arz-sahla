@@ -485,23 +485,20 @@ export default function ProductDetail() {
 
                 {/* ✅ نموذج التقييم الجديد */}
                 {!showReviewForm ? (
-                  <div className="py-12 text-center border-2 border-dashed border-surface-high hover:border-primary transition-colors cursor-pointer" onClick={() => setShowReviewForm(true)}>
-                    <p className="text-gray-500 font-bold uppercase tracking-widest mb-4">هل جربت هذا المنتج؟</p>
-                    <Button size="sm" variant="outline" className="rounded-none border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-all uppercase tracking-widest text-[10px] font-bold px-8">
+                  <div className="py-12 text-center border-2 border-dashed border-surface-high rounded-lg hover:border-primary transition-colors cursor-pointer" onClick={() => setShowReviewForm(true)}>
+                    <p className="text-gray-500 font-semibold mb-3">هل جربت هذا المنتج؟</p>
+                    <Button size="sm" variant="outline">
                       اكتب تقييمك 
                     </Button>
                   </div>
                 ) : (
-                  <div className="bg-surface-low border border-surface-high p-8 mb-12 animate-in fade-in slide-in-from-top-4 duration-500">
-                    <h3 className="text-xl font-display font-bold text-gray-900 mb-8 uppercase tracking-tight flex items-center gap-4">
-                      اكتب تقييمك
-                      <div className="h-px bg-surface-high flex-grow" />
-                    </h3>
+                  <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-6 mb-8 animate-in fade-in">
+                    <h3 className="text-lg font-bold text-blue-900 mb-4"> اكتب تقييمك</h3>
                     
                     {/* النجوم للتقييم */}
-                    <div className="mb-8">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">كم نجمة تعطيه؟</p>
-                      <div className="flex gap-3">
+                    <div className="mb-4">
+                      <p className="text-sm font-semibold text-blue-900 mb-2">كم نجمة تعطيه؟</p>
+                      <div className="flex gap-2">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
                             key={star}
@@ -509,39 +506,37 @@ export default function ProductDetail() {
                             className="focus:outline-none transition-transform hover:scale-110"
                           >
                             <Star
-                              className={`w-8 h-8 cursor-pointer transition-colors ${
+                              className={`w-6 h-6 cursor-pointer ${
                                 star <= reviewRating
-                                  ? "fill-primary text-primary"
-                                  : "text-gray-200"
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "text-gray-300"
                               }`}
                             />
                           </button>
                         ))}
                       </div>
-                      <p className="text-[10px] font-bold text-primary mt-3 uppercase tracking-widest">{reviewRating} / 5 نجوم</p>
+                      <p className="text-xs text-blue-700 mt-1">{reviewRating} من 5 نجوم</p>
                     </div>
 
                     {/* حقل التعليق */}
-                    <div className="mb-8">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-4">ما رأيك في المنتج؟</label>
+                    <div className="mb-4">
+                      <label className="text-sm font-semibold text-blue-900 block mb-2">ما رأيك في المنتج؟</label>
                       <textarea
                         value={reviewComment}
                         onChange={(e) => setReviewComment(e.target.value)}
                         placeholder="مثال: المنتج جودته عالية جداً والتغليف رائع..."
-                        className="w-full bg-white px-5 py-4 border border-surface-high focus:outline-none focus:border-primary resize-vertical text-gray-900 placeholder:text-gray-300 transition-colors"
-                        rows={5}
+                        className="w-full px-3 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:border-blue-500 resize-vertical"
+                        rows={4}
                       />
-                      <div className="flex justify-end mt-2">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{reviewComment.length} / 500 حرف</p>
-                      </div>
+                      <p className="text-xs text-blue-700 mt-1">{reviewComment.length} / 500 حرف</p>
                     </div>
 
                     {/* إضافة صور */}
-                    <div className="mb-10">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-4">
+                    <div className="mb-4">
+                      <label className="text-sm font-semibold text-blue-900 block mb-2">
                         📸 أضف صور (اختياري - حد أقصى 3)
                       </label>
-                      <div className="border border-dashed border-surface-high p-6 bg-white/50 hover:bg-white hover:border-primary transition-all group flex flex-col items-center justify-center gap-3">
+                      <div className="border-2 border-dashed border-blue-300 rounded-lg p-4 bg-blue-50 hover:bg-blue-100 transition-colors">
                         <input
                           type="file"
                           multiple
@@ -553,12 +548,12 @@ export default function ProductDetail() {
                         />
                         <label
                           htmlFor="review-images-input"
-                          className={`flex flex-col items-center gap-2 cursor-pointer w-full h-full py-4 ${
+                          className={`flex items-center justify-center gap-2 cursor-pointer ${
                             reviewImages.length >= 3 ? "opacity-50 cursor-not-allowed" : ""
                           }`}
                         >
-                          <ImagePlus className="w-6 h-6 text-gray-400 group-hover:text-primary transition-colors" />
-                          <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest group-hover:text-gray-900 transition-colors">
+                          <ImagePlus className="w-5 h-5 text-blue-600" />
+                          <span className="text-sm text-blue-700 font-medium">
                             اختر صور أو اسحبها هنا ({reviewImages.length}/3)
                           </span>
                         </label>
@@ -566,20 +561,21 @@ export default function ProductDetail() {
 
                       {/* عرض الصور المختارة */}
                       {reviewImages.length > 0 && (
-                        <div className="mt-6 grid grid-cols-3 gap-4">
+                        <div className="mt-3 grid grid-cols-3 gap-2">
                           {reviewImages.map((image, index) => (
-                            <div key={index} className="relative group aspect-square">
+                            <div key={index} className="relative group">
                               <img
                                 src={image}
                                 alt={`صورة ${index + 1}`}
-                                className="w-full h-full object-cover border border-surface-high grayscale hover:grayscale-0 transition-all duration-500"
+                                className="w-full h-24 object-cover rounded-lg border border-blue-200"
                               />
                               <button
                                 onClick={() => removeImage(index)}
-                                className="absolute top-2 right-2 bg-red-500 text-white p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                                className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                               >
                                 <X className="w-3 h-3" />
                               </button>
+                              <p className="text-xs text-gray-500 text-center mt-1">صورة {index + 1}</p>
                             </div>
                           ))}
                         </div>
@@ -587,20 +583,19 @@ export default function ProductDetail() {
                     </div>
 
                     {/* الأزرار */}
-                    <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-surface-high">
+                    <div className="flex gap-2">
                       <Button
-                        size="lg"
+                        size="sm"
                         onClick={handleCreateReview}
                         disabled={createReview.isPending}
-                        className="bg-primary hover:bg-primary-dim text-white flex-1 h-14 rounded-none font-display font-bold uppercase tracking-widest text-xs"
+                        className="bg-blue-600 hover:bg-blue-700 flex-1"
                       >
                         <Send className="w-4 h-4 mr-2" />
                         {createReview.isPending ? "جاري الإرسال..." : "إرسال التقييم"}
                       </Button>
                       <Button
-                        size="lg"
+                        size="sm"
                         variant="outline"
-                        className="flex-1 h-14 rounded-none font-display font-bold uppercase tracking-widest text-xs border-surface-high hover:bg-white text-gray-400 hover:text-gray-900"
                         onClick={() => {
                           setShowReviewForm(false);
                           setReviewComment("");
@@ -613,7 +608,6 @@ export default function ProductDetail() {
                     </div>
                   </div>
                 )}
-
 
                 <div className="space-y-16">
                   {product.reviews && product.reviews.filter((r: any) => r.status === 'approved').length > 0 ? (
