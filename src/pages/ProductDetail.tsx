@@ -505,7 +505,7 @@ export default function ProductDetail() {
                 {/* ✅ نموذج التقييم الجديد */}
                 {!showReviewForm ? (
                   <div
-                    className="py-12 text-center border-2 border-dashed border-surface-high rounded-lg hover:border-primary transition-colors cursor-pointer"
+                    className="py-12 text-center border border-surface-high rounded-[1.75rem] bg-surface-low transition-colors hover:border-primary cursor-pointer"
                     onClick={() => setShowReviewForm(true)}
                   >
                     <p className="text-gray-500 font-semibold mb-3">
@@ -516,62 +516,68 @@ export default function ProductDetail() {
                     </Button>
                   </div>
                 ) : (
-                  <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-6 mb-8 animate-in fade-in">
-                    <h3 className="text-lg font-bold text-blue-900 mb-4">
-                      {" "}
-                      اكتب تقييمك
-                    </h3>
+                  <div className="bg-white border border-surface-high rounded-[2rem] p-8 md:p-10 shadow-sm animate-in fade-in">
+                    <div className="flex flex-col gap-2 mb-6">
+                      <h3 className="text-2xl font-display font-bold text-gray-900">
+                        اكتب تقييمك
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        شارك تجربتك مع المنتج وساعد غيرك على الاختيار الأفضل.
+                      </p>
+                    </div>
 
                     {/* النجوم للتقييم */}
-                    <div className="mb-4">
-                      <p className="text-sm font-semibold text-blue-900 mb-2">
+                    <div className="mb-6">
+                      <p className="text-sm font-semibold text-gray-900 mb-3">
                         كم نجمة تعطيه؟
                       </p>
-                      <div className="flex gap-2">
+                      <div className="flex items-center gap-2">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
                             key={star}
+                            type="button"
                             onClick={() => setReviewRating(star)}
                             className="focus:outline-none transition-transform hover:scale-110"
+                            aria-label={`${star} نجوم`}
                           >
                             <Star
                               className={`w-6 h-6 cursor-pointer ${
                                 star <= reviewRating
-                                  ? "fill-yellow-400 text-yellow-400"
+                                  ? "fill-primary text-primary"
                                   : "text-gray-300"
                               }`}
                             />
                           </button>
                         ))}
                       </div>
-                      <p className="text-xs text-blue-700 mt-1">
+                      <p className="text-xs text-gray-500 mt-2">
                         {reviewRating} من 5 نجوم
                       </p>
                     </div>
 
                     {/* حقل التعليق */}
-                    <div className="mb-4">
-                      <label className="text-sm font-semibold text-blue-900 block mb-2">
+                    <div className="mb-6">
+                      <label className="text-sm font-semibold text-gray-900 block mb-3">
                         ما رأيك في المنتج؟
                       </label>
                       <textarea
                         value={reviewComment}
                         onChange={(e) => setReviewComment(e.target.value)}
                         placeholder="مثال: المنتج جودته عالية جداً والتغليف رائع..."
-                        className="w-full px-3 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:border-blue-500 resize-vertical"
+                        className="w-full min-h-[140px] rounded-[1.5rem] border border-surface-high px-4 py-4 text-base text-gray-900 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white resize-vertical"
                         rows={4}
                       />
-                      <p className="text-xs text-blue-700 mt-1">
+                      <p className="text-xs text-gray-500 mt-3">
                         {reviewComment.length} / 500 حرف
                       </p>
                     </div>
 
                     {/* إضافة صور */}
-                    <div className="mb-4">
-                      <label className="text-sm font-semibold text-blue-900 block mb-2">
+                    <div className="mb-6">
+                      <label className="text-sm font-semibold text-gray-900 block mb-3">
                         📸 أضف صور (اختياري - حد أقصى 3)
                       </label>
-                      <div className="border-2 border-dashed border-blue-300 rounded-lg p-4 bg-blue-50 hover:bg-blue-100 transition-colors">
+                      <div className="border border-dashed border-surface-high rounded-[1.5rem] p-4 bg-surface-low">
                         <input
                           type="file"
                           multiple
@@ -583,36 +589,36 @@ export default function ProductDetail() {
                         />
                         <label
                           htmlFor="review-images-input"
-                          className={`flex items-center justify-center gap-2 cursor-pointer ${
+                          className={`flex items-center justify-center gap-2 py-4 px-3 rounded-[1.5rem] cursor-pointer transition-colors ${
                             reviewImages.length >= 3
                               ? "opacity-50 cursor-not-allowed"
-                              : ""
+                              : "hover:bg-surface-high"
                           }`}
                         >
-                          <ImagePlus className="w-5 h-5 text-blue-600" />
-                          <span className="text-sm text-blue-700 font-medium">
+                          <ImagePlus className="w-5 h-5 text-primary" />
+                          <span className="text-sm text-gray-600 font-medium">
                             اختر صور أو اسحبها هنا ({reviewImages.length}/3)
                           </span>
                         </label>
                       </div>
 
-                      {/* عرض الصور المختارة */}
                       {reviewImages.length > 0 && (
-                        <div className="mt-3 grid grid-cols-3 gap-2">
+                        <div className="mt-4 grid grid-cols-3 gap-3">
                           {reviewImages.map((image, index) => (
-                            <div key={index} className="relative group">
+                            <div key={index} className="relative group rounded-3xl overflow-hidden border border-surface-high">
                               <img
                                 src={image}
                                 alt={`صورة ${index + 1}`}
-                                className="w-full h-24 object-cover rounded-lg border border-blue-200"
+                                className="w-full h-24 object-cover"
                               />
                               <button
+                                type="button"
                                 onClick={() => removeImage(index)}
-                                className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="absolute top-2 right-2 bg-white/90 text-gray-800 p-1 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
                               >
                                 <X className="w-3 h-3" />
                               </button>
-                              <p className="text-xs text-gray-500 text-center mt-1">
+                              <p className="text-[11px] text-gray-500 text-center p-2">
                                 صورة {index + 1}
                               </p>
                             </div>
@@ -622,12 +628,13 @@ export default function ProductDetail() {
                     </div>
 
                     {/* الأزرار */}
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-3 sm:flex-row">
                       <Button
+                        type="button"
                         size="sm"
+                        className="w-full sm:flex-1"
                         onClick={handleCreateReview}
                         disabled={createReview.isPending}
-                        className="bg-blue-600 hover:bg-blue-700 flex-1"
                       >
                         <Send className="w-4 h-4 mr-2" />
                         {createReview.isPending
@@ -635,8 +642,10 @@ export default function ProductDetail() {
                           : "إرسال التقييم"}
                       </Button>
                       <Button
+                        type="button"
                         size="sm"
                         variant="outline"
+                        className="w-full sm:flex-1"
                         onClick={() => {
                           setShowReviewForm(false);
                           setReviewComment("");

@@ -74,12 +74,12 @@ export default function Home() {
             <div className="md:w-1/2 text-right">
               <Reveal delay={0.1}>
                 <span className="inline-block bg-primary/10 text-primary text-[10px] font-bold tracking-[0.2em] uppercase px-4 py-1.5 mb-6">
-                  Choose your comfort first
+                  .We don't sell you a product, we sell you comfort
                 </span>
               </Reveal>
               <Reveal delay={0.2}>
                 <h1 className="text-5xl md:text-7xl font-display font-bold text-gray-900 mb-8 leading-[1.1] tracking-tighter">
-                  Sahla DZ المتجر الذي يفهم مشكلتك <br /> قبل أن يبيع لك الحل
+                  المتجر الذي يوفر لك <br /> الحل لمشكلاتك اليومية
                 </h1>
               </Reveal>
               <Reveal delay={0.3}>
@@ -215,7 +215,7 @@ export default function Home() {
                 </h3>
                 <p className="text-sm text-gray-500 leading-relaxed">
                   نشحن طلبك إلى أقرب مكتب Maystro Delivery في ولايتك للتوصيل السريع
-                  والمضمون في 48 ساعة.
+                  والمضمون في 48-72 ساعة.
                 </p>
               </div>
             </Reveal>
@@ -229,7 +229,7 @@ export default function Home() {
                 </h3>
                 <p className="text-sm text-gray-500 leading-relaxed">
                   فريق دعم متخصص للرد على استفساراتك ومتابعة طلباتك عبر الهاتف
-                  أو فيسبوك.
+                  أو الواتساب.
                 </p>
               </div>
             </Reveal>

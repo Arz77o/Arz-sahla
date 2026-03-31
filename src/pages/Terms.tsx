@@ -141,8 +141,8 @@ export default function Terms() {
                           Maystro Delivery
                         </span>{" "}
                         بنظام <span className="italic">Stop Desk</span>{" "}
-                        (الاستلام من المكتب). يلتزم الزبون بالتوجه لمكتب Maystro Delivery
-                        في ولايته لاستلام طرده فور وصوله.
+                        (الاستلام من المكتب). يلتزم الزبون بالتوجه لمكتب Maystro
+                        Delivery في ولايته لاستلام طرده فور وصوله.
                       </p>
                     </div>
                   </div>
@@ -152,8 +152,8 @@ export default function Terms() {
                     </h3>
                     <div className="md:col-span-2 space-y-4 text-sm leading-loose">
                       <p>
-                        تستغرق عملية التجهيز من 24-48 ساعة، بينما يستغرق التوصيل
-                        من 2 إلى 5 أيام عمل حسب بعد الولاية.
+                        تستغرق عملية التجهيز 24 ساعة، بينما يستغرق التوصيل من
+                        48-72 ساعة بعد التأكيد الطلبية حسب بعد الولاية.
                       </p>
                     </div>
                   </div>
@@ -231,14 +231,43 @@ export default function Terms() {
                     <span className="text-red-600 font-bold italic underline">
                       ⚠️ تنبيه:
                     </span>
-                    رفض استلام الطلبات المؤكدة (COD) يسبب خسائر مادية للمتجر،
-                    وقد يؤدي لإدراج رقم الهاتف في القائمة السوداء لشركتنا
-                    وشركائنا.
+                    رفض استلام الطلبات المؤكدة (COD) يسبب خسائر مادية للمتجر, قد
+                    يؤدي إلى حظر حسابك من الطلبات المستقبلية.
                   </p>
                 </div>
               </section>
 
-              {/* 6. Return Policy - Red Alert Block */}
+              {/* 6. Store Obligations */}
+              <section>
+                <div className="flex items-center gap-6 mb-12">
+                  <div className="text-4xl font-display font-bold text-primary/20 leading-none">
+                    06.
+                  </div>
+                  <h2 className="text-3xl font-display font-bold text-gray-900 uppercase tracking-tight">
+                    التزامات المتجر
+                  </h2>
+                </div>
+                <div className="space-y-6 text-sm text-gray-600 leading-loose">
+                  <p className="flex items-start gap-4 uppercase tracking-[0.1em]">
+                    <span className="text-primary font-bold">✓</span>
+                    فحص دقيق لكل منتج قبل الشحن لضمان وصوله بحالة ممتازة.
+                  </p>
+                  <p className="flex items-start gap-4 uppercase tracking-[0.1em]">
+                    <span className="text-primary font-bold">✓</span>
+                    معالجة الطلبات المؤكدة خلال 24 ساعة وإعلامك بحالة الشحن.
+                  </p>
+                  <p className="flex items-start gap-4 uppercase tracking-[0.1em]">
+                    <span className="text-primary font-bold">✓</span>
+                    الحفاظ على سرية بياناتك الشخصية واستخدامها فقط لأغراض الطلب.
+                  </p>
+                  <p className="flex items-start gap-4 uppercase tracking-[0.1em]">
+                    <span className="text-primary font-bold">✓</span>
+                    تقديم دعم فني واستشاري سريع في حال وجود أي استفسار أو مشكلة.
+                  </p>
+                </div>
+              </section>
+
+              {/* 7. Return Policy - Red Alert Block */}
               <section className="bg-surface-low -mx-8 md:-mx-16 p-8 md:p-16 border-y border-surface-high">
                 <div className="flex items-center gap-6 mb-16">
                   <div className="text-4xl font-display font-bold text-red-600/20 leading-none">
