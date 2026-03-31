@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ShoppingCart, Star, Loader2, X, Send, ImagePlus, Trash2 } from "lucide-react";
+import {
+  ShoppingCart,
+  Star,
+  Loader2,
+  X,
+  Send,
+  ImagePlus,
+  Trash2,
+} from "lucide-react";
 import { SEOMeta } from "../components/shared/SEOMeta";
 import { formatDZD } from "../lib/pricing";
 import { useCartStore } from "../store/cartStore";
@@ -109,15 +117,17 @@ export default function ProductDetail() {
     });
 
     // Track add_to_cart in GA4
-    gtag.trackEcommerce('add_to_cart', {
-      currency: 'DZD',
+    gtag.trackEcommerce("add_to_cart", {
+      currency: "DZD",
       value: priceDZD * quantity,
-      items: [{
-        item_id: product.id,
-        item_name: name,
-        price: priceDZD,
-        quantity,
-      }],
+      items: [
+        {
+          item_id: product.id,
+          item_name: name,
+          price: priceDZD,
+          quantity,
+        },
+      ],
     });
   };
 
@@ -157,7 +167,7 @@ export default function ProductDetail() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []) as File[];
     const remainingSlots = 3 - reviewImages.length;
-    
+
     if (files.length > remainingSlots) {
       toast.error(`يمكنك إضافة ${remainingSlots} صور فقط`);
       return;
@@ -205,37 +215,36 @@ export default function ProductDetail() {
         ogType="product"
         schemas={[
           {
-            '@context': 'https://schema.org',
-            '@type': 'Product',
+            "@context": "https://schema.org",
+            "@type": "Product",
             name,
             description: description?.substring(0, 500),
             image: selectedImage ? [selectedImage] : undefined,
             sku: product.id,
             offers: {
-              '@type': 'Offer',
-              url: typeof window !== 'undefined' ? window.location.href : '',
-              priceCurrency: 'DZD',
+              "@type": "Offer",
+              url: typeof window !== "undefined" ? window.location.href : "",
+              priceCurrency: "DZD",
               price: priceDZD,
               availability:
                 product.stock_quantity > 0
-                  ? 'https://schema.org/InStock'
-                  : 'https://schema.org/OutOfStock',
-              seller: { '@type': 'Organization', name: 'SAHLA DZ.' },
+                  ? "https://schema.org/InStock"
+                  : "https://schema.org/OutOfStock",
+              seller: { "@type": "Organization", name: "SAHLA DZ." },
             },
             aggregateRating:
               product.avg_rating > 0
                 ? {
-                  '@type': 'AggregateRating',
-                  ratingValue: product.avg_rating.toFixed(1),
-                  reviewCount: product.reviews?.length ?? 1,
-                  bestRating: '5',
-                  worstRating: '1',
-                }
+                    "@type": "AggregateRating",
+                    ratingValue: product.avg_rating.toFixed(1),
+                    reviewCount: product.reviews?.length ?? 1,
+                    bestRating: "5",
+                    worstRating: "1",
+                  }
                 : undefined,
           },
         ]}
       />
-
 
       <div className="container mx-auto px-4 py-12 md:py-20 lg:py-32">
         {/* Main Product Info Card */}
@@ -267,10 +276,11 @@ export default function ProductDetail() {
                       <button
                         key={idx}
                         onClick={() => setSelectedImage(img)}
-                        className={`w-24 h-24 border transition-all flex-shrink-0 ${selectedImage === img
-                          ? "border-primary ring-1 ring-primary"
-                          : "border-surface-high hover:border-gray-400"
-                          }`}
+                        className={`w-24 h-24 border transition-all flex-shrink-0 ${
+                          selectedImage === img
+                            ? "border-primary ring-1 ring-primary"
+                            : "border-surface-high hover:border-gray-400"
+                        }`}
                       >
                         <img
                           src={img}
@@ -294,10 +304,11 @@ export default function ProductDetail() {
                   {/* Product Meta */}
                   <div className="flex items-center gap-6 mb-10">
                     <span
-                      className={`inline-block px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] ${outOfStock
-                        ? "bg-red-50 text-red-700"
-                        : "bg-primary/10 text-primary"
-                        }`}
+                      className={`inline-block px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] ${
+                        outOfStock
+                          ? "bg-red-50 text-red-700"
+                          : "bg-primary/10 text-primary"
+                      }`}
                     >
                       {outOfStock
                         ? t("product.outOfStock")
@@ -357,10 +368,11 @@ export default function ProductDetail() {
                                       option: opt,
                                     })
                                   }
-                                  className={`flex-grow px-6 py-3 text-xs font-bold uppercase tracking-widest transition-all ${active
-                                    ? "bg-primary text-white"
-                                    : "bg-white text-gray-500 hover:text-gray-900 hover:bg-surface-low"
-                                    }`}
+                                  className={`flex-grow px-6 py-3 text-xs font-bold uppercase tracking-widest transition-all ${
+                                    active
+                                      ? "bg-primary text-white"
+                                      : "bg-white text-gray-500 hover:text-gray-900 hover:bg-surface-low"
+                                  }`}
                                 >
                                   {opt}
                                 </button>
@@ -407,10 +419,11 @@ export default function ProductDetail() {
                 <div className="mt-12 pt-12 border-t border-surface-high">
                   <Button
                     size="lg"
-                    className={`w-full h-20 text-xl font-display font-bold tracking-tighter ${inCart
-                      ? "bg-gray-900 hover:bg-black"
-                      : "bg-primary hover:bg-primary-dim"
-                      }`}
+                    className={`w-full h-20 text-xl font-display font-bold tracking-tighter ${
+                      inCart
+                        ? "bg-gray-900 hover:bg-black"
+                        : "bg-primary hover:bg-primary-dim"
+                    }`}
                     onClick={handleAddToCart}
                     disabled={outOfStock}
                   >
@@ -439,7 +452,10 @@ export default function ProductDetail() {
                     {t("product.description")}
                     <div className="h-px bg-surface-high flex-grow" />
                   </h2>
-                  <div className="prose max-w-none text-gray-500 leading-relaxed text-base md:text-lg whitespace-pre-line overflow-hidden" dir="auto">
+                  <div
+                    className="prose max-w-none text-gray-500 leading-relaxed text-base md:text-lg whitespace-pre-line overflow-hidden"
+                    dir="auto"
+                  >
                     {description || t("no_description")}
                   </div>
                 </div>
@@ -453,7 +469,10 @@ export default function ProductDetail() {
                       {t("product.problemSolved")}
                       <div className="h-px bg-surface-high flex-grow" />
                     </h2>
-                    <div className="prose max-w-none text-gray-900 leading-relaxed text-base md:text-lg whitespace-pre-line overflow-hidden" dir="auto">
+                    <div
+                      className="prose max-w-none text-gray-900 leading-relaxed text-base md:text-lg whitespace-pre-line overflow-hidden"
+                      dir="auto"
+                    >
                       {problemSolved}
                     </div>
                   </div>
@@ -485,19 +504,29 @@ export default function ProductDetail() {
 
                 {/* ✅ نموذج التقييم الجديد */}
                 {!showReviewForm ? (
-                  <div className="py-12 text-center border-2 border-dashed border-surface-high rounded-lg hover:border-primary transition-colors cursor-pointer" onClick={() => setShowReviewForm(true)}>
-                    <p className="text-gray-500 font-semibold mb-3">هل جربت هذا المنتج؟</p>
+                  <div
+                    className="py-12 text-center border-2 border-dashed border-surface-high rounded-lg hover:border-primary transition-colors cursor-pointer"
+                    onClick={() => setShowReviewForm(true)}
+                  >
+                    <p className="text-gray-500 font-semibold mb-3">
+                      هل جربت هذا المنتج؟
+                    </p>
                     <Button size="sm" variant="outline">
-                      اكتب تقييمك 
+                      اكتب تقييمك
                     </Button>
                   </div>
                 ) : (
                   <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-6 mb-8 animate-in fade-in">
-                    <h3 className="text-lg font-bold text-blue-900 mb-4"> اكتب تقييمك</h3>
-                    
+                    <h3 className="text-lg font-bold text-blue-900 mb-4">
+                      {" "}
+                      اكتب تقييمك
+                    </h3>
+
                     {/* النجوم للتقييم */}
                     <div className="mb-4">
-                      <p className="text-sm font-semibold text-blue-900 mb-2">كم نجمة تعطيه؟</p>
+                      <p className="text-sm font-semibold text-blue-900 mb-2">
+                        كم نجمة تعطيه؟
+                      </p>
                       <div className="flex gap-2">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
@@ -515,12 +544,16 @@ export default function ProductDetail() {
                           </button>
                         ))}
                       </div>
-                      <p className="text-xs text-blue-700 mt-1">{reviewRating} من 5 نجوم</p>
+                      <p className="text-xs text-blue-700 mt-1">
+                        {reviewRating} من 5 نجوم
+                      </p>
                     </div>
 
                     {/* حقل التعليق */}
                     <div className="mb-4">
-                      <label className="text-sm font-semibold text-blue-900 block mb-2">ما رأيك في المنتج؟</label>
+                      <label className="text-sm font-semibold text-blue-900 block mb-2">
+                        ما رأيك في المنتج؟
+                      </label>
                       <textarea
                         value={reviewComment}
                         onChange={(e) => setReviewComment(e.target.value)}
@@ -528,7 +561,9 @@ export default function ProductDetail() {
                         className="w-full px-3 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:border-blue-500 resize-vertical"
                         rows={4}
                       />
-                      <p className="text-xs text-blue-700 mt-1">{reviewComment.length} / 500 حرف</p>
+                      <p className="text-xs text-blue-700 mt-1">
+                        {reviewComment.length} / 500 حرف
+                      </p>
                     </div>
 
                     {/* إضافة صور */}
@@ -549,7 +584,9 @@ export default function ProductDetail() {
                         <label
                           htmlFor="review-images-input"
                           className={`flex items-center justify-center gap-2 cursor-pointer ${
-                            reviewImages.length >= 3 ? "opacity-50 cursor-not-allowed" : ""
+                            reviewImages.length >= 3
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
                           }`}
                         >
                           <ImagePlus className="w-5 h-5 text-blue-600" />
@@ -575,7 +612,9 @@ export default function ProductDetail() {
                               >
                                 <X className="w-3 h-3" />
                               </button>
-                              <p className="text-xs text-gray-500 text-center mt-1">صورة {index + 1}</p>
+                              <p className="text-xs text-gray-500 text-center mt-1">
+                                صورة {index + 1}
+                              </p>
                             </div>
                           ))}
                         </div>
@@ -591,7 +630,9 @@ export default function ProductDetail() {
                         className="bg-blue-600 hover:bg-blue-700 flex-1"
                       >
                         <Send className="w-4 h-4 mr-2" />
-                        {createReview.isPending ? "جاري الإرسال..." : "إرسال التقييم"}
+                        {createReview.isPending
+                          ? "جاري الإرسال..."
+                          : "إرسال التقييم"}
                       </Button>
                       <Button
                         size="sm"
@@ -610,61 +651,65 @@ export default function ProductDetail() {
                 )}
 
                 <div className="space-y-16">
-                  {product.reviews && product.reviews.filter((r: any) => r.status === 'approved').length > 0 ? (
-                    product.reviews.filter((r: any) => r.status === 'approved').map((r: any) => (
-                      <div key={r.id} className="group">
-                        <div className="flex justify-between items-start mb-6">
-                          <div className="flex items-center gap-6">
-                            <div className="w-14 h-14 bg-surface-low flex items-center justify-center font-bold text-gray-900 text-lg">
-                              {r.full_name?.[0]?.toUpperCase() || "A"}
-                            </div>
-                            <div>
-                              <div className="font-bold text-gray-900 mb-1 uppercase tracking-widest text-xs">
-                                {r.full_name || "User"}
+                  {product.reviews &&
+                  product.reviews.filter((r: any) => r.status === "approved")
+                    .length > 0 ? (
+                    product.reviews
+                      .filter((r: any) => r.status === "approved")
+                      .map((r: any) => (
+                        <div key={r.id} className="group">
+                          <div className="flex justify-between items-start mb-6">
+                            <div className="flex items-center gap-6">
+                              <div className="w-14 h-14 bg-surface-low flex items-center justify-center font-bold text-gray-900 text-lg">
+                                {r.full_name?.[0]?.toUpperCase() || "A"}
                               </div>
-                              <div className="flex gap-0.5">
-                                {[...Array(5)].map((_, i) => (
-                                  <Star
-                                    key={i}
-                                    className={`w-3 h-3 ${i < r.rating ? "fill-primary" : "fill-none stroke-gray-200"}`}
+                              <div>
+                                <div className="font-bold text-gray-900 mb-1 uppercase tracking-widest text-xs">
+                                  {r.full_name || "User"}
+                                </div>
+                                <div className="flex gap-0.5">
+                                  {[...Array(5)].map((_, i) => (
+                                    <Star
+                                      key={i}
+                                      className={`w-3 h-3 ${i < r.rating ? "fill-primary" : "fill-none stroke-gray-200"}`}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">
+                              {new Date(r.created_at).toLocaleDateString(
+                                "en-US",
+                                {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                },
+                              )}
+                            </span>
+                          </div>
+                          <p className="text-gray-500 leading-relaxed mb-8 max-w-2xl">
+                            {r.comment}
+                          </p>
+                          {r.images && r.images.length > 0 && (
+                            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                              {r.images.map((img: string, i: number) => (
+                                <div
+                                  key={i}
+                                  className="w-32 h-32 border border-surface-high cursor-zoom-in overflow-hidden"
+                                  onClick={() => setZoomedImage(img)}
+                                >
+                                  <img
+                                    src={img}
+                                    alt=""
+                                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
                                   />
-                                ))}
-                              </div>
+                                </div>
+                              ))}
                             </div>
-                          </div>
-                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">
-                            {new Date(r.created_at).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                              },
-                            )}
-                          </span>
+                          )}
                         </div>
-                        <p className="text-gray-500 leading-relaxed mb-8 max-w-2xl">
-                          {r.comment}
-                        </p>
-                        {r.images && r.images.length > 0 && (
-                          <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-                            {r.images.map((img: string, i: number) => (
-                              <div
-                                key={i}
-                                className="w-32 h-32 border border-surface-high cursor-zoom-in overflow-hidden"
-                                onClick={() => setZoomedImage(img)}
-                              >
-                                <img
-                                  src={img}
-                                  alt=""
-                                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                                />
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))
+                      ))
                   ) : (
                     <div className="py-20 text-center border-2 border-dashed border-surface-high">
                       <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-xs">
@@ -695,7 +740,8 @@ export default function ProductDetail() {
                           Maystro Delivery
                         </p>
                         <p className="text-xs text-white/60 leading-relaxed">
-                          توصيل سريع ومضمون إلى أقرب مكتب Maystro Delivery في ولايتك.
+                          توصيل سريع ومضمون إلى أقرب مكتب Maystro Delivery في
+                          ولايتك.
                         </p>
                       </div>
                     </li>
