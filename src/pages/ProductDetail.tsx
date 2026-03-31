@@ -605,7 +605,10 @@ export default function ProductDetail() {
                       {reviewImages.length > 0 && (
                         <div className="mt-4 grid grid-cols-3 gap-3">
                           {reviewImages.map((image, index) => (
-                            <div key={index} className="relative group rounded-3xl overflow-hidden border border-surface-high">
+                            <div
+                              key={index}
+                              className="relative group rounded-3xl overflow-hidden border border-surface-high"
+                            >
                               <img
                                 src={image}
                                 alt={`صورة ${index + 1}`}
