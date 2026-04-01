@@ -14,6 +14,7 @@ export default function AdminSettings() {
     free_shipping_threshold: 800,
     default_profit_margin: 50,
     ga_id: '',
+    pixel_id: '',
   });
 
   const [shippingFees, setShippingFees] = useState<any[]>([]);
@@ -42,6 +43,7 @@ export default function AdminSettings() {
         free_shipping_threshold: pm.free_shipping_threshold ?? 800,
         default_profit_margin: pm.default_profit_margin ?? 50,
         ga_id: pm.ga_id || '',
+        pixel_id: pm.pixel_id || '',
       });
     }
     setLoading(false);
@@ -206,6 +208,20 @@ export default function AdminSettings() {
                   className="w-full px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl font-mono text-xs focus:ring-2 focus:ring-blue-500 outline-none"
                 />
                 <p className="text-[9px] text-gray-400 leading-tight italic">أدخل معرف التتبع (GA4) لتفعيل إحصائيات زوار الموقع تلقائياً.</p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">
+                  Meta Pixel ID
+                </label>
+                <input
+                  type="text"
+                  value={settings.pixel_id}
+                  onChange={(e) => setSettings({ ...settings, pixel_id: e.target.value })}
+                  placeholder="Ex: 123456789012345"
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl font-mono text-xs focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+                <p className="text-[9px] text-gray-400 leading-tight italic">أدخل معرف Meta Pixel لتفعيل تتبع صفحة الويب.</p>
               </div>
             </div>
 
