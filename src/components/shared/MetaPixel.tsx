@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
 
-const DEFAULT_PIXEL_ID = "1487462996129129";
+const DEFAULT_PIXEL_ID = "942071035089557"; // معرف Pixel الافتراضي (يمكنك تغييره)
 
 declare global {
   interface Window {
