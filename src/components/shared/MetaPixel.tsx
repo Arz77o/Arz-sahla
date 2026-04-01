@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { supabase } from '../../lib/supabase';
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { supabase } from "../../lib/supabase";
 
-const DEFAULT_PIXEL_ID = '1487462996129129';
+const DEFAULT_PIXEL_ID = "1487462996129129";
 
 declare global {
   interface Window {
@@ -18,9 +18,14 @@ export const MetaPixel: React.FC = () => {
   useEffect(() => {
     const initPixel = async () => {
       try {
-        const { data, error } = await supabase.from('settings').select('*').single();
+        const { data, error } = await supabase
+          .from("settings")
+          .select("*")
+          .single();
         if (error || !data) {
-          console.warn('[Meta Pixel] Unable to fetch settings, using default Pixel ID.');
+          console.warn(
+            "[Meta Pixel] Unable to fetch settings, using default Pixel ID.",
+          );
         }
 
         const id = (data as any)?.payment_methods?.pixel_id || DEFAULT_PIXEL_ID;
@@ -30,7 +35,7 @@ export const MetaPixel: React.FC = () => {
           return;
         }
 
-        const script = document.createElement('script');
+        const script = document.createElement("script");
         script.innerHTML = `!function(f,b,e,v,n,t,s){
           if(f.fbq)return;n=f.fbq=function(){n.callMethod?
           n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -46,7 +51,7 @@ export const MetaPixel: React.FC = () => {
         (window as any).__metaPixelInitialized = true;
         setPixelId(id);
       } catch (err) {
-        console.error('[Meta Pixel] Initialization failed:', err);
+        console.error("[Meta Pixel] Initialization failed:", err);
       }
     };
 
@@ -54,8 +59,8 @@ export const MetaPixel: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!pixelId || typeof window.fbq !== 'function') return;
-    window.fbq('track', 'PageView', {
+    if (!pixelId || typeof window.fbq !== "function") return;
+    window.fbq("track", "PageView", {
       page_path: location.pathname + location.search,
     });
   }, [location.pathname, location.search, pixelId]);
