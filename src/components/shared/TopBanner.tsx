@@ -5,7 +5,7 @@ export const TopBanner = () => {
   const messages = [
     " توصيل سـريع ل30 ولاية 🚀 عبـر Expedia Chrono",
     "إحصل على تخفيض عند الدفع بـ Chargily📢",
-    "الدفع عند الاستلام متوفر في جميع مكاتب التوصيل 📦"
+    "الدفع عند الاستلام متوفر 📦"
   ];
 
   React.useEffect(() => {

@@ -13,7 +13,6 @@ import { useAuthStore } from "../store/authStore";
 import { supabase } from "../lib/supabase";
 import type { Database } from "../types/database.types";
 import { WILAYAS } from "../lib/algeria";
-import { getCommunesByWilaya } from "../lib/communes";
 import { formatDZD } from "../lib/pricing";
 import { Button } from "../components/ui/button";
 import { gtag } from "../lib/gtag";
@@ -30,7 +29,7 @@ const checkoutSchema = z.object({
   phone: z
     .string()
     .regex(/^(0)(5|6|7)[0-9]{8}$/, "رقم هاتف غير صالح (مثال: 0550123456)"),
-  address: z.string(),
+  address: z.string().min(5, "يرجى كتابة العنوان بالتفصيل لضمان وصول الطلبية"),
   deliveryType: z.enum(["desk", "home"], {
     message: "يرجى اختيار نوع التوصيل",
   }),
@@ -59,8 +58,6 @@ export default function Checkout() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isShowingVideo, setIsShowingVideo] = useState(false);
   const [shippingFeesConfig, setShippingFeesConfig] = useState<any[]>([]);
-  const [communeInput, setCommuneInput] = useState("");
-  const [showCommuneDropdown, setShowCommuneDropdown] = useState(false);
 
   const PAYMENT_GUIDE_VIDEO_URL = "/e-dahabia-tutorial.webm";
 
@@ -115,22 +112,6 @@ export default function Checkout() {
   const wilayaName = wilaya ? (isAr ? wilaya.name_ar : wilaya.name_en) : "";
   const paymentMethod = watch("paymentMethod");
   const termsAccepted = watch("termsAccepted");
-
-  // ── بلديات الولاية المختارة ──
-  const availableCommunes = useMemo(() => {
-    if (!wilayaCode) return [];
-    const code = parseInt(wilayaCode);
-    return getCommunesByWilaya(code);
-  }, [wilayaCode]);
-
-  // فلترة البلديات حسب ما يكتبه المستخدم
-  const filteredCommunes = useMemo(() => {
-    if (!communeInput) return availableCommunes;
-    return availableCommunes.filter(c =>
-      c.toLowerCase().includes(communeInput.toLowerCase()) ||
-      c.includes(communeInput)
-    );
-  }, [communeInput, availableCommunes]);
 
   // ── حساب سعر الشحن ──
   const subtotal = getTotal(paymentMethod);
@@ -405,7 +386,6 @@ export default function Checkout() {
                                 register("wilaya").onChange(e);
                                 // إعادة تعيين البلدية عند تغيير الولاية
                                 setValue("commune", "");
-                                setCommuneInput("");
                               }}
                               className="w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all"
                             >
@@ -422,46 +402,17 @@ export default function Checkout() {
                             {errors.wilaya && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.wilaya.message}</p>}
                           </div>
 
-                          {/* Commune — Autocomplete */}
+                          {/* Commune — Text Input */}
                           <div className="space-y-3 relative">
                             <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t("checkout.commune")}</label>
                             <input
                               {...register("commune")}
-                              value={communeInput}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                setCommuneInput(val);
-                                setValue("commune", val, { shouldValidate: true });
-                                setShowCommuneDropdown(true);
-                              }}
-                              onFocus={() => setShowCommuneDropdown(true)}
-                              onBlur={() => setTimeout(() => setShowCommuneDropdown(false), 200)}
-                              autoComplete="off"
                               disabled={!wilayaCode}
                               className={`w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all ${
                                 !wilayaCode ? "opacity-50 cursor-not-allowed" : ""
                               }`}
-                              placeholder={wilayaCode ? "اكتب للبحث عن بلديتك..." : "اختر الولاية أولاً"}
+                              placeholder={wilayaCode ? "اكتب اسم بلديتك هنا..." : "اختر الولاية أولاً"}
                             />
-                            {/* Dropdown */}
-                            {showCommuneDropdown && filteredCommunes.length > 0 && wilayaCode && (
-                              <div className="absolute top-full left-0 right-0 z-50 bg-white border border-surface-high shadow-lg max-h-52 overflow-y-auto">
-                                {filteredCommunes.map((commune) => (
-                                  <button
-                                    key={commune}
-                                    type="button"
-                                    onMouseDown={() => {
-                                      setCommuneInput(commune);
-                                      setValue("commune", commune, { shouldValidate: true });
-                                      setShowCommuneDropdown(false);
-                                    }}
-                                    className="w-full text-right px-4 py-3 text-sm hover:bg-primary/5 hover:text-primary transition-colors font-medium border-b border-surface-high last:border-0"
-                                  >
-                                    {commune}
-                                  </button>
-                                ))}
-                              </div>
-                            )}
                             {errors.commune && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.commune.message}</p>}
                           </div>
                         </div>
@@ -480,18 +431,19 @@ export default function Checkout() {
                           </div>
                         )}
 
-                        {/* للتوصيل المكتبي — عنوان اختياري / ملاحظة */}
+                        {/* للتوصيل المكتبي — عنوان / ملاحظة */}
                         {deliveryType === "desk" && (
                           <div className="space-y-3">
                             <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                              {t("checkout.address")} <span className="text-gray-300">(اختياري)</span>
+                              {t("checkout.address")}
                             </label>
                             <textarea
                               {...register("address")}
                               rows={2}
                               className="w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all resize-none"
-                              placeholder="ملاحظة أو عنوان إضافي (اختياري)"
+                              placeholder="اكتب العنوان أو أي ملاحظة إضافية للطلب..."
                             />
+                            {errors.address && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.address.message}</p>}
                           </div>
                         )}
                       </div>
