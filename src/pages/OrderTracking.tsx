@@ -215,7 +215,7 @@ export default function OrderTracking() {
                   <span
                     className={`text-[10px] font-black uppercase tracking-widest ${order.tracking_number ? "text-primary" : "text-gray-400"}`}
                   >
-                    🚚 رقم تتبع الطرد - Maystro Delivery
+                    🚚 رقم تتبع الطرد - Expedia Chrono
                   </span>
                   <Truck
                     className={`w-5 h-5 ${order.tracking_number ? "text-primary" : "text-gray-300"}`}
@@ -240,13 +240,13 @@ export default function OrderTracking() {
                         <Copy className="w-5 h-5" />
                       </button>
                       <a
-                        href="https://maystro-delivery.com/trackingSD.html"
+                        href="https://ecotrack.dz/ar/suivi"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 px-4 py-3 bg-primary text-white font-bold hover:bg-primary-dim transition-all"
                       >
                         <ExternalLink className="w-5 h-5" />
-                        تتبع على Maystro Delivery
+                        تتبع على Expedia Chrono
                       </a>
                     </div>
                   )}
@@ -254,7 +254,7 @@ export default function OrderTracking() {
                 {order.tracking_number && (
                   <p className="text-xs text-primary mt-4 font-bold flex items-center justify-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    ادخل هذا الرقم في موقع Maystro Delivery لتتبع طردك
+                    ادخل هذا الرقم في موقع Expedia Chrono لتتبع طردك
                   </p>
                 )}
               </div>
@@ -353,8 +353,7 @@ export default function OrderTracking() {
                       تم الشحن
                     </h4>
                     <p className="text-sm text-gray-500 mt-2 mb-3">
-                      طلبك الآن مع شركة الشحن وهو في طريقه إلى مكتب الولاية
-                      الخاصة بك.
+                      طلبك الآن مع شركة Expedia Chrono وهو في طريقه إليك.
                     </p>
                   </div>
                 </div>
@@ -362,18 +361,18 @@ export default function OrderTracking() {
                 {order.tracking_number && currentStep >= 4 && (
                   <div className="mt-3 bg-white border border-surface-high p-4 text-right mr-[3.75rem]">
                     <div className="text-xs text-primary font-medium mb-1">
-                      🚚 رقم تتبع Maystro Delivery:
+                      🚚 رقم تتبع Expedia Chrono:
                     </div>
                     <div className="font-mono font-bold text-gray-900 text-lg mb-3">
                       {order.tracking_number}
                     </div>
                     <a
-                      href="https://maystro-delivery.com/trackingSD.html"
+                      href="https://ecotrack.dz/ar/suivi"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-primary hover:text-primary-dim font-medium underline"
                     >
-                      تتبع طردك على موقع Maystro Delivery &larr;
+                      تتبع طردك على موقع Expedia Chrono &larr;
                     </a>
                   </div>
                 )}
@@ -398,7 +397,9 @@ export default function OrderTracking() {
                     جاهز للاستلام
                   </h4>
                   <p className="text-sm text-gray-500 mt-2">
-                    لقد وصل الطرد إلى مكتب الشحن (Stop Desk) في ولايتك، يمكنك استلامه الآن.
+                    {order.delivery_type === "home"
+                      ? "لقد وصل المندوب إلى منزلك أو سيصلك قريباً. يرجى التواجد لاستلام الطرد."
+                      : "لقد وصل الطرد إلى مكتب Expedia Chrono (Stop Desk) في ولايتك، يمكنك استلامه الآن."}
                   </p>
                 </div>
               </div>

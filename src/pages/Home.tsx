@@ -214,7 +214,7 @@ export default function Home() {
                   توصيل Stop Desk
                 </h3>
                 <p className="text-sm text-gray-500 leading-relaxed">
-                  نشحن طلبك إلى أقرب مكتب Maystro Delivery في ولايتك للتوصيل السريع
+                  نشحن طلبك إلى أقرب مكتب Expedia Chrono في ولايتك للتوصيل السريع
                   والمضمون في 48-72 ساعة.
                 </p>
               </div>

@@ -44,7 +44,7 @@ export default function FAQ() {
                 <div className="space-y-px bg-surface-high border border-surface-high">
                   {[
                     { q: "كم يستغرق التوصيل؟", a: "يستغرق التوصيل من 48 ساعة الى 72 ساعة لولايات الجزائر." },
-                    { q: "أين أستلم طردي؟", a: "يتم تسليم الطرود عبر خدمة Stop Desk (الاستلام من مكتب شركة الشحن) في ولايتك." },
+                    { q: "أين أستلم طردي؟", a: "نوفر خيارين عبر Expedia Chrono: توصيل إلى المنزل 🏠 أو توصيل إلى المكتب 🏢 في ولايتك. تختار الطريقة المناسبة عند الطلب." },
                     { q: "هل هناك رسوم إضافية؟", a: "لا توجد رسوم خفية. تدفع فقط السعر الإجمالي الموضح في الطلب." }
                   ].map((item, i) => (
                     <div key={i} className="bg-white p-8 md:p-10 group hover:bg-surface-low transition-all">

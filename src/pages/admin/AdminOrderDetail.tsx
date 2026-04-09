@@ -66,7 +66,7 @@ export default function AdminOrderDetail() {
 الهاتف: ${order.phone}
 طريقة التواصل: ${order.contact_preference === "whatsapp" ? "واتساب" : order.contact_preference === "email" ? "إيميل" : "إتصال هاتف"}
 العنوان: ${order.address}، ${order.commune}، ${order.wilaya}
-${order.maystro_desk ? `مكتب Maystro Delivery: ${order.maystro_desk
+${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk
         }` : ""}`;
 
     navigator.clipboard
@@ -295,21 +295,16 @@ ${order.maystro_desk ? `مكتب Maystro Delivery: ${order.maystro_desk
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-500 mb-1">طريقة التوصيل</div>
-                <div className="flex flex-col gap-2">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-lg text-sm font-bold text-gray-800 self-start">
-                    استلام من المكتب (Stop Desk)
-                  </div>
-                  {order.maystro_desk && (
-                    <div className="p-3 bg-amber-50 border border-amber-100 rounded-lg">
-                      <div className="text-xs text-amber-700 mb-1 font-bold">
-                        مكتب Maystro Delivery المحدد:
-                      </div>
-                      <div className="text-amber-900 font-bold">
-                        {order.maystro_desk}
-                      </div>
-                    </div>
-                  )}
+                <div className="text-sm text-gray-500 mb-1">نوع التوصيل</div>
+                <div
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-bold ${order.delivery_type === "home"
+                    ? "bg-orange-100 text-orange-800"
+                    : "bg-blue-100 text-blue-800"
+                    }`}
+                >
+                  {order.delivery_type === "home"
+                    ? "توصيل إلى المنزل"
+                    : "توصيل إلى المكتب"}
                 </div>
               </div>
             </div>
@@ -399,8 +394,11 @@ ${order.maystro_desk ? `مكتب Maystro Delivery: ${order.maystro_desk
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-500 flex items-center gap-2">
                   🚚 رسوم الشحن
-                  <span className="text-xs px-2 py-0.5 bg-gray-100 rounded-full">
-                    استلام من المكتب
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${order.delivery_type === "home"
+                    ? "bg-orange-100 text-orange-700"
+                    : "bg-gray-100 text-gray-600"
+                    }`}>
+                    {order.delivery_type === "home" ? "🏠 منزل" : "🏢 مكتب"}
                   </span>
                 </span>
                 <span className="font-bold text-gray-900">
@@ -451,28 +449,28 @@ ${order.maystro_desk ? `مكتب Maystro Delivery: ${order.maystro_desk
 
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                  🚚 رقم تتبع Maystro Delivery
+                  🚚 رقم تتبع Expedia Chrono
                 </label>
                 <input
                   type="text"
                   value={trackingNumber}
                   onChange={(e) => setTrackingNumber(e.target.value)}
-                  placeholder="مثال: YAL123456789"
+                  placeholder="مثال: EXP123456789"
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none font-mono"
                   dir="ltr"
                 />
                 {trackingNumber ? (
                   <a
-                    href="https://maystro-delivery.com/trackingSD.html"
+                    href="https://ecotrack.dz/ar/suivi"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 text-xs text-blue-600 hover:text-blue-800 font-medium mt-1"
                   >
-                    ↗️ تتبع الطرد على موقع Maystro Delivery
+                    ↗️ تتبع الطرد على موقع Expedia Chrono
                   </a>
                 ) : (
                   <p className="text-xs text-gray-400">
-                    أضف رقم التتبع المقدم من Maystro Delivery ليتمكن الزبون من التتبع.
+                    أضف رقم التتبع المقدم من Expedia Chrono ليتمكن الزبون من التتبع.
                   </p>
                 )}
               </div>

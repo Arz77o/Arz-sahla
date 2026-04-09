@@ -3,7 +3,7 @@ import React from "react";
 export const TopBanner = () => {
   const [currentMsg, setCurrentMsg] = React.useState(0);
   const messages = [
-    " توصيل سـريع ل30 ولاية 🚀 عبـر Maystro Delivery",
+    " توصيل سـريع ل30 ولاية 🚀 عبـر Expedia Chrono",
     "إحصل على تخفيض عند الدفع بـ Chargily📢",
     "الدفع عند الاستلام متوفر في جميع مكاتب التوصيل 📦"
   ];

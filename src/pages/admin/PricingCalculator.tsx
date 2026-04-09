@@ -32,8 +32,8 @@ export default function PricingCalculator() {
   const [wilayas, setWilayas] = useState<WilayaFee[]>([]);
   const [loadingWilayas, setLoadingWilayas] = useState(true);
   const [buyPrice, setBuyPrice] = useState<number>(1000);
-  const [shippingType, setShippingType] = useState<"Maystro Delivery" | "manual">(
-    "Maystro Delivery",
+  const [shippingType, setShippingType] = useState<"Expedia Chrono" | "manual">(
+    "Expedia Chrono",
   );
   const [deliveryType] = useState<"home" | "desk">("desk"); // Hardcoded to desk as requested
   const [selectedWilayaCode, setSelectedWilayaCode] = useState<number>(22); // Default Alger
@@ -149,8 +149,8 @@ export default function PricingCalculator() {
       (w) => w.wilaya_code === selectedWilayaCode,
     );
     const selectedZoneName =
-      shippingType === "Maystro Delivery"
-        ? `${selectedWilayaCode} - ${selectedWilaya?.wilaya_name} (Maystro Delivery Desk)`
+      shippingType === "Expedia Chrono"
+        ? `${selectedWilayaCode} - ${selectedWilaya?.wilaya_name} (توصيل إلى المكتب)`
         : "بدون شحن";
 
     const text = `المنتج: ${buyPrice.toLocaleString("ar-DZ")} دج
@@ -362,6 +362,7 @@ export default function PricingCalculator() {
                     <h3 className="font-black text-gray-900 tracking-tight">
                       الدفع عند الاستلام
                     </h3>
+                    <p className="text-[10px] text-gray-400 mt-1">توصيل إلى المكتب • توصيل إلى المنزل</p>
                     <p className="text-[10px] text-orange-600 font-bold uppercase tracking-widest">
                       Cash on Delivery
                     </p>

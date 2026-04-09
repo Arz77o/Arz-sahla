@@ -235,12 +235,12 @@ export default function ProductDetail() {
             aggregateRating:
               product.avg_rating > 0
                 ? {
-                    "@type": "AggregateRating",
-                    ratingValue: product.avg_rating.toFixed(1),
-                    reviewCount: product.reviews?.length ?? 1,
-                    bestRating: "5",
-                    worstRating: "1",
-                  }
+                  "@type": "AggregateRating",
+                  ratingValue: product.avg_rating.toFixed(1),
+                  reviewCount: product.reviews?.length ?? 1,
+                  bestRating: "5",
+                  worstRating: "1",
+                }
                 : undefined,
           },
         ]}
@@ -276,11 +276,10 @@ export default function ProductDetail() {
                       <button
                         key={idx}
                         onClick={() => setSelectedImage(img)}
-                        className={`w-24 h-24 border transition-all flex-shrink-0 ${
-                          selectedImage === img
+                        className={`w-24 h-24 border transition-all flex-shrink-0 ${selectedImage === img
                             ? "border-primary ring-1 ring-primary"
                             : "border-surface-high hover:border-gray-400"
-                        }`}
+                          }`}
                       >
                         <img
                           src={img}
@@ -304,11 +303,10 @@ export default function ProductDetail() {
                   {/* Product Meta */}
                   <div className="flex items-center gap-6 mb-10">
                     <span
-                      className={`inline-block px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] ${
-                        outOfStock
+                      className={`inline-block px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] ${outOfStock
                           ? "bg-red-50 text-red-700"
                           : "bg-primary/10 text-primary"
-                      }`}
+                        }`}
                     >
                       {outOfStock
                         ? t("product.outOfStock")
@@ -368,11 +366,10 @@ export default function ProductDetail() {
                                       option: opt,
                                     })
                                   }
-                                  className={`flex-grow px-6 py-3 text-xs font-bold uppercase tracking-widest transition-all ${
-                                    active
+                                  className={`flex-grow px-6 py-3 text-xs font-bold uppercase tracking-widest transition-all ${active
                                       ? "bg-primary text-white"
                                       : "bg-white text-gray-500 hover:text-gray-900 hover:bg-surface-low"
-                                  }`}
+                                    }`}
                                 >
                                   {opt}
                                 </button>
@@ -419,11 +416,10 @@ export default function ProductDetail() {
                 <div className="mt-12 pt-12 border-t border-surface-high">
                   <Button
                     size="lg"
-                    className={`w-full h-20 text-xl font-display font-bold tracking-tighter ${
-                      inCart
+                    className={`w-full h-20 text-xl font-display font-bold tracking-tighter ${inCart
                         ? "bg-gray-900 hover:bg-black"
                         : "bg-primary hover:bg-primary-dim"
-                    }`}
+                      }`}
                     onClick={handleAddToCart}
                     disabled={outOfStock}
                   >
@@ -541,11 +537,10 @@ export default function ProductDetail() {
                             aria-label={`${star} نجوم`}
                           >
                             <Star
-                              className={`w-6 h-6 cursor-pointer ${
-                                star <= reviewRating
+                              className={`w-6 h-6 cursor-pointer ${star <= reviewRating
                                   ? "fill-primary text-primary"
                                   : "text-gray-300"
-                              }`}
+                                }`}
                             />
                           </button>
                         ))}
@@ -589,11 +584,10 @@ export default function ProductDetail() {
                         />
                         <label
                           htmlFor="review-images-input"
-                          className={`flex items-center justify-center gap-2 py-4 px-3 rounded-[1.5rem] cursor-pointer transition-colors ${
-                            reviewImages.length >= 3
+                          className={`flex items-center justify-center gap-2 py-4 px-3 rounded-[1.5rem] cursor-pointer transition-colors ${reviewImages.length >= 3
                               ? "opacity-50 cursor-not-allowed"
                               : "hover:bg-surface-high"
-                          }`}
+                            }`}
                         >
                           <ImagePlus className="w-5 h-5 text-primary" />
                           <span className="text-sm text-gray-600 font-medium">
@@ -664,8 +658,8 @@ export default function ProductDetail() {
 
                 <div className="space-y-16">
                   {product.reviews &&
-                  product.reviews.filter((r: any) => r.status === "approved")
-                    .length > 0 ? (
+                    product.reviews.filter((r: any) => r.status === "approved")
+                      .length > 0 ? (
                     product.reviews
                       .filter((r: any) => r.status === "approved")
                       .map((r: any) => (
@@ -749,10 +743,10 @@ export default function ProductDetail() {
                       </span>
                       <div className="space-y-2">
                         <p className="font-bold uppercase tracking-widest text-[11px] leading-tight">
-                          Maystro Delivery
+                          Expedia Chrono
                         </p>
                         <p className="text-xs text-white/60 leading-relaxed">
-                          توصيل سريع ومضمون إلى أقرب مكتب Maystro Delivery في
+                          توصيل سريع ومضمون إلى أقرب مكتب Expedia Chrono في
                           ولايتك.
                         </p>
                       </div>

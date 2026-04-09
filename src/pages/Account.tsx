@@ -536,10 +536,12 @@ export default function Account() {
                               </div>
                               <div className="bg-white p-4 border border-surface-high">
                                 <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400 mb-2">
-                                  Maystro Delivery Desk
+                                  Delivery Type
                                 </p>
-                                <p className="text-sm font-bold text-gray-900">
-                                  {order.maystro_desk || "—"}
+                                <p className={`text-sm font-bold ${order.delivery_type === "home" ? "text-grey-900" : "text-gray-900"}`}>
+                                  {order.delivery_type === "home"
+                                    ? "توصيل إلى المنزل"
+                                    : "توصيل إلى المكتب"}
                                 </p>
                               </div>
                               <div className="bg-white p-4 border border-surface-high">

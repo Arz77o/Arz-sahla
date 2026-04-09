@@ -84,29 +84,29 @@ export default function AdminSettings() {
     }
   };
 
-  const handleBulkUpdate = async (type: "add" | "subtract" | "set") => {
+  const handleBulkUpdate = async (type: "add" | "subtract" | "set", feeField: "desk_fee" | "home_fee" = "desk_fee") => {
     if (bulkAmount === 0 && type !== "set") return;
 
     setIsFeesLoading(true);
     try {
       const updates = shippingFees.map((fee) => {
-        let newFee = fee.desk_fee;
+        let newFee = fee[feeField] ?? fee.desk_fee;
         if (type === "add") newFee += bulkAmount;
         else if (type === "subtract") newFee -= bulkAmount;
         else if (type === "set") newFee = bulkAmount;
-        return { ...fee, desk_fee: Math.max(0, newFee) };
+        return { ...fee, [feeField]: Math.max(0, newFee) };
       });
 
-      // Update in DB (sequentially or in bulk if supported)
+      // Update in DB sequentially
       for (const update of updates) {
         await (supabaseAdmin as any)
           .from("shipping_fees")
-          .update({ desk_fee: update.desk_fee })
+          .update({ [feeField]: update[feeField] })
           .eq("id", update.id);
       }
 
       setShippingFees(updates);
-      toast.success("تم تحديث جميع الأسعار بنجاح");
+      toast.success(`تم تحديث جميع أسعار ${feeField === "home_fee" ? "المنزل" : "المكتب"} بنجاح`);
     } catch (err) {
       toast.error("حدث خطأ أثناء التحديث الجماعي");
     } finally {
@@ -260,32 +260,48 @@ export default function AdminSettings() {
               </div>
 
               <div className="pt-4 border-t border-gray-50">
-                <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-100">
-                  <h4 className="text-[10px] font-bold text-blue-900 mb-2 uppercase tracking-tight">
+                <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-100 space-y-4">
+                  <h4 className="text-[10px] font-bold text-blue-900 uppercase tracking-tight">
                     أدوات تعديل جماعية ⚡
                   </h4>
-                  <div className="space-y-3">
-                    <input
-                      type="number"
-                      value={bulkAmount}
-                      onChange={(e) => setBulkAmount(Number(e.target.value))}
-                      placeholder="المبلغ (دج)..."
-                      className="w-full px-3 py-1.5 text-xs bg-white border border-blue-200 rounded-lg outline-none font-bold"
-                    />
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleBulkUpdate("add")}
-                        className="flex-1 bg-white border border-blue-200 py-1.5 rounded-lg text-[10px] font-bold text-blue-700 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
-                      >
-                        إضافة للكل (+)
-                      </button>
-                      <button
-                        onClick={() => handleBulkUpdate("subtract")}
-                        className="flex-1 bg-white border border-blue-200 py-1.5 rounded-lg text-[10px] font-bold text-blue-700 hover:bg-red-500 hover:border-red-600 hover:text-white transition-all shadow-sm"
-                      >
-                        خصم للكل (-)
-                      </button>
-                    </div>
+                  <input
+                    type="number"
+                    value={bulkAmount}
+                    onChange={(e) => setBulkAmount(Number(e.target.value))}
+                    placeholder="المبلغ (دج)..."
+                    className="w-full px-3 py-1.5 text-xs bg-white border border-blue-200 rounded-lg outline-none font-bold"
+                  />
+                  {/* أسعار المكتب */}
+                  <p className="text-[9px] font-bold text-blue-700 uppercase tracking-widest">🏢 أسعار المكتب</p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleBulkUpdate("add", "desk_fee")}
+                      className="flex-1 bg-white border border-blue-200 py-1.5 rounded-lg text-[10px] font-bold text-blue-700 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                    >
+                      إضافة (+)
+                    </button>
+                    <button
+                      onClick={() => handleBulkUpdate("subtract", "desk_fee")}
+                      className="flex-1 bg-white border border-blue-200 py-1.5 rounded-lg text-[10px] font-bold text-blue-700 hover:bg-red-500 hover:border-red-600 hover:text-white transition-all shadow-sm"
+                    >
+                      خصم (-)
+                    </button>
+                  </div>
+                  {/* أسعار المنزل */}
+                  <p className="text-[9px] font-bold text-orange-600 uppercase tracking-widest">🏠 أسعار المنزل</p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleBulkUpdate("add", "home_fee")}
+                      className="flex-1 bg-white border border-orange-200 py-1.5 rounded-lg text-[10px] font-bold text-orange-700 hover:bg-orange-500 hover:text-white transition-all shadow-sm"
+                    >
+                      إضافة (+)
+                    </button>
+                    <button
+                      onClick={() => handleBulkUpdate("subtract", "home_fee")}
+                      className="flex-1 bg-white border border-orange-200 py-1.5 rounded-lg text-[10px] font-bold text-orange-700 hover:bg-red-500 hover:border-red-600 hover:text-white transition-all shadow-sm"
+                    >
+                      خصم (-)
+                    </button>
                   </div>
                 </div>
               </div>
@@ -296,9 +312,12 @@ export default function AdminSettings() {
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
               <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <h2 className="text-sm font-black text-gray-900 uppercase tracking-tighter">
-                  مصاريف الشحن (Stop Desk)
-                </h2>
+                <div>
+                  <h2 className="text-sm font-black text-gray-900 uppercase tracking-tighter">
+                    مصاريف الشحن — Expedia Chrono
+                  </h2>
+                  <p className="text-[10px] text-gray-400 mt-1">توصيل إلى المكتب • توصيل إلى المنزل</p>
+                </div>
                 <div className="relative">
                   <input
                     type="text"
@@ -324,7 +343,8 @@ export default function AdminSettings() {
                     <thead>
                       <tr className="bg-white text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em] sticky top-0 z-10 border-b border-gray-100 shadow-sm">
                         <th className="px-6 py-4">الولاية</th>
-                        <th className="px-6 py-4">السعر (دج)</th>
+                        <th className="px-6 py-4 text-center">🏢 مكتب (دج)</th>
+                        <th className="px-6 py-4 text-center">🏠 منزل (دج)</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
@@ -349,7 +369,7 @@ export default function AdminSettings() {
                                 </span>
                               </div>
                             </td>
-                            <td className="px-6 py-4">
+                            <td className="px-6 py-4 text-center">
                               <input
                                 type="number"
                                 defaultValue={fee.desk_fee}
@@ -360,7 +380,21 @@ export default function AdminSettings() {
                                     parseInt(e.target.value),
                                   )
                                 }
-                                className="w-24 px-3 py-1.5 border border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-black text-gray-900 group-hover:bg-white transition-all"
+                                className="w-24 px-3 py-1.5 border border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-black text-gray-900 group-hover:bg-white transition-all text-center"
+                              />
+                            </td>
+                            <td className="px-6 py-4 text-center">
+                              <input
+                                type="number"
+                                defaultValue={fee.home_fee ?? (fee.desk_fee + 200)}
+                                onBlur={(e) =>
+                                  handleUpdateFee(
+                                    fee.id,
+                                    "home_fee",
+                                    parseInt(e.target.value),
+                                  )
+                                }
+                                className="w-24 px-3 py-1.5 border border-orange-100 bg-orange-50/40 rounded-xl focus:ring-2 focus:ring-orange-400 outline-none font-black text-orange-700 group-hover:bg-white transition-all text-center"
                               />
                             </td>
                           </tr>

@@ -138,11 +138,12 @@ export default function Terms() {
                       <p>
                         نعتمد حصرياً على خدمة{" "}
                         <span className="font-bold text-gray-900">
-                          Maystro Delivery
+                          Expedia Chrono
                         </span>{" "}
-                        بنظام <span className="italic">Stop Desk</span>{" "}
-                        (الاستلام من المكتب). يلتزم الزبون بالتوجه لمكتب Maystro
-                        Delivery في ولايته لاستلام طرده فور وصوله.
+                        بخيارين للتوصيل:{" "}
+                        <span className="italic">توصيل إلى المكتب</span>{" "}
+                        أو <span className="italic">توصيل إلى المنزل</span>.
+                        يختار الزبون الطريقة المناسبة له عند إتمام الطلبية.
                       </p>
                     </div>
                   </div>

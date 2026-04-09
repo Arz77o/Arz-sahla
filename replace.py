@@ -2,8 +2,8 @@ import os
 import glob
 
 replacements = {
-    "DHD Express": "Maystro Delivery",
-    "https://platform.dhd-dz.com/suivi/": "https://maystro-delivery.com/trackingSD.html"
+    "DHD Express": "Expedia Chrono",
+    "https://platform.dhd-dz.com/suivi/": "https://ecotrack.dz/ar/suivi"
 }
 
 def replace_in_file(filepath):

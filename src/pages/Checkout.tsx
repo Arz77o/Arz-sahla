@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, AlertCircle, CheckCircle2, ShieldCheck, Phone, MessageSquare, Mail, Send, Play } from "lucide-react";
+import { Loader2, AlertCircle, CheckCircle2, ShieldCheck, Phone, MessageSquare, Mail, Send, Play, Building2, Home } from "lucide-react";
 import { toast } from "sonner";
 
 import { SEOMeta } from "../components/shared/SEOMeta";
@@ -13,11 +13,13 @@ import { useAuthStore } from "../store/authStore";
 import { supabase } from "../lib/supabase";
 import type { Database } from "../types/database.types";
 import { WILAYAS } from "../lib/algeria";
+import { getCommunesByWilaya } from "../lib/communes";
 import { formatDZD } from "../lib/pricing";
 import { Button } from "../components/ui/button";
 import { gtag } from "../lib/gtag";
 import { VideoModal } from "../components/shared/VideoModal";
 
+// ─── Schema ──────────────────────────────────────────────────────────────────
 const checkoutSchema = z.object({
   fullName: z.string().min(3, "الاسم الكامل مطلوب"),
   wilaya: z.string().min(1, "يرجى اختيار الولاية").refine((val) => {
@@ -28,7 +30,10 @@ const checkoutSchema = z.object({
   phone: z
     .string()
     .regex(/^(0)(5|6|7)[0-9]{8}$/, "رقم هاتف غير صالح (مثال: 0550123456)"),
-  address: z.string().min(5, "العنوان بالتفصيل مطلوب"),
+  address: z.string(),
+  deliveryType: z.enum(["desk", "home"], {
+    message: "يرجى اختيار نوع التوصيل",
+  }),
   paymentMethod: z.enum(["cod", "chargily"], {
     message: "يرجى اختيار طريقة الدفع",
   }),
@@ -42,6 +47,7 @@ const checkoutSchema = z.object({
 
 type CheckoutFormValues = z.infer<typeof checkoutSchema>;
 
+// ─── Component ───────────────────────────────────────────────────────────────
 export default function Checkout() {
   const { t, i18n } = useTranslation();
   const isAr = i18n.language === "ar";
@@ -53,22 +59,15 @@ export default function Checkout() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isShowingVideo, setIsShowingVideo] = useState(false);
   const [shippingFeesConfig, setShippingFeesConfig] = useState<any[]>([]);
-  const [storeSettings, setStoreSettings] = useState({ free_shipping_threshold: 800 });
+  const [communeInput, setCommuneInput] = useState("");
+  const [showCommuneDropdown, setShowCommuneDropdown] = useState(false);
 
   const PAYMENT_GUIDE_VIDEO_URL = "/e-dahabia-tutorial.webm";
 
   React.useEffect(() => {
     const fetchData = async () => {
       const feesRes = await supabase.from("shipping_fees").select("*");
-      const settingsRes = await supabase.from("settings").select("*").single();
-
       if (feesRes.data) setShippingFeesConfig(feesRes.data);
-      if (settingsRes.data) {
-        const s = settingsRes.data as any;
-        setStoreSettings({
-          free_shipping_threshold: s.payment_methods?.free_shipping_threshold ?? 800
-        });
-      }
     };
     fetchData();
   }, []);
@@ -103,6 +102,7 @@ export default function Checkout() {
       address: "",
       wilaya: "",
       commune: "",
+      deliveryType: "desk",
       paymentMethod: "cod",
       contactPreference: "phone",
       termsAccepted: false,
@@ -110,22 +110,45 @@ export default function Checkout() {
   });
 
   const wilayaCode = watch("wilaya");
+  const deliveryType = watch("deliveryType");
   const wilaya = WILAYAS.find((w) => w.code.toString() === wilayaCode);
   const wilayaName = wilaya ? (isAr ? wilaya.name_ar : wilaya.name_en) : "";
   const paymentMethod = watch("paymentMethod");
   const termsAccepted = watch("termsAccepted");
 
+  // ── بلديات الولاية المختارة ──
+  const availableCommunes = useMemo(() => {
+    if (!wilayaCode) return [];
+    const code = parseInt(wilayaCode);
+    return getCommunesByWilaya(code);
+  }, [wilayaCode]);
+
+  // فلترة البلديات حسب ما يكتبه المستخدم
+  const filteredCommunes = useMemo(() => {
+    if (!communeInput) return availableCommunes;
+    return availableCommunes.filter(c =>
+      c.toLowerCase().includes(communeInput.toLowerCase()) ||
+      c.includes(communeInput)
+    );
+  }, [communeInput, availableCommunes]);
+
+  // ── حساب سعر الشحن ──
   const subtotal = getTotal(paymentMethod);
   const getShippingFee = () => {
-    // Show default 800 DZ even if no wilaya is selected, to ensure it "appears" in calculations
-    if (!wilayaCode) return 800;
+    if (!wilayaCode) return deliveryType === "home" ? 1000 : 800;
     const feeConfig = shippingFeesConfig.find(f => f.wilaya_code.toString() === wilayaCode);
-    return feeConfig ? feeConfig.desk_fee : 800;
+    if (!feeConfig) return deliveryType === "home" ? 1000 : 800;
+    // إذا كان home_fee موجوداً استخدمه، وإلا أضف 200 دج على desk_fee
+    if (deliveryType === "home") {
+      return feeConfig.home_fee ?? (feeConfig.desk_fee + 200);
+    }
+    return feeConfig.desk_fee;
   };
 
   const displayShippingFee = getShippingFee();
   const finalTotal = subtotal + (paymentMethod === 'chargily' ? 0 : displayShippingFee);
 
+  // ── onSubmit ──
   const onSubmit: SubmitHandler<CheckoutFormValues> = async (data) => {
     if (!user) {
       toast.error("يجب تسجيل الدخول لإتمام الطلب");
@@ -156,7 +179,8 @@ export default function Checkout() {
           status: "pending",
           admin_note: data.paymentMethod === "chargily" ? "⏳ في انتظار الدفع عبر شارجيلي" : null,
           terms_accepted: data.termsAccepted,
-        } as any) // Use as any to bypass some strict TS mismatches if any
+          delivery_type: data.deliveryType,
+        } as any)
         .select()
         .single();
 
@@ -181,7 +205,6 @@ export default function Checkout() {
 
       if (itemsError) throw itemsError;
 
-      // 3. Track InitiateCheckout for GA4 (purchase will be tracked on success page)
       gtag.trackEcommerce('begin_checkout', {
         currency: 'DZD',
         value: finalTotal,
@@ -251,9 +274,11 @@ export default function Checkout() {
 
           <div className="flex flex-col lg:flex-row gap-20 max-w-7xl mx-auto items-start">
             <div className="flex-1 w-full lg:max-w-2xl">
-              <form id="checkout-form" onSubmit={handleSubmit(onSubmit)} className="space-y-16 md:space-y-24">
+              <form id="checkout-form" onSubmit={handleSubmit((data) => onSubmit(data))} className="space-y-16 md:space-y-24">
                 <div className="space-y-12">
                   <div className="space-y-16">
+
+                    {/* ── قسم البيانات الشخصية ── */}
                     <div className="space-y-8">
                       <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-gray-900 flex items-center gap-3">
                         <div className="w-1.5 h-1.5 bg-primary" />
@@ -284,17 +309,104 @@ export default function Checkout() {
                       </div>
                     </div>
 
+                    {/* ── قسم خيار نوع التوصيل ── */}
                     <div className="space-y-8">
                       <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-gray-900 flex items-center gap-3">
                         <div className="w-1.5 h-1.5 bg-primary" />
-                        عنوان التوصيل (مكتب Maystro Delivery)
+                        نوع التوصيل
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Stop Desk */}
+                        <label
+                          className={`flex items-start gap-4 p-5 border cursor-pointer transition-all ${
+                            deliveryType === "desk"
+                              ? "border-primary bg-primary/5"
+                              : "border-surface-high bg-white hover:border-gray-300"
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            {...register("deliveryType")}
+                            value="desk"
+                            className="w-4 h-4 accent-primary mt-1 shrink-0"
+                          />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Building2 className={`w-4 h-4 ${deliveryType === "desk" ? "text-primary" : "text-gray-400"}`} />
+                              <span className="text-xs font-bold uppercase tracking-widest text-gray-900">
+                                توصيل إلى المكتب
+                              </span>
+                            </div>
+                            <p className="text-[10px] text-gray-400 leading-relaxed">
+                              الاستلام من أقرب مكتب Expedia Chrono في ولايتك (Stop Desk)
+                            </p>
+                            {wilayaCode && (
+                              <span className="mt-2 inline-block text-[10px] font-black text-primary">
+                                {formatDZD(shippingFeesConfig.find(f => f.wilaya_code.toString() === wilayaCode)?.desk_fee ?? 800)}
+                              </span>
+                            )}
+                          </div>
+                        </label>
+
+                        {/* Home Delivery */}
+                        <label
+                          className={`flex items-start gap-4 p-5 border cursor-pointer transition-all ${
+                            deliveryType === "home"
+                              ? "border-primary bg-primary/5"
+                              : "border-surface-high bg-white hover:border-gray-300"
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            {...register("deliveryType")}
+                            value="home"
+                            className="w-4 h-4 accent-primary mt-1 shrink-0"
+                          />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Home className={`w-4 h-4 ${deliveryType === "home" ? "text-primary" : "text-gray-400"}`} />
+                              <span className="text-xs font-bold uppercase tracking-widest text-gray-900">
+                                توصيل إلى المنزل
+                              </span>
+                            </div>
+                            <p className="text-[10px] text-gray-400 leading-relaxed">
+                              التوصيل مباشرةً إلى عنوان منزلك عبر Expedia Chrono
+                            </p>
+                            {wilayaCode && (
+                              <span className="mt-2 inline-block text-[10px] font-black text-primary">
+                                {(() => {
+                                  const fee = shippingFeesConfig.find(f => f.wilaya_code.toString() === wilayaCode);
+                                  return formatDZD(fee?.home_fee ?? (fee?.desk_fee ? fee.desk_fee + 200 : 1000));
+                                })()}
+                              </span>
+                            )}
+                          </div>
+                        </label>
+                      </div>
+                      {errors.deliveryType && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.deliveryType.message}</p>}
+                    </div>
+
+                    {/* ── قسم عنوان التوصيل ── */}
+                    <div className="space-y-8">
+                      <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-gray-900 flex items-center gap-3">
+                        <div className="w-1.5 h-1.5 bg-primary" />
+                        {deliveryType === "home"
+                          ? "عنوان المنزل — Expedia Chrono"
+                          : "عنوان التوصيل (مكتب Expedia Chrono)"}
                       </h3>
                       <div className="space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          {/* Wilaya */}
                           <div className="space-y-3">
                             <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t("checkout.wilaya")}</label>
                             <select
                               {...register("wilaya")}
+                              onChange={(e) => {
+                                register("wilaya").onChange(e);
+                                // إعادة تعيين البلدية عند تغيير الولاية
+                                setValue("commune", "");
+                                setCommuneInput("");
+                              }}
                               className="w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all"
                             >
                               <option value="">{t("checkout.wilayaPlaceholder")}</option>
@@ -309,29 +421,83 @@ export default function Checkout() {
                             )}
                             {errors.wilaya && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.wilaya.message}</p>}
                           </div>
-                          <div className="space-y-3">
+
+                          {/* Commune — Autocomplete */}
+                          <div className="space-y-3 relative">
                             <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t("checkout.commune")}</label>
                             <input
                               {...register("commune")}
-                              className="w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all"
-                              placeholder="البلدية"
+                              value={communeInput}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setCommuneInput(val);
+                                setValue("commune", val, { shouldValidate: true });
+                                setShowCommuneDropdown(true);
+                              }}
+                              onFocus={() => setShowCommuneDropdown(true)}
+                              onBlur={() => setTimeout(() => setShowCommuneDropdown(false), 200)}
+                              autoComplete="off"
+                              disabled={!wilayaCode}
+                              className={`w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all ${
+                                !wilayaCode ? "opacity-50 cursor-not-allowed" : ""
+                              }`}
+                              placeholder={wilayaCode ? "اكتب للبحث عن بلديتك..." : "اختر الولاية أولاً"}
                             />
+                            {/* Dropdown */}
+                            {showCommuneDropdown && filteredCommunes.length > 0 && wilayaCode && (
+                              <div className="absolute top-full left-0 right-0 z-50 bg-white border border-surface-high shadow-lg max-h-52 overflow-y-auto">
+                                {filteredCommunes.map((commune) => (
+                                  <button
+                                    key={commune}
+                                    type="button"
+                                    onMouseDown={() => {
+                                      setCommuneInput(commune);
+                                      setValue("commune", commune, { shouldValidate: true });
+                                      setShowCommuneDropdown(false);
+                                    }}
+                                    className="w-full text-right px-4 py-3 text-sm hover:bg-primary/5 hover:text-primary transition-colors font-medium border-b border-surface-high last:border-0"
+                                  >
+                                    {commune}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
                             {errors.commune && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.commune.message}</p>}
                           </div>
                         </div>
-                        <div className="space-y-3">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t("checkout.address")}</label>
-                          <textarea
-                            {...register("address")}
-                            rows={3}
-                            className="w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all resize-none"
-                            placeholder={t("checkout.addressPlaceholder")}
-                          />
-                          {errors.address && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.address.message}</p>}
-                        </div>
+
+                        {/* Address — shown only for home delivery */}
+                        {deliveryType === "home" && (
+                          <div className="space-y-3">
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t("checkout.address")}</label>
+                            <textarea
+                              {...register("address")}
+                              rows={3}
+                              className="w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all resize-none"
+                              placeholder={t("checkout.addressPlaceholder")}
+                            />
+                            {errors.address && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.address.message}</p>}
+                          </div>
+                        )}
+
+                        {/* للتوصيل المكتبي — عنوان اختياري / ملاحظة */}
+                        {deliveryType === "desk" && (
+                          <div className="space-y-3">
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                              {t("checkout.address")} <span className="text-gray-300">(اختياري)</span>
+                            </label>
+                            <textarea
+                              {...register("address")}
+                              rows={2}
+                              className="w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all resize-none"
+                              placeholder="ملاحظة أو عنوان إضافي (اختياري)"
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
 
+                    {/* ── قسم طريقة الدفع ── */}
                     <div className="space-y-8">
                       <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-gray-900 flex items-center gap-3">
                         <div className="w-1.5 h-1.5 bg-primary" />
@@ -395,6 +561,7 @@ export default function Checkout() {
                       </div>
                     </div>
 
+                    {/* ── قسم طريقة التواصل ── */}
                     <div className="space-y-6">
                       <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-gray-900 flex items-center gap-3">
                         <div className="w-1.5 h-1.5 bg-primary" />
@@ -424,6 +591,7 @@ export default function Checkout() {
                   </div>
                 </div>
 
+                {/* ── الشروط والأحكام ── */}
                 <div className="mt-12 bg-surface-low border border-surface-high p-8 flex items-start gap-6">
                   <div className="flex items-center mt-1">
                     <input
@@ -462,6 +630,7 @@ export default function Checkout() {
               </form>
             </div>
 
+            {/* ── ملخص الطلب ── */}
             <div className="w-full lg:w-[400px] shrink-0">
               <div className="bg-surface-low p-8 md:p-10 border border-surface-high sticky top-24">
                 <h2 className="text-xl font-display font-bold text-gray-900 mb-10 uppercase tracking-widest">
@@ -499,7 +668,9 @@ export default function Checkout() {
                     <span className="font-bold">{formatDZD(subtotal)}</span>
                   </div>
                   <div className="flex justify-between items-center text-xs">
-                    <span className="font-bold uppercase tracking-widest text-primary text-[10px]">سعر الشحن</span>
+                    <span className="font-bold uppercase tracking-widest text-primary text-[10px]">
+                      الشحن — {deliveryType === "home" ? "🏠 منزل" : "🏢 مكتب"}
+                    </span>
                     <span className="font-bold text-primary">{paymentMethod === 'chargily' ? formatDZD(0) : formatDZD(displayShippingFee)}</span>
                   </div>
                   <div className="pt-10 border-t border-surface-high flex justify-between items-end">
