@@ -162,7 +162,7 @@ export default function Checkout() {
 
       if (orderError) throw orderError;
       if (!order) throw new Error("لم يتم إنشاء الطلب");
-      
+
       const orderId = order.id;
 
       const orderItems = items.map((item) => ({
@@ -266,7 +266,7 @@ export default function Checkout() {
                           <input
                             {...register("fullName")}
                             className="w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all"
-                            placeholder="John Doe"
+                            placeholder="يرجى إدخال إسمك الكامل"
                           />
                           {errors.fullName && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.fullName.message}</p>}
                         </div>
@@ -275,7 +275,7 @@ export default function Checkout() {
                           <input
                             {...register("phone")}
                             className="w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all tracking-tighter"
-                            placeholder="0550 12 34 56"
+                            placeholder="0543215868"
                           />
                           <p className="text-[10px] text-amber-600 font-medium leading-relaxed">
                             الرقم الهاتفي الذي تدخله هو الذي سوف نتصل بك به ونرسل إليك رسالة في الواتساب، لذا يرجى التأكد.
@@ -294,11 +294,10 @@ export default function Checkout() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Stop Desk */}
                         <label
-                          className={`flex items-start gap-4 p-5 border cursor-pointer transition-all ${
-                            deliveryType === "desk"
-                              ? "border-primary bg-primary/5"
-                              : "border-surface-high bg-white hover:border-gray-300"
-                          }`}
+                          className={`flex items-start gap-4 p-5 border cursor-pointer transition-all ${deliveryType === "desk"
+                            ? "border-primary bg-primary/5"
+                            : "border-surface-high bg-white hover:border-gray-300"
+                            }`}
                         >
                           <input
                             type="radio"
@@ -326,11 +325,10 @@ export default function Checkout() {
 
                         {/* Home Delivery */}
                         <label
-                          className={`flex items-start gap-4 p-5 border cursor-pointer transition-all ${
-                            deliveryType === "home"
-                              ? "border-primary bg-primary/5"
-                              : "border-surface-high bg-white hover:border-gray-300"
-                          }`}
+                          className={`flex items-start gap-4 p-5 border cursor-pointer transition-all ${deliveryType === "home"
+                            ? "border-primary bg-primary/5"
+                            : "border-surface-high bg-white hover:border-gray-300"
+                            }`}
                         >
                           <input
                             type="radio"
@@ -403,9 +401,8 @@ export default function Checkout() {
                             <input
                               {...register("commune")}
                               disabled={!wilayaCode}
-                              className={`w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all ${
-                                !wilayaCode ? "opacity-50 cursor-not-allowed" : ""
-                              }`}
+                              className={`w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all ${!wilayaCode ? "opacity-50 cursor-not-allowed" : ""
+                                }`}
                               placeholder={wilayaCode ? "اكتب اسم بلديتك هنا..." : "اختر الولاية أولاً"}
                             />
                             {errors.commune && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.commune.message}</p>}

@@ -18,11 +18,7 @@ export default function Cart() {
   const { user } = useAuthStore();
 
   const handleCheckout = () => {
-    if (!user) {
-      navigate('/login?returnTo=/checkout');
-    } else {
-      navigate('/checkout');
-    }
+    navigate('/checkout');
   };
 
   if (items.length === 0) {
