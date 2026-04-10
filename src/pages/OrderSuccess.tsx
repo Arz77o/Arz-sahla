@@ -7,12 +7,15 @@ import { supabase } from "../lib/supabase";
 import { formatDZD } from "../lib/pricing";
 import { Button } from "../components/ui/button";
 import { gtag } from "../lib/gtag";
+import { useAuthStore } from "../store/authStore";
+import { UserPlus, Sparkles } from "lucide-react";
 
 export default function OrderSuccess() {
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get("order_id");
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuthStore();
   const { clearCart } = useCartStore();
 
   useEffect(() => {
@@ -112,6 +115,42 @@ export default function OrderSuccess() {
                 </Link>
               </div>
             </div>
+
+            {/* Registration Nudge for Guests */}
+            {!user && (
+              <div className="lg:col-span-12 mt-8">
+                <div className="relative overflow-hidden bg-primary p-8 md:p-12 border border-primary">
+                  {/* Decorative Sparkles */}
+                  <div className="absolute top-0 right-0 p-4 opacity-10">
+                    <Sparkles className="w-32 h-32 text-white" />
+                  </div>
+                  
+                  <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div className="max-w-xl text-center md:text-right">
+                      <h3 className="text-2xl md:text-3xl font-display font-bold text-white mb-4">
+                        أنشئ حساباً وتابع طلبك بسهولة!
+                      </h3>
+                      <p className="text-white/80 text-xs font-bold uppercase tracking-widest leading-relaxed">
+                        بمجرد إنشاء حسابك، ستتمكن من تتبع حالة شحنتك في الوقت الحقيقي، الاطلاع على سجل طلباتك، والحصول على عروض حصرية.
+                      </p>
+                    </div>
+                    <Link 
+                      to={`/register?returnTo=/account&phone=${order?.phone || ""}`}
+                      className="w-full md:w-auto"
+                    >
+                      <Button 
+                        size="lg" 
+                        variant="secondary" 
+                        className="w-full h-16 px-10 bg-white text-primary hover:bg-gray-100 font-display font-bold uppercase tracking-widest gap-3"
+                      >
+                        <UserPlus className="w-5 h-5" />
+                        إنشاء حساب الآن
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <aside className="lg:col-span-5">
               <div className="bg-surface-low p-8 md:p-12 border border-surface-high sticky top-24">

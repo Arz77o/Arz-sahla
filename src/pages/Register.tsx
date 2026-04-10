@@ -33,6 +33,9 @@ export default function Register() {
     formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      phone: searchParams.get('phone') || '',
+    }
   });
 
   const onSubmit = async (data: RegisterFormValues) => {

@@ -131,11 +131,6 @@ export default function Checkout() {
 
   // ── onSubmit ──
   const onSubmit: SubmitHandler<CheckoutFormValues> = async (data) => {
-    if (!user) {
-      toast.error("يجب تسجيل الدخول لإتمام الطلب");
-      return;
-    }
-
     setIsSubmitting(true);
     const selectedWilaya = WILAYAS.find(w => w.code.toString() === data.wilaya);
     if (selectedWilaya?.unsupported) {
@@ -147,7 +142,7 @@ export default function Checkout() {
       const { data: order, error: orderError } = await supabase
         .from("orders")
         .insert({
-          user_id: user.id,
+          user_id: user?.id || null,
           full_name: data.fullName,
           phone: data.phone,
           wilaya: wilayaName,

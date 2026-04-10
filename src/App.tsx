@@ -99,23 +99,11 @@ function App() {
             <Route path="/faq" element={<FAQ />} />
             <Route path="/terms" element={<Terms />} />
 
+            {/* Public/Guest Accessible Routes */}
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/order/success" element={<OrderSuccess />} />
+
             {/* Protected Store Routes */}
-            <Route
-              path="/checkout"
-              element={
-                <ProtectedRoute>
-                  <Checkout />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/order/success"
-              element={
-                <ProtectedRoute>
-                  <OrderSuccess />
-                </ProtectedRoute>
-              }
-            />
             <Route
               path="/account"
               element={
