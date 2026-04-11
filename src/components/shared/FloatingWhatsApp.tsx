@@ -1,14 +1,20 @@
 import React from "react";
 import { MessageCircle } from "lucide-react";
+import { fpixel } from "../../lib/fpixel";
 
 export const FloatingWhatsApp = () => {
   const whatsappUrl = "https://wa.me/213774422923";
+
+  const handleClick = () => {
+    fpixel.event("Contact", { method: "WhatsApp", type: "Floating Button" });
+  };
 
   return (
     <a
       href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={handleClick}
       className="fixed bottom-6 right-6 z-[100] group flex items-center justify-center"
       aria-label="Contact us on WhatsApp"
     >

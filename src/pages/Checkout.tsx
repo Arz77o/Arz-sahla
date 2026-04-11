@@ -16,6 +16,7 @@ import { WILAYAS } from "../lib/algeria";
 import { formatDZD } from "../lib/pricing";
 import { Button } from "../components/ui/button";
 import { gtag } from "../lib/gtag";
+import { fpixel } from "../lib/fpixel";
 import { VideoModal } from "../components/shared/VideoModal";
 
 // ─── Schema ──────────────────────────────────────────────────────────────────
@@ -80,6 +81,15 @@ export default function Checkout() {
           price: i.price_dzd,
           quantity: i.quantity
         }))
+      });
+
+      // Track InitiateCheckout for Meta Pixel
+      fpixel.event("InitiateCheckout", {
+        content_ids: items.map((i) => i.product_id),
+        content_type: "product",
+        value: finalTotal,
+        currency: "DZD",
+        num_items: items.length,
       });
     }
   }, [items, isAr, getTotal]);

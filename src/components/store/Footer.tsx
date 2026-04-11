@@ -2,9 +2,14 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Facebook, Instagram, MessageCircle } from "lucide-react";
+import { fpixel } from "../../lib/fpixel";
 
 export const Footer: React.FC = () => {
   const { t } = useTranslation();
+
+  const handleWhatsAppClick = () => {
+    fpixel.event("Contact", { method: "WhatsApp", type: "Footer Link" });
+  };
 
   return (
     <footer className="bg-surface-high text-gray-600 py-16 mt-20 border-t border-gray-200/50">
@@ -100,6 +105,7 @@ export const Footer: React.FC = () => {
               href="https://wa.me/213774422923"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={handleWhatsAppClick}
               className="group flex items-center gap-3 hover:text-primary transition-all duration-300"
             >
               <div className="p-2 bg-white border border-gray-100 rounded-xl group-hover:scale-110 transition-transform">

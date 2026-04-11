@@ -25,6 +25,7 @@ import {
 } from "../hooks/useProducts";
 import { useCategories } from "../hooks/useCategories";
 import { gtag } from "../lib/gtag";
+import { fpixel } from "../lib/fpixel";
 
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -93,6 +94,16 @@ export default function ProductDetail() {
           },
         ],
       });
+
+      // Track ViewContent for Meta Pixel
+      fpixel.event("ViewContent", {
+        content_name: name,
+        content_category: product.category_id,
+        content_ids: [product.id],
+        content_type: "product",
+        value: priceDZD,
+        currency: "DZD",
+      });
     }
   }, [product, name, priceDZD]);
 
@@ -128,6 +139,15 @@ export default function ProductDetail() {
           quantity,
         },
       ],
+    });
+
+    // Track AddToCart for Meta Pixel
+    fpixel.event("AddToCart", {
+      content_name: name,
+      content_ids: [product.id],
+      content_type: "product",
+      value: priceDZD * quantity,
+      currency: "DZD",
     });
   };
 
