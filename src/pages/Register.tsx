@@ -74,7 +74,7 @@ export default function Register() {
               Join
             </h1>
             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary italic">
-              CREATE YOUR ARCHIVAL IDENTITY
+              CREATE YOUR ACCOUNT TO UNLOCK REVIEWS & TRACKING
             </p>
           </div>
 

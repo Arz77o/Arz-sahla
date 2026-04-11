@@ -499,7 +499,24 @@ export default function ProductDetail() {
                 </div>
 
                 {/* ✅ نموذج التقييم الجديد */}
-                {!showReviewForm ? (
+                {!user ? (
+                  <div className="py-12 text-center border border-surface-high rounded-[1.75rem] bg-surface-low/50 transition-colors">
+                    <p className="text-gray-500 font-semibold mb-4">
+                      {isAr ? "يجب تسجيل الدخول لإضافة تقييم" : "You must log in to add a review"}
+                    </p>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => navigate("/login")}
+                      className="border-primary text-primary hover:bg-primary hover:text-white"
+                    >
+                      {isAr ? "تسجيل الدخول / فتح حساب" : "Login / Create Account"}
+                    </Button>
+                    <p className="text-[10px] text-gray-400 mt-4 uppercase tracking-widest">
+                      {isAr ? "انضم إلينا لتتمكن من مشاركة تجربتك" : "Join us to share your experience"}
+                    </p>
+                  </div>
+                ) : !showReviewForm ? (
                   <div
                     className="py-12 text-center border border-surface-high rounded-[1.75rem] bg-surface-low transition-colors hover:border-primary cursor-pointer"
                     onClick={() => setShowReviewForm(true)}
