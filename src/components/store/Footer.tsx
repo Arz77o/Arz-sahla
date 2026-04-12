@@ -74,7 +74,7 @@ export const Footer: React.FC = () => {
           </h4>
           <div className="space-y-4">
             <a
-              href="https://www.facebook.com/profile.php?id=61579502319748"
+              href="https://www.facebook.com/profile.php?id=61573327657382"
               target="_blank"
               rel="noopener noreferrer"
               className="group flex items-center gap-3 hover:text-primary transition-all duration-300"
