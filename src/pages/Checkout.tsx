@@ -15,8 +15,7 @@ import type { Database } from "../types/database.types";
 import { WILAYAS } from "../lib/algeria";
 import { formatDZD } from "../lib/pricing";
 import { Button } from "../components/ui/button";
-import { gtag } from "../lib/gtag";
-import { fpixel } from "../lib/fpixel";
+import { gtm } from "../lib/gtm";
 import { VideoModal } from "../components/shared/VideoModal";
 
 // ─── Schema ──────────────────────────────────────────────────────────────────
@@ -72,7 +71,7 @@ export default function Checkout() {
 
   React.useEffect(() => {
     if (items.length > 0) {
-      gtag.trackEcommerce('begin_checkout', {
+      gtm.ecommerce('begin_checkout', {
         currency: 'DZD',
         value: getTotal(),
         items: items.map(i => ({
@@ -81,15 +80,6 @@ export default function Checkout() {
           price: i.price_dzd,
           quantity: i.quantity
         }))
-      });
-
-      // Track InitiateCheckout for Meta Pixel
-      fpixel.event("InitiateCheckout", {
-        content_ids: items.map((i) => i.product_id),
-        content_type: "product",
-        value: finalTotal,
-        currency: "DZD",
-        num_items: items.length,
       });
     }
   }, [items, isAr, getTotal]);
@@ -191,7 +181,7 @@ export default function Checkout() {
 
       if (itemsError) throw itemsError;
 
-      gtag.trackEcommerce('begin_checkout', {
+      gtm.ecommerce('begin_checkout', {
         currency: 'DZD',
         value: finalTotal,
         items: items.map(i => ({

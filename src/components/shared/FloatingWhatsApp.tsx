@@ -1,12 +1,12 @@
 import React from "react";
 import { MessageCircle } from "lucide-react";
-import { fpixel } from "../../lib/fpixel";
+import { gtm } from "../../lib/gtm";
 
 export const FloatingWhatsApp = () => {
   const whatsappUrl = "https://wa.me/213774422923";
 
   const handleClick = () => {
-    fpixel.event("Contact", { method: "WhatsApp", type: "Floating Button" });
+    gtm.event("Contact", { method: "WhatsApp", type: "Floating Button" });
   };
 
   return (

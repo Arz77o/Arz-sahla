@@ -2,13 +2,13 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Facebook, Instagram, MessageCircle } from "lucide-react";
-import { fpixel } from "../../lib/fpixel";
+import { gtm } from "../../lib/gtm";
 
 export const Footer: React.FC = () => {
   const { t } = useTranslation();
 
   const handleWhatsAppClick = () => {
-    fpixel.event("Contact", { method: "WhatsApp", type: "Footer Link" });
+    gtm.event("Contact", { method: "WhatsApp", type: "Footer Link" });
   };
 
   return (

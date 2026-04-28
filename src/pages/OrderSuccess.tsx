@@ -6,8 +6,7 @@ import { useCartStore } from "../store/cartStore";
 import { supabase } from "../lib/supabase";
 import { formatDZD } from "../lib/pricing";
 import { Button } from "../components/ui/button";
-import { gtag } from "../lib/gtag";
-import { fpixel } from "../lib/fpixel";
+import { gtm } from "../lib/gtm";
 import { useAuthStore } from "../store/authStore";
 import { UserPlus, Sparkles } from "lucide-react";
 
@@ -43,7 +42,7 @@ export default function OrderSuccess() {
           const shouldTrack = data.payment_method === 'cod' || data.payment_method === 'chargily';
 
           if (shouldTrack) {
-            gtag.trackEcommerce('purchase', {
+            gtm.ecommerce('purchase', {
               transaction_id: data.id,
               value: data.total_dzd,
               currency: 'DZD',
@@ -53,15 +52,6 @@ export default function OrderSuccess() {
                 quantity: item.quantity || 1,
                 price: item.unit_price_dzd || 0,
               })) || [],
-            });
-
-            // Track Purchase for Meta Pixel
-            fpixel.event("Purchase", {
-              content_ids: (data as any).order_items?.map((item: any) => item.product_id) || [],
-              content_type: "product",
-              value: data.total_dzd,
-              currency: "DZD",
-              num_items: (data as any).order_items?.length || 0,
             });
           }
 

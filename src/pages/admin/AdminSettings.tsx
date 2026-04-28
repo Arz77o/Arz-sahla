@@ -16,8 +16,7 @@ export default function AdminSettings() {
   const [settings, setSettings] = useState({
     free_shipping_threshold: 800,
     default_profit_margin: 50,
-    ga_id: "",
-    pixel_id: "",
+    gtm_id: "",
   });
 
   const [shippingFees, setShippingFees] = useState<any[]>([]);
@@ -45,8 +44,7 @@ export default function AdminSettings() {
       setSettings({
         free_shipping_threshold: pm.free_shipping_threshold ?? 800,
         default_profit_margin: pm.default_profit_margin ?? 50,
-        ga_id: pm.ga_id || "",
-        pixel_id: pm.pixel_id || "",
+        gtm_id: pm.gtm_id || "",
       });
     }
     setLoading(false);
@@ -67,10 +65,15 @@ export default function AdminSettings() {
   const handleSaveSettings = async () => {
     setIsSaving(true);
     try {
+      // Create a copy of paymentMethods and remove old tracking IDs
+      const updatedPaymentMethods = { ...paymentMethods, ...settings };
+      delete (updatedPaymentMethods as any).ga_id;
+      delete (updatedPaymentMethods as any).pixel_id;
+
       const { error } = await (supabaseAdmin as any)
         .from("settings")
         .update({
-          payment_methods: { ...paymentMethods, ...settings },
+          payment_methods: updatedPaymentMethods,
           updated_at: new Date().toISOString(),
         })
         .eq("id", 1);
@@ -224,37 +227,19 @@ export default function AdminSettings() {
 
                 <div className="space-y-2 border-t pt-4">
                   <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">
-                    Google Analytics Measurement ID (GA4)
+                    Google Tag Manager ID (GTM)
                   </label>
                   <input
                     type="text"
-                    value={settings.ga_id}
+                    value={settings.gtm_id}
                     onChange={(e) =>
-                      setSettings({ ...settings, ga_id: e.target.value })
+                      setSettings({ ...settings, gtm_id: e.target.value })
                     }
-                    placeholder="Ex: G-XXXXXXXXXX"
+                    placeholder="Ex: GTM-XXXXXXX"
                     className="w-full px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl font-mono text-xs focus:ring-2 focus:ring-blue-500 outline-none"
                   />
                   <p className="text-[9px] text-gray-400 leading-tight italic">
-                    أدخل معرف التتبع (GA4) لتفعيل إحصائيات زوار الموقع تلقائياً.
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">
-                    Meta Pixel ID
-                  </label>
-                  <input
-                    type="text"
-                    value={settings.pixel_id}
-                    onChange={(e) =>
-                      setSettings({ ...settings, pixel_id: e.target.value })
-                    }
-                    placeholder="Ex: 123456789012345"
-                    className="w-full px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl font-mono text-xs focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
-                  <p className="text-[9px] text-gray-400 leading-tight italic">
-                    أدخل معرف Meta Pixel لتفعيل تتبع صفحة الويب.
+                    أدخل معرف Google Tag Manager (GTM) لتفعيل التتبع الشامل للموقع.
                   </p>
                 </div>
               </div>

@@ -24,8 +24,7 @@ import {
   useDeleteReview,
 } from "../hooks/useProducts";
 import { useCategories } from "../hooks/useCategories";
-import { gtag } from "../lib/gtag";
-import { fpixel } from "../lib/fpixel";
+import { gtm } from "../lib/gtm";
 
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -79,10 +78,10 @@ export default function ProductDetail() {
   const inCart = product ? isInCart(product.id) : false;
   const outOfStock = product ? product.stock_quantity <= 0 : false;
 
-  // Track view_item for GA4 (All hooks must be before early returns)
+  // Track view_item via GTM dataLayer
   useEffect(() => {
     if (product) {
-      gtag.trackEcommerce("view_item", {
+      gtm.ecommerce("view_item", {
         currency: "DZD",
         value: priceDZD,
         items: [
@@ -93,16 +92,6 @@ export default function ProductDetail() {
             quantity: 1,
           },
         ],
-      });
-
-      // Track ViewContent for Meta Pixel
-      fpixel.event("ViewContent", {
-        content_name: name,
-        content_category: product.category_id,
-        content_ids: [product.id],
-        content_type: "product",
-        value: priceDZD,
-        currency: "DZD",
       });
     }
   }, [product, name, priceDZD]);
@@ -127,8 +116,8 @@ export default function ProductDetail() {
       stock_limit: product.stock_quantity,
     });
 
-    // Track add_to_cart in GA4
-    gtag.trackEcommerce("add_to_cart", {
+    // Track add_to_cart via GTM dataLayer
+    gtm.ecommerce("add_to_cart", {
       currency: "DZD",
       value: priceDZD * quantity,
       items: [
@@ -139,15 +128,6 @@ export default function ProductDetail() {
           quantity,
         },
       ],
-    });
-
-    // Track AddToCart for Meta Pixel
-    fpixel.event("AddToCart", {
-      content_name: name,
-      content_ids: [product.id],
-      content_type: "product",
-      value: priceDZD * quantity,
-      currency: "DZD",
     });
   };
 

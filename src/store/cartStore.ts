@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { toast } from 'sonner';
-import { gtag } from '../lib/gtag';
+import { gtm } from '../lib/gtm';
 
 export interface CartItem {
   product_id: string;
@@ -56,8 +56,8 @@ export const useCartStore = create<CartState>()(
           set({ items: [...items, item] });
           toast.success("تمت الإضافة إلى السلة");
           
-          // Track add_to_cart for GA4
-          gtag.trackEcommerce('add_to_cart', {
+          // Track add_to_cart via GTM dataLayer
+          gtm.ecommerce('add_to_cart', {
             currency: 'DZD',
             value: item.price_dzd * item.quantity,
             items: [{
