@@ -19,12 +19,22 @@ export const gtm = {
    * @param data Additional data to push
    */
   event: (eventName: string, data?: object) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: eventName,
-        ...data,
-      });
-      console.log(`[GTM] 🚀 ${eventName}`, data);
+    if (typeof window !== 'undefined') {
+      // Use gtag if available
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', eventName, data);
+        console.log(`[gtag] 🚀 ${eventName}`, data);
+        return;
+      }
+
+      // Fallback to dataLayer
+      if (window.dataLayer) {
+        window.dataLayer.push({
+          event: eventName,
+          ...data,
+        });
+        console.log(`[GTM] 🚀 ${eventName}`, data);
+      }
     }
   },
 
@@ -37,15 +47,23 @@ export const gtm = {
     event: 'view_item' | 'add_to_cart' | 'begin_checkout' | 'purchase',
     data: object
   ) => {
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      // Clear previous ecommerce object first (best practice)
-      window.dataLayer.push({ ecommerce: null });
-      
-      window.dataLayer.push({
-        event,
-        ecommerce: data,
-      });
-      console.log(`[GTM-Ecommerce] 🛍️ ${event}`, data);
+    if (typeof window !== 'undefined') {
+      // Use gtag if available (for G-XXXX IDs)
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', event, data);
+        console.log(`[gtag-Ecommerce] 🛍️ ${event}`, data);
+        return;
+      }
+
+      // Fallback to dataLayer (for GTM-XXXX IDs)
+      if (window.dataLayer) {
+        window.dataLayer.push({ ecommerce: null });
+        window.dataLayer.push({
+          event,
+          ecommerce: data,
+        });
+        console.log(`[GTM-Ecommerce] 🛍️ ${event}`, data);
+      }
     }
   },
 };
