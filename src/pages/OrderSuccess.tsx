@@ -31,7 +31,7 @@ export default function OrderSuccess() {
       try {
         const { data } = await supabase
           .from("orders")
-          .select("*, order_items(product_id)")
+          .select("*, order_items(*)")
           .eq("id", orderId)
           .single();
         if (data) {
