@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 
@@ -12,9 +12,15 @@ declare global {
 export const GoogleTagManager: React.FC = () => {
   const location = useLocation();
   const [gtmId, setGtmId] = useState<string | null>(null);
+  const isInitialized = useRef(false);
+  const lastTrackedPath = useRef<string | null>(null);
 
   useEffect(() => {
     const initGTM = async () => {
+      // Avoid double initialization in StrictMode
+      if (isInitialized.current || window.gtmInitialized) return;
+      isInitialized.current = true;
+
       try {
         const { data, error } = await supabase.from('settings').select('*').single();
         if (error || !data) return;
@@ -25,6 +31,7 @@ export const GoogleTagManager: React.FC = () => {
           return;
         }
 
+        // Check again after async call
         if (window.gtmInitialized) {
           setGtmId(id);
           return;
@@ -55,13 +62,18 @@ export const GoogleTagManager: React.FC = () => {
 
   // Track virtual page views for SPA
   useEffect(() => {
-    if (!gtmId || !window.dataLayer) return;
+    const currentPath = location.pathname + location.search;
+    
+    // Avoid double tracking in StrictMode or same path re-renders
+    if (!gtmId || !window.dataLayer || lastTrackedPath.current === currentPath) return;
 
     window.dataLayer.push({
       event: 'page_view',
-      page_path: location.pathname + location.search,
+      page_path: currentPath,
       page_title: document.title
     });
+    
+    lastTrackedPath.current = currentPath;
   }, [location.pathname, location.search, gtmId]);
 
   return null;

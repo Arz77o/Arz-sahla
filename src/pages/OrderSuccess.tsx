@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { CheckCircle2, Package, ArrowRight, Loader2, ArrowLeft } from "lucide-react";
 import { SEOMeta } from "../components/shared/SEOMeta";
@@ -23,9 +23,11 @@ export default function OrderSuccess() {
     clearCart();
   }, [clearCart]);
 
+  const lastTrackedOrderId = useRef<string | null>(null);
+
   useEffect(() => {
     const fetchOrder = async () => {
-      if (!orderId) return;
+      if (!orderId || lastTrackedOrderId.current === orderId) return;
       try {
         const { data } = await supabase
           .from("orders")
@@ -36,12 +38,9 @@ export default function OrderSuccess() {
           setOrder(data);
 
           // Track Purchase for GA4
-          // COD: track immediately (order is confirmed on placement)
-          // Chargily: track when user lands on success page after redirect
-          // (Chargily redirects to /order/success after payment, so we track both)
           const shouldTrack = data.payment_method === 'cod' || data.payment_method === 'chargily';
 
-          if (shouldTrack) {
+          if (shouldTrack && lastTrackedOrderId.current !== orderId) {
             gtm.ecommerce('purchase', {
               transaction_id: data.id,
               value: data.total_dzd,
@@ -53,8 +52,8 @@ export default function OrderSuccess() {
                 price: item.unit_price_dzd || 0,
               })) || [],
             });
+            lastTrackedOrderId.current = orderId;
           }
-
         }
       } catch (error) {
         console.error("Error fetching order:", error);

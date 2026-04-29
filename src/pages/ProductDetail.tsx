@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -78,9 +78,11 @@ export default function ProductDetail() {
   const inCart = product ? isInCart(product.id) : false;
   const outOfStock = product ? product.stock_quantity <= 0 : false;
 
+  const lastTrackedProductId = useRef<string | null>(null);
+
   // Track view_item via GTM dataLayer
   useEffect(() => {
-    if (product) {
+    if (product && lastTrackedProductId.current !== product.id) {
       gtm.ecommerce("view_item", {
         currency: "DZD",
         value: priceDZD,
@@ -93,6 +95,7 @@ export default function ProductDetail() {
           },
         ],
       });
+      lastTrackedProductId.current = product.id;
     }
   }, [product, name, priceDZD]);
 
