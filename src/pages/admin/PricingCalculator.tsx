@@ -7,8 +7,6 @@ import {
   TrendingUp,
   AlertTriangle,
   Copy,
-  ShieldCheck,
-  CreditCard,
   Banknote,
   Info,
   EyeOff,
@@ -41,7 +39,6 @@ export default function PricingCalculator() {
   const [packagingFee, setPackagingFee] = useState<number>(100);
   const [retourFee, setRetourFee] = useState<number>(130);
   const [returnRateCOD, setReturnRateCOD] = useState<number>(30);
-  const [returnRateChargily, setReturnRateChargily] = useState<number>(1);
   const [profitMargin, setProfitMargin] = useState<number>(40);
   const [showAdvanced, setShowAdvanced] = useState<boolean>(false);
 
@@ -103,35 +100,14 @@ export default function PricingCalculator() {
     const codProfit = codSell - realCostCOD;
     const codMarginActual = (codProfit / (codSell || 1)) * 100;
 
-    // Chargily Calculations
-    const successRateChargily = 1 - returnRateChargily / 100;
-    const returnRatioChargily =
-      returnRateChargily / 100 / (successRateChargily || 0.01);
-    const retourLossChargily = currentShippingFee + retourFee + packagingFee;
-    const retourShareChargily = returnRatioChargily * retourLossChargily;
-    const realCostChargily =
-      buyPrice + currentShippingFee + packagingFee + retourShareChargily;
-    const marginChargily = realCostChargily * (profitMargin / 100);
-    const chargilySell =
-      Math.round((realCostChargily + marginChargily) / 10) * 10;
-    const chargilyProfit = chargilySell - realCostChargily;
-    const chargilyMarginActual = (chargilyProfit / (chargilySell || 1)) * 100;
-
-    const chargilyRejectionLoss = currentShippingFee + retourFee + packagingFee;
     const codRejectionLoss = currentShippingFee + retourFee + packagingFee;
 
     return {
       retourShareCOD,
-      retourShareChargily,
       realCostCOD,
-      realCostChargily,
-      chargilySell,
       codSell,
-      chargilyProfit,
       codProfit,
-      chargilyMarginActual,
       codMarginActual,
-      chargilyRejectionLoss,
       codRejectionLoss,
     };
   }, [
@@ -140,7 +116,6 @@ export default function PricingCalculator() {
     packagingFee,
     retourFee,
     returnRateCOD,
-    returnRateChargily,
     profitMargin,
   ]);
 
@@ -154,10 +129,9 @@ export default function PricingCalculator() {
         : "بدون شحن";
 
     const text = `المنتج: ${buyPrice.toLocaleString("ar-DZ")} دج
-سعر Chargily: ${results.chargilySell.toLocaleString("ar-DZ")} دج — ربح ${results.chargilyProfit.toLocaleString("ar-DZ")} دج
 سعر COD: ${results.codSell.toLocaleString("ar-DZ")} دج — ربح ${results.codProfit.toLocaleString("ar-DZ")} دج
 المنطقة: ${selectedZoneName}
-نسبة العودة: Chargily (${returnRateChargily}%) | COD (${returnRateCOD}%)
+نسبة العودة: COD (${returnRateCOD}%)
 هامش الربح: ${profitMargin}%`;
 
     navigator.clipboard.writeText(text);
@@ -279,14 +253,12 @@ export default function PricingCalculator() {
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
-                      العودة Chargily %
+                      هامش الربح المستهدف
                     </label>
                     <input
                       type="number"
-                      value={returnRateChargily}
-                      onChange={(e) =>
-                        setReturnRateChargily(Number(e.target.value))
-                      }
+                      value={profitMargin}
+                      onChange={(e) => setProfitMargin(Number(e.target.value))}
                       className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-blue-500 outline-none font-bold text-sm bg-gray-50/50"
                     />
                   </div>
@@ -315,43 +287,13 @@ export default function PricingCalculator() {
 
         {/* Right Column - Results */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Combined Pricing Dashboard Card */}
+          {/* COD Pricing Dashboard Card */}
           <div className="bg-white rounded-[2.5rem] p-8 border-2 border-gray-100 shadow-2xl space-y-8 relative overflow-hidden">
             <div className="absolute top-0 right-0 p-8 opacity-5">
               <Calculator className="w-32 h-32" />
             </div>
 
             <div className="space-y-8 relative z-10">
-              {/* Chargily Panel */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-200">
-                    <ShieldCheck className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-black text-gray-900 tracking-tight">
-                      الدفع الإلكتروني
-                    </h3>
-                    <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest">
-                      Chargily Gateway
-                    </p>
-                  </div>
-                </div>
-
-                <div className="p-6 rounded-4xl bg-emerald-50 border-2 border-emerald-100 flex flex-col items-center text-center space-y-2">
-                  <span className="text-xs font-bold text-emerald-700/60 uppercase tracking-widest">
-                    سعر البيع المقترح
-                  </span>
-                  <div className="text-4xl font-black text-emerald-900 tracking-tighter">
-                    {formatPrice(results.chargilySell)}
-                  </div>
-                  <div className="flex items-center gap-2 px-4 py-1.5 bg-white rounded-full text-emerald-600 font-black text-xs shadow-sm">
-                    <TrendingUp className="w-3.5 h-3.5" />+
-                    {formatPrice(results.chargilyProfit)} ربح صافي
-                  </div>
-                </div>
-              </div>
-
               {/* COD Panel */}
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
@@ -407,7 +349,7 @@ export default function PricingCalculator() {
         </div>
       </div>
 
-      {/* Detail Breakdown - Moved to bottom and made more subtle */}
+      {/* Detail Breakdown */}
       <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-6">
         <button
           onClick={() => handleCopy()}
@@ -417,7 +359,7 @@ export default function PricingCalculator() {
           نسخ ملخص الحسابات للواتساب
         </button>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-70 hover:opacity-100 transition-opacity">
+        <div className="opacity-70 hover:opacity-100 transition-opacity">
           <div className="p-4 rounded-xl bg-slate-50 text-[10px] space-y-1">
             <p className="font-bold text-slate-500 uppercase">
               تفاصيل التكلفة COD
@@ -432,22 +374,6 @@ export default function PricingCalculator() {
             <div className="flex justify-between text-blue-600">
               <span>تأمين العودة:</span>{" "}
               <span>+{formatPrice(results.retourShareCOD)}</span>
-            </div>
-          </div>
-          <div className="p-4 rounded-xl bg-emerald-50 text-[10px] space-y-1">
-            <p className="font-bold text-emerald-500 uppercase">
-              تفاصيل التكلفة Chargily
-            </p>
-            <div className="flex justify-between">
-              <span>شراء + تغليف:</span>{" "}
-              <span>{formatPrice(buyPrice + packagingFee)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>شحن:</span> <span>{formatPrice(shippingFee)}</span>
-            </div>
-            <div className="flex justify-between text-emerald-600">
-              <span>تأمين العودة:</span>{" "}
-              <span>+{formatPrice(results.retourShareChargily)}</span>
             </div>
           </div>
         </div>

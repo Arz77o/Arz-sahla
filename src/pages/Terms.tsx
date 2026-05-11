@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   AlertTriangle,
   Truck,
-  CreditCard,
   RefreshCcw,
   Lock,
 } from "lucide-react";
@@ -87,7 +86,7 @@ export default function Terms() {
                       طرق الدفع
                     </span>
                     <span className="font-display font-bold text-gray-900 tracking-tight text-lg italic uppercase text-primary">
-                      Chargily (CIB/Edahabia) & COD
+                      الدفع عند الاستلام (COD)
                     </span>
                   </div>
                 </div>
@@ -172,27 +171,7 @@ export default function Terms() {
                   </h2>
                 </div>
                 <div className="space-y-10 text-gray-700">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-l-2 border-primary pl-8">
-                    <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900">
-                      الدفع الإلكتروني (FREE)
-                    </h3>
-                    <div className="md:col-span-2 space-y-4 text-sm leading-loose">
-                      <p className="bg-primary/5 p-6 border-r-4 border-primary">
-                        <span className="font-bold text-primary block mb-2 underline decoration-wavy">
-                          عرض حصري:
-                        </span>
-                        عند اختيار الدفع عبر{" "}
-                        <span className="font-bold">
-                          البطاقة الذهبية أو CIB
-                        </span>
-                        ، يستفيد الزبون من{" "}
-                        <span className="font-bold uppercase">
-                          شحن مجاني بالكامل
-                        </span>{" "}
-                        (يطبق العرض على الولايات التي يقل سعر شحنها عن 800 دج).
-                      </p>
-                    </div>
-                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-l-2 border-gray-100 pl-8">
                     <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900">
                       الدفع عند الاستلام

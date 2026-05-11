@@ -30,7 +30,7 @@ interface ProductFormValues {
   name_ar: string;
   description_ar: string;
   price_dzd: number;
-  price_chargily: number;
+
   stock_quantity: number;
   category_id: string;
   avg_rating: number;
@@ -76,7 +76,7 @@ export default function AdminProductForm() {
       name_ar: "",
       description_ar: "",
       price_dzd: 0,
-      price_chargily: 0,
+
       stock_quantity: 0,
       category_id: "",
       avg_rating: 5,
@@ -93,7 +93,7 @@ export default function AdminProductForm() {
         name_ar: product.name_ar || "",
         description_ar: product.description_ar || "",
         price_dzd: product.price_dzd || 0,
-        price_chargily: product.price_chargily || 0,
+
         stock_quantity: product.stock_quantity || 0,
         category_id: product.category_id || "",
         avg_rating: product.avg_rating ?? 5,
@@ -172,7 +172,7 @@ export default function AdminProductForm() {
       name_ar: data.name_ar.trim(),
       description_ar: data.description_ar?.trim() || null,
       price_dzd: Number(data.price_dzd),
-      price_chargily: Number(data.price_chargily),
+
       stock_quantity: Number(data.stock_quantity),
       category_id: data.category_id || null,
       avg_rating: Number(data.avg_rating),
@@ -567,34 +567,7 @@ export default function AdminProductForm() {
               </div>
 
 
-              {/* Price Chargily */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                  ⚡ سعر Chargily
-                </label>
-                <div
-                  dir="ltr"
-                  className={`flex rounded-lg border-2 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 ${errors.price_chargily ? "border-red-500" : "border-gray-200"}`}
-                >
-                  <span className="flex items-center px-3 bg-green-100 text-green-700 text-sm font-bold">
-                    DZD
-                  </span>
-                  <input
-                    type="number"
-                    {...register("price_chargily", { valueAsNumber: true })}
-                    className="flex-1 px-3 py-2.5 outline-none font-bold text-lg text-green-600 bg-white"
-                    dir="ltr"
-                  />
-                </div>
-                {errors.price_chargily && (
-                  <p className="text-red-500 text-xs">
-                    {errors.price_chargily?.message as string}
-                  </p>
-                )}
-                <p className="text-[10px] text-gray-500 mt-1">
-                  💡 اتركه 0 إذا كنت لا تريد تقديم خصم خاص بـ Chargily
-                </p>
-              </div>
+
 
               {/* Stock Quantity */}
               <div className="space-y-2">

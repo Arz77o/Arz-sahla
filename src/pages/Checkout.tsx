@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, AlertCircle, CheckCircle2, ShieldCheck, Phone, MessageSquare, Mail, Send, Play, Building2, Home } from "lucide-react";
+import { Loader2, AlertCircle, CheckCircle2, ShieldCheck, Phone, MessageSquare, Mail, Send, Building2, Home } from "lucide-react";
 import { toast } from "sonner";
 
 import { SEOMeta } from "../components/shared/SEOMeta";
@@ -16,7 +16,7 @@ import { WILAYAS } from "../lib/algeria";
 import { formatDZD } from "../lib/pricing";
 import { Button } from "../components/ui/button";
 import { gtm } from "../lib/gtm";
-import { VideoModal } from "../components/shared/VideoModal";
+
 
 // ─── Schema ──────────────────────────────────────────────────────────────────
 const checkoutSchema = z.object({
@@ -33,7 +33,7 @@ const checkoutSchema = z.object({
   deliveryType: z.enum(["desk", "home"], {
     message: "يرجى اختيار نوع التوصيل",
   }),
-  paymentMethod: z.enum(["cod", "chargily"], {
+  paymentMethod: z.enum(["cod"], {
     message: "يرجى اختيار طريقة الدفع",
   }),
   contactPreference: z.enum(["phone", "whatsapp"], {
@@ -56,10 +56,7 @@ export default function Checkout() {
   const { user } = useAuthStore();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isShowingVideo, setIsShowingVideo] = useState(false);
   const [shippingFeesConfig, setShippingFeesConfig] = useState<any[]>([]);
-
-  const PAYMENT_GUIDE_VIDEO_URL = "/e-dahabia-tutorial.webm";
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -114,7 +111,7 @@ export default function Checkout() {
   const termsAccepted = watch("termsAccepted");
 
   // ── حساب سعر الشحن ──
-  const subtotal = getTotal(paymentMethod);
+  const subtotal = getTotal();
   const getShippingFee = () => {
     if (!wilayaCode) return deliveryType === "home" ? 1000 : 800;
     const feeConfig = shippingFeesConfig.find(f => f.wilaya_code.toString() === wilayaCode);
@@ -127,7 +124,7 @@ export default function Checkout() {
   };
 
   const displayShippingFee = getShippingFee();
-  const finalTotal = subtotal + (paymentMethod === 'chargily' ? 0 : displayShippingFee);
+  const finalTotal = subtotal + displayShippingFee;
 
   // ── onSubmit ──
   const onSubmit: SubmitHandler<CheckoutFormValues> = async (data) => {
@@ -153,7 +150,7 @@ export default function Checkout() {
           payment_method: data.paymentMethod,
           contact_preference: data.contactPreference,
           status: "pending",
-          admin_note: data.paymentMethod === "chargily" ? "⏳ في انتظار الدفع عبر شارجيلي" : null,
+          admin_note: null,
           terms_accepted: data.termsAccepted,
           delivery_type: data.deliveryType,
         } as any)
@@ -169,9 +166,7 @@ export default function Checkout() {
         order_id: orderId,
         product_id: item.product_id,
         quantity: item.quantity,
-        unit_price_dzd: (data.paymentMethod === 'chargily' && item.price_chargily && item.price_chargily > 0)
-          ? item.price_chargily
-          : item.price_dzd,
+        unit_price_dzd: item.price_dzd,
         variant: item.variant ? (item.variant as any) : null,
       }));
 
@@ -187,26 +182,12 @@ export default function Checkout() {
         items: items.map(i => ({
           item_id: i.product_id,
           item_name: isAr ? i.name_ar : i.name_en,
-          price: (data.paymentMethod === 'chargily' && i.price_chargily && i.price_chargily > 0) ? i.price_chargily : i.price_dzd,
+          price: i.price_dzd,
           quantity: i.quantity
         }))
       });
 
-      if (data.paymentMethod === "chargily") {
-        const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
-          body: {
-            order_id: orderId,
-            total_dzd: finalTotal,
-            site_url: window.location.origin
-          }
-        });
 
-        if (checkoutError) throw checkoutError;
-        if (checkoutData?.checkout_url) {
-          window.location.href = checkoutData.checkout_url;
-          return;
-        }
-      }
 
       navigate(`/order/success?order_id=${orderId}`);
     } catch (error: any) {
@@ -469,39 +450,7 @@ export default function Checkout() {
                             </div>
                           </div>
                         </label>
-                        <label
-                          className={`flex flex-col md:flex-row items-center gap-6 p-6 border transition-all ${watch("paymentMethod") === "chargily"
-                            ? "border-primary bg-primary/5 shadow-inner cursor-pointer"
-                            : "border-surface-high bg-white hover:border-gray-300 cursor-pointer"
-                            }`}
-                        >
-                          <input
-                            type="radio"
-                            {...register("paymentMethod")}
-                            value="chargily"
-                            className="w-5 h-5 accent-primary"
-                          />
-                          <div className="flex-1">
-                            <div className="text-xs font-bold uppercase tracking-widest text-gray-900 mb-1 flex items-center gap-2">
-                              {t("checkout.online")}
-                            </div>
-                            <div className="text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
-                              {t("checkout.onlineDescription")}
-                            </div>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setIsShowingVideo(true);
-                              }}
-                              className="mt-4 flex items-center gap-2 text-[10px] font-bold text-primary hover:underline uppercase tracking-widest decoration-2 underline-offset-4"
-                            >
-                              <Play className="w-3 h-3 fill-primary" />
-                              شاهد كيفية الدفع بالبطاقة؟
-                            </button>
-                          </div>
-                        </label>
+
                       </div>
                     </div>
 
@@ -599,7 +548,7 @@ export default function Checkout() {
                           {isAr ? item.name_ar : item.name_en}
                         </h4>
                         <div className="text-sm font-display font-bold text-primary mt-2">
-                          {item.quantity} × {formatDZD(paymentMethod === 'chargily' && item.price_chargily && item.price_chargily > 0 ? item.price_chargily : item.price_dzd)}
+                          {item.quantity} × {formatDZD(item.price_dzd)}
                         </div>
                       </div>
                     </div>
@@ -615,7 +564,7 @@ export default function Checkout() {
                     <span className="font-bold uppercase tracking-widest text-primary text-[10px]">
                       الشحن — {deliveryType === "home" ? "🏠 منزل" : "🏢 مكتب"}
                     </span>
-                    <span className="font-bold text-primary">{paymentMethod === 'chargily' ? formatDZD(0) : formatDZD(displayShippingFee)}</span>
+                    <span className="font-bold text-primary">{formatDZD(displayShippingFee)}</span>
                   </div>
                   <div className="pt-10 border-t border-surface-high flex justify-between items-end">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">الإجمالي</span>
@@ -643,12 +592,7 @@ export default function Checkout() {
         </div>
       </div>
 
-      <VideoModal
-        isOpen={isShowingVideo}
-        onClose={() => setIsShowingVideo(false)}
-        videoUrl={PAYMENT_GUIDE_VIDEO_URL}
-        title="شرح كيفية الدفع بالبطاقة الذهبية / CIB"
-      />
+
     </>
   );
 }

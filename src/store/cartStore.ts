@@ -8,7 +8,7 @@ export interface CartItem {
   name_ar: string;
   name_en: string;
   price_dzd: number;
-  price_chargily?: number;
+
   image: string;
   variant: { group: string; option: string } | null;
   quantity: number;
@@ -22,7 +22,7 @@ interface CartState {
   updateQuantity: (product_id: string, quantity: number) => void;
   removeItem: (product_id: string) => void;
   clearCart: () => void;
-  getTotal: (paymentMethod?: string) => number;
+  getTotal: () => number;
   getItemCount: () => number;
   isInCart: (product_id: string) => boolean;
   setHydrated: () => void;
@@ -91,11 +91,8 @@ export const useCartStore = create<CartState>()(
         set({ items: get().items.filter((i) => i.product_id !== product_id) });
       },
       clearCart: () => set({ items: [] }),
-      getTotal: (paymentMethod?: string) => get().items.reduce((total, item) => {
-        const price = (paymentMethod === 'chargily' && item.price_chargily && item.price_chargily > 0)
-          ? item.price_chargily 
-          : item.price_dzd;
-        return total + (price * (item.quantity || 1));
+      getTotal: () => get().items.reduce((total, item) => {
+        return total + (item.price_dzd * (item.quantity || 1));
       }, 0),
       getItemCount: () => get().items.reduce((total, item) => total + (item.quantity || 1), 0),
       isInCart: (product_id) => get().items.some((i) => i.product_id === product_id),

@@ -11,7 +11,7 @@ export interface Product {
   problem_solved_ar: string | null;
   problem_solved_en?: string | null;
   price_dzd: number | null;
-  price_chargily: number | null;
+  price_chargily?: number | null;
   images: string[];
   category_id: string;
   avg_rating: number;

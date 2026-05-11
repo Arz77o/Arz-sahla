@@ -16,7 +16,7 @@ interface ProductCardProps {
     name_ar: string;
     name_en: string;
     price_dzd: number;
-    price_chargily: number;
+
     images: string[];
     avg_rating: number;
     stock_quantity: number;
@@ -42,7 +42,7 @@ export const ProductCard = React.memo<ProductCardProps>(({ product, showQuickAdd
       name_ar: product.name_ar,
       name_en: product.name_en,
       price_dzd: priceDZD,
-      price_chargily: product.price_chargily,
+
       image: product.images?.[0] || "",
       variant: null,
       quantity: 1,
@@ -76,11 +76,7 @@ export const ProductCard = React.memo<ProductCardProps>(({ product, showQuickAdd
               </span>
             </div>
           )}
-          {product.price_chargily > 0 && product.price_chargily < priceDZD && (
-            <div className="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold px-3 py-1 flex items-center gap-1">
-              <span>OFFRE ÉLEC ⚡</span>
-            </div>
-          )}
+
 
           {/* Quick Add Button Overlay */}
           {showQuickAdd && product.stock_quantity > 0 && (

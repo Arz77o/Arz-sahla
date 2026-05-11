@@ -38,7 +38,7 @@ export default function OrderSuccess() {
           setOrder(data);
 
           // Track Purchase for GA4
-          const shouldTrack = data.payment_method === 'cod' || data.payment_method === 'chargily';
+          const shouldTrack = data.payment_method === 'cod';
 
           if (shouldTrack && lastTrackedOrderId.current !== orderId) {
             gtm.ecommerce('purchase', {
@@ -171,9 +171,9 @@ export default function OrderSuccess() {
                     <div>
                       <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-2">Payment Protocol</span>
                       <div className="flex items-center gap-3">
-                        <div className={`w-2 h-2 ${order.payment_method === 'cod' ? 'bg-amber-500' : 'bg-primary'}`} />
+                        <div className="w-2 h-2 bg-amber-500" />
                         <span className="text-sm font-bold uppercase tracking-widest text-gray-900 italic">
-                          {order.payment_method === 'cod' ? 'Cash on Delivery' : 'Chargily Digital'}
+                          Cash on Delivery
                         </span>
                       </div>
                     </div>

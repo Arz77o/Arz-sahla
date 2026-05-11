@@ -10,6 +10,7 @@ import {
   Smartphone,
   Laptop,
   Headphones,
+  CarFront,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { SEOMeta } from "../components/shared/SEOMeta";
@@ -31,6 +32,11 @@ const slugIconMap: Record<string, string> = {
   headset: "Headphones",
   headsets: "Headphones",
   audio: "Headphones",
+  car: "CarFront",
+  cars: "CarFront",
+  auto: "CarFront",
+  automotive: "CarFront",
+  accessories: "CarFront",
 };
 
 const toPascalCase = (value: string): string =>
@@ -45,6 +51,7 @@ const iconByName: Record<string, LucideIcon> = {
   Smartphone,
   Laptop,
   Headphones,
+  CarFront,
 };
 
 const getCategoryIcon = (iconName?: string | null, slug?: string): LucideIcon => {
@@ -197,11 +204,10 @@ export default function Home() {
                   <ShieldCheck className="w-full h-full stroke-1" />
                 </div>
                 <h3 className="text-xl font-display font-bold text-gray-900">
-                  دفع آمن بالدينار
+                  الدفع عند الاستلام
                 </h3>
                 <p className="text-sm text-gray-500 leading-relaxed">
-                  ادفع بكل أمان عبر البطاقة الذهبية أو CIB باستخدام منصة
-                  Chargily المشفرة.
+                  ادفع بكل أمان عند استلام طلبيتك — لا حاجة لأي دفع مسبق.
                 </p>
               </div>
             </Reveal>

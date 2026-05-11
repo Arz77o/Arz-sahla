@@ -215,7 +215,7 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk
             >
               {order.payment_method === "cod"
                 ? "الدفع عند الاستلام (COD)"
-                : "دفع إلكتروني (Chargily)"}
+                : "الدفع عند الاستلام (COD)"}
             </div>
           </div>
         }
@@ -488,16 +488,7 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk
                 />
               </div>
 
-              {order.chargily_ref && (
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                  <div className="text-xs text-gray-500 mb-1">
-                    مرجع Chargily
-                  </div>
-                  <div className="font-mono text-sm text-gray-900 break-all">
-                    {order.chargily_ref}
-                  </div>
-                </div>
-              )}
+
 
               <Button
                 onClick={handleSave}

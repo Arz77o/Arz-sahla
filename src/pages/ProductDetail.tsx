@@ -112,7 +112,7 @@ export default function ProductDetail() {
       name_ar: product.name_ar,
       name_en: product.name_en,
       price_dzd: priceDZD,
-      price_chargily: product.price_chargily,
+
       image: absoluteImageUrl,
       variant: selectedVariant,
       quantity: quantity,
@@ -334,18 +334,7 @@ export default function ProductDetail() {
                     {formatDZD(priceDZD)}
                   </div>
 
-                  {product.price_chargily > 0 &&
-                    product.price_chargily < priceDZD && (
-                      <div className="bg-surface-high border border-surface-high p-4 mb-10">
-                        <span className="text-[11px] font-bold uppercase tracking-widest text-primary">
-                          Prix Électronique:{" "}
-                          <span className="text-lg ml-2">
-                            {formatDZD(product.price_chargily)}
-                          </span>{" "}
-                          ⚡
-                        </span>
-                      </div>
-                    )}
+
 
                   {/* Variants Selector */}
                   {product.variants && product.variants.length > 0 && (

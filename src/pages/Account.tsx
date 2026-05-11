@@ -297,7 +297,6 @@ export default function Account() {
                   >
                     <option value="all">All Payment</option>
                     <option value="cod">COD</option>
-                    <option value="chargily">Chargily</option>
                   </select>
                 </div>
 
@@ -383,9 +382,7 @@ export default function Account() {
                                 Protocol
                               </span>
                               <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 italic">
-                                {order.payment_method === "cod"
-                                  ? "COD"
-                                  : "Chargily"}
+                                COD
                               </span>
                             </div>
                             <div>

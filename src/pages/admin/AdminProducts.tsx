@@ -84,7 +84,7 @@ export default function AdminProducts() {
                       {formatDZD(product.price_dzd)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-600" dir="ltr">
-                      {formatDZD(product.price_chargily || product.price_dzd)}
+                      {formatDZD(product.price_dzd)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${(product.stock_quantity ?? 0) <= 0 ? 'bg-red-100 text-red-800' :
