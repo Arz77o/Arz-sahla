@@ -280,8 +280,8 @@ export default function ProductDetail() {
                         key={idx}
                         onClick={() => setSelectedImage(img)}
                         className={`w-24 h-24 border transition-all flex-shrink-0 ${selectedImage === img
-                            ? "border-primary ring-1 ring-primary"
-                            : "border-surface-high hover:border-gray-400"
+                          ? "border-primary ring-1 ring-primary"
+                          : "border-surface-high hover:border-gray-400"
                           }`}
                       >
                         <img
@@ -307,8 +307,8 @@ export default function ProductDetail() {
                   <div className="flex items-center gap-6 mb-10">
                     <span
                       className={`inline-block px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] ${outOfStock
-                          ? "bg-red-50 text-red-700"
-                          : "bg-primary/10 text-primary"
+                        ? "bg-red-50 text-red-700"
+                        : "bg-primary/10 text-primary"
                         }`}
                     >
                       {outOfStock
@@ -359,8 +359,8 @@ export default function ProductDetail() {
                                     })
                                   }
                                   className={`flex-grow px-6 py-3 text-xs font-bold uppercase tracking-widest transition-all ${active
-                                      ? "bg-primary text-white"
-                                      : "bg-white text-gray-500 hover:text-gray-900 hover:bg-surface-low"
+                                    ? "bg-primary text-white"
+                                    : "bg-white text-gray-500 hover:text-gray-900 hover:bg-surface-low"
                                     }`}
                                 >
                                   {opt}
@@ -409,8 +409,8 @@ export default function ProductDetail() {
                   <Button
                     size="lg"
                     className={`w-full h-20 text-xl font-display font-bold tracking-tighter ${inCart
-                        ? "bg-gray-900 hover:bg-black"
-                        : "bg-primary hover:bg-primary-dim"
+                      ? "bg-gray-900 hover:bg-black"
+                      : "bg-primary hover:bg-primary-dim"
                       }`}
                     onClick={handleAddToCart}
                     disabled={outOfStock}
@@ -496,9 +496,9 @@ export default function ProductDetail() {
                     <p className="text-gray-500 font-semibold mb-4">
                       {isAr ? "يجب تسجيل الدخول لإضافة تقييم" : "You must log in to add a review"}
                     </p>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
+                    <Button
+                      size="sm"
+                      variant="outline"
                       onClick={() => navigate("/login")}
                       className="border-primary text-primary hover:bg-primary hover:text-white"
                     >
@@ -547,8 +547,8 @@ export default function ProductDetail() {
                           >
                             <Star
                               className={`w-6 h-6 cursor-pointer ${star <= reviewRating
-                                  ? "fill-primary text-primary"
-                                  : "text-gray-300"
+                                ? "fill-primary text-primary"
+                                : "text-gray-300"
                                 }`}
                             />
                           </button>
@@ -594,8 +594,8 @@ export default function ProductDetail() {
                         <label
                           htmlFor="review-images-input"
                           className={`flex items-center justify-center gap-2 py-4 px-3 rounded-[1.5rem] cursor-pointer transition-colors ${reviewImages.length >= 3
-                              ? "opacity-50 cursor-not-allowed"
-                              : "hover:bg-surface-high"
+                            ? "opacity-50 cursor-not-allowed"
+                            : "hover:bg-surface-high"
                             }`}
                         >
                           <ImagePlus className="w-5 h-5 text-primary" />
@@ -755,8 +755,7 @@ export default function ProductDetail() {
                           Expedia Chrono
                         </p>
                         <p className="text-xs text-white/60 leading-relaxed">
-                          توصيل سريع ومضمون إلى أقرب مكتب Expedia Chrono في
-                          ولايتك.
+                          توصيل سريع ومضمون بواسطة Expedia Chrono
                         </p>
                       </div>
                     </li>
@@ -769,8 +768,7 @@ export default function ProductDetail() {
                           Secure Payment
                         </p>
                         <p className="text-xs text-white/60 leading-relaxed">
-                          دفع آمن بالدينار الجزائري عبر البطاقة الذهبية أو CIB.
-                        </p>
+                          دفع آمن بالدينار الجزائري عبر الدفع عند الإستلام                        </p>
                       </div>
                     </li>
                     <li className="flex gap-6 items-start">
