@@ -8,6 +8,7 @@ import { Loader2, AlertCircle, CheckCircle2, ShieldCheck, Phone, MessageSquare, 
 import { toast } from "sonner";
 
 import { SEOMeta } from "../components/shared/SEOMeta";
+import { ReservationTimer } from "../components/shared/ScarcityIndicators";
 import { useCartStore } from "../store/cartStore";
 import { useAuthStore } from "../store/authStore";
 import { supabase } from "../lib/supabase";
@@ -227,6 +228,10 @@ export default function Checkout() {
               <span className="text-[10px] font-bold text-primary uppercase tracking-widest block mb-1">Items for collection</span>
               <span className="text-4xl font-display font-bold text-gray-900 tracking-tighter">{getItemCount()}</span>
             </div>
+          </div>
+
+          <div className="max-w-7xl mx-auto w-full mb-8">
+            <ReservationTimer />
           </div>
 
           <div className="flex flex-col lg:flex-row gap-20 max-w-7xl mx-auto items-start">

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Trash2, ShoppingBag, ShieldCheck, ArrowRight, ArrowLeft } from 'lucide-react';
 import { SEOMeta } from '../components/shared/SEOMeta';
+import { ReservationTimer } from '../components/shared/ScarcityIndicators';
 import { useCartStore } from '../store/cartStore';
 import { useAuthStore } from '../store/authStore';
 import { formatDZD } from '../lib/pricing';
@@ -68,6 +69,7 @@ export default function Cart() {
         <div className="flex flex-col lg:flex-row gap-12 max-w-7xl mx-auto items-start">
           {/* Cart Items List */}
           <div className="flex-1 space-y-6 w-full">
+            <ReservationTimer />
             {items.map((item) => (
               <div 
                 key={item.product_id} 

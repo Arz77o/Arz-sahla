@@ -18,7 +18,8 @@
     "total": "Total",
     "checkout": "Proceed to Checkout",
     "secure": "Secure Cash on Delivery payment",
-    "suggestedTitle": "Frequently bought together"
+    "suggestedTitle": "Frequently bought together",
+    "reservation": "⚠️ Your cart is reserved for {time} minutes. Complete your purchase before items sell out!"
   },
   "product": {
     "available": "In Stock",
@@ -34,7 +35,11 @@
     "securePay": "Secure Cash on Delivery payment",
     "fastDelivery": "Reliable and fast delivery to Shipping Office (Expedia Chrono Desk)",
     "description": "Product Description",
-    "buyerReviews": "Customer Reviews"
+    "buyerReviews": "Customer Reviews",
+    "lowStockAlert": "Hurry, only {count} left in stock!",
+    "deliveryCountdown": "Order in the next {time} to get it shipped today!",
+    "wasPrice": "Original Price:",
+    "saveAmount": "Save {percent}%"
   },
   "order": {
     "pending": "Pending",

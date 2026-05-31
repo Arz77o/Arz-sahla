@@ -18,7 +18,8 @@
     "total": "الإجمالي",
     "checkout": "المتابعة للدفع",
     "secure": "دفع آمن عند الاستلام",
-    "suggestedTitle": "عادة ما يتم شراؤها معا"
+    "suggestedTitle": "عادة ما يتم شراؤها معا",
+    "reservation": "⚠️ سلتك محجوزة لمدة {time} دقيقة. أكمل طلبك الآن قبل نفاد الكمية!"
   },
   "product": {
     "available": "متوفر في المخزون",
@@ -34,7 +35,11 @@
     "securePay": "دفع آمن عند الاستلام",
     "fastDelivery": "توصيل سريع وموثوق إلى مكتب الشحن (Stop Desk)",
     "description": "وصف المنتج",
-    "buyerReviews": "آراء الزبائن"
+    "buyerReviews": "آراء الزبائن",
+    "lowStockAlert": "أسرع! متبقي {count} قطع فقط في المخزون!",
+    "deliveryCountdown": "اطلب خلال {time} ليتم شحن طلبك اليوم!",
+    "wasPrice": "السعر السابق:",
+    "saveAmount": "وفر {percent}%"
   },
   "order": {
     "pending": "إنتظار التأكيد",

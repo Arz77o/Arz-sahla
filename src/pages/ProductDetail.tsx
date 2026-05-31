@@ -11,6 +11,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { SEOMeta } from "../components/shared/SEOMeta";
+import { StockProgressBar } from "../components/shared/ScarcityIndicators";
 import { formatDZD } from "../lib/pricing";
 import { useCartStore } from "../store/cartStore";
 import { useSettingsStore } from "../store/settingsStore";
@@ -315,11 +316,6 @@ export default function ProductDetail() {
                         ? t("product.outOfStock")
                         : t("product.available")}
                     </span>
-                    {!outOfStock && product.stock_quantity < 10 && (
-                      <span className="text-[10px] text-amber-600 font-bold uppercase tracking-widest">
-                        Low Stock: {product.stock_quantity}
-                      </span>
-                    )}
                     <div className="flex items-center gap-1.5 text-xs font-bold text-gray-400 ml-auto uppercase tracking-widest">
                       <Star className="w-3.5 h-3.5 fill-gray-900 text-gray-900" />
                       <span>{product.avg_rating.toFixed(1)}</span>
@@ -330,9 +326,41 @@ export default function ProductDetail() {
                     {name}
                   </h1>
 
-                  <div className="text-5xl font-display font-bold text-primary mb-6 tracking-tighter">
-                    {formatDZD(priceDZD)}
-                  </div>
+                  {/* ─── Price Comparison Block ─── */}
+                  {priceDZD > 0 && (() => {
+                    // Calculate the original price: 30% higher, rounded to nearest 100 DZD
+                    const originalPrice = Math.round((priceDZD * 1.30) / 100) * 100;
+                    const discountPercent = Math.round(((originalPrice - priceDZD) / originalPrice) * 100);
+                    return (
+                      <div className="mb-8 space-y-3">
+                        {/* Badge + Original Price row */}
+                        <div className="flex items-center gap-3 flex-wrap">
+                          <span className="inline-flex items-center px-3 py-1 bg-red-600 text-white text-[11px] font-black uppercase tracking-widest">
+                            {t("product.saveAmount").replace("{percent}", discountPercent.toString())}
+                          </span>
+                          <div className="flex items-center gap-2 text-sm text-gray-400">
+                            <span className="text-[10px] font-bold uppercase tracking-widest">
+                              {t("product.wasPrice")}
+                            </span>
+                            <span className="line-through font-display font-bold text-gray-400 text-xl">
+                              {formatDZD(originalPrice)}
+                            </span>
+                          </div>
+                        </div>
+                        {/* Current price — big and bold */}
+                        <div className="text-5xl font-display font-bold text-primary tracking-tighter">
+                          {formatDZD(priceDZD)}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* ScarcityUrgency Suite */}
+                  {!outOfStock && (
+                    <div className="mb-10">
+                      <StockProgressBar stock={product.stock_quantity} />
+                    </div>
+                  )}
 
 
 

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabaseAdmin } from '../lib/supabase';
 import { toast } from 'sonner';
@@ -50,6 +51,34 @@ export function useProducts(categoryId?: string, includeHidden = false) {
 }
 
 export function useProduct(id: string) {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!id) return;
+
+    // Realtime channel subscription for instant stock/product updates
+    const channel = supabaseAdmin
+      .channel(`product-realtime-${id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'products',
+          filter: `id=eq.${id}`,
+        },
+        () => {
+          // Instantly invalidate queries to trigger a background refetch
+          queryClient.invalidateQueries({ queryKey: ['product', id] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabaseAdmin.removeChannel(channel);
+    };
+  }, [id, queryClient]);
+
   return useQuery({
     queryKey: ['product', id],
     queryFn: async () => {
