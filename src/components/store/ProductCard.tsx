@@ -1,14 +1,42 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Star } from "lucide-react";
 import { formatDZD } from "../../lib/pricing";
 import { useTranslation } from "react-i18next";
 import { useSettingsStore } from "../../store/settingsStore";
 import { Reveal } from "../shared/Reveal";
-
 import { useCartStore } from "../../store/cartStore";
-import { Plus, ShoppingCart } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "../ui/button";
+
+/**
+ * Appends width/quality params to Supabase storage URLs for smaller images.
+ * Unsplash URLs get Unsplash resize params, others get Supabase transform params.
+ * Pattern: use URL API to safely append query params without breaking existing ones.
+ */
+function getOptimizedImageUrl(src: string, width: number): string {
+  if (!src) return src;
+  try {
+    // Supabase storage public URLs
+    if (src.includes('supabase.co/storage')) {
+      const url = new URL(src);
+      url.searchParams.set('width', String(width));
+      url.searchParams.set('quality', '75');
+      url.searchParams.set('format', 'webp');
+      return url.toString();
+    }
+    // Unsplash URLs
+    if (src.includes('unsplash.com')) {
+      const url = new URL(src);
+      url.searchParams.set('w', String(width));
+      url.searchParams.set('q', '75');
+      url.searchParams.set('auto', 'format');
+      return url.toString();
+    }
+    return src;
+  } catch {
+    return src;
+  }
+}
 
 interface ProductCardProps {
   product: {
@@ -59,14 +87,16 @@ export const ProductCard = React.memo<ProductCardProps>(({ product, showQuickAdd
         {/* Product Image */}
         <div className="relative aspect-square overflow-hidden bg-surface-high">
           <img
-            src={
-              product.images?.[0] || "https://picsum.photos/seed/sahla/400/400"
-            }
+            src={getOptimizedImageUrl(
+              product.images?.[0] || "https://picsum.photos/seed/sahla/400/400",
+              400
+            )}
             alt={name}
             width={400}
             height={400}
             loading="lazy"
             decoding="async"
+            sizes="(max-width: 640px) 50vw, 25vw"
             className="object-cover w-full h-full grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
           />
           {product.stock_quantity <= 0 && (

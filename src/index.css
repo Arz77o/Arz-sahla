@@ -45,6 +45,26 @@
     font-family: var(--font-display);
     letter-spacing: -0.025em; /* tracking-tight */
   }
+
+  /* 
+    content-visibility: auto — tells the browser to skip rendering off-screen
+    sections until they're about to appear. One of the biggest render performance
+    wins for long pages, especially on mobile.
+    contain-intrinsic-size hints the expected size so no layout shift occurs.
+  */
+  section {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 500px;
+  }
+
+  /* 
+    Override for the first section (hero) — it's always visible,
+    so we never want to skip it. Critical for LCP.
+  */
+  section:first-of-type {
+    content-visibility: visible;
+    contain-intrinsic-size: auto;
+  }
 }
 
 @layer components {
@@ -74,6 +94,12 @@
     border: none;
     transition-property: background-color;
     transition-duration: 200ms;
+    /* 
+      CSS containment for ProductCard — isolates layout calculation
+      so the browser doesn't repaint the whole page when a card changes.
+    */
+    contain: layout style;
   }
   
 }
+

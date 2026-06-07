@@ -50,6 +50,14 @@
   <!-- Preconnect for performance -->
   <link rel="preconnect" href="https://rwxwvuwzajrfocphzvge.supabase.co" />
   <link rel="dns-prefetch" href="https://rwxwvuwzajrfocphzvge.supabase.co" />
+  <!-- Preload the LCP hero image from local public folder — fastest possible, served from Cloudflare edge -->
+  <link
+    rel="preload"
+    as="image"
+    href="/background.webp"
+    type="image/webp"
+    fetchpriority="high"
+  />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preload" as="style"

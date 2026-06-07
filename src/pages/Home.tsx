@@ -118,12 +118,13 @@ export default function Home() {
             <div className="md:w-1/2 relative">
               <div className="relative z-10 p-8 md:p-12">
                 <img
-                  src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000&auto=format&fit=crop"
-                  alt="Featured Product"
-                  width="1000"
-                  height="667"
+                  src="/background.webp"
+                  alt="منتجات سهلة دي زد"
+                  width="800"
+                  height="534"
                   fetchPriority="high"
                   loading="eager"
+                  decoding="sync"
                   className="w-full h-auto object-cover shadow-2xl grayscale-[30%] hover:grayscale-0 transition-all duration-700"
                 />
               </div>
