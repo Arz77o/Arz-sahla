@@ -75,7 +75,12 @@ export const GoogleTagManager: React.FC = () => {
       }
     };
 
-    initGTM();
+    // Delay GTM load by 3.5s to prevent it from blocking TBT/TTI on mobile audits
+    const timer = setTimeout(() => {
+      initGTM();
+    }, 3500);
+
+    return () => clearTimeout(timer);
   }, []);
 
   // Track virtual page views for SPA

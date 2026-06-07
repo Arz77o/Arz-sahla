@@ -19,8 +19,10 @@ import { GoogleTagManager } from "./components/shared/GoogleTagManager";
 import { TopBanner } from "./components/shared/TopBanner";
 import { FloatingWhatsApp } from "./components/shared/FloatingWhatsApp";
 
-// Lazy Loaded Pages
-const Home = lazy(() => import("./pages/Home"));
+// Eagerly Loaded Critical Pages (Fixes LCP Delay!)
+import Home from "./pages/Home";
+
+// Lazy Loaded Secondary Pages
 const Products = lazy(() => import("./pages/Products"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
 const Cart = lazy(() => import("./pages/Cart"));
