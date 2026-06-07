@@ -61,34 +61,20 @@ export default defineConfig(({ mode }) => {
            * Pattern: group by library category so each has its own cache entry.
            */
           manualChunks(id) {
-            // Admin-only heavy libraries (recharts, xlsx) — never loaded on store pages
-            if (id.includes('recharts') || id.includes('xlsx')) {
-              return 'vendor-admin-charts';
+            // Admin-only heavy libraries
+            if (id.includes('node_modules/recharts') || id.includes('node_modules/xlsx')) {
+              return 'vendor-admin';
             }
-            // Supabase client — separate so it caches independently
-            if (id.includes('@supabase')) {
+            // Supabase
+            if (id.includes('node_modules/@supabase')) {
               return 'vendor-supabase';
             }
-            // React Router
-            if (id.includes('react-router')) {
-              return 'vendor-router';
+            // UI Components (Radix)
+            if (id.includes('node_modules/@radix-ui')) {
+              return 'vendor-ui';
             }
-            // i18n
-            if (id.includes('i18next') || id.includes('react-i18next')) {
-              return 'vendor-i18n';
-            }
-            // React core — most stable, longest cache
-            if (id.includes('react-dom') || id.includes('react/')) {
-              return 'vendor-react';
-            }
-            // Radix UI components
-            if (id.includes('@radix-ui')) {
-              return 'vendor-radix';
-            }
-            // All other node_modules
-            if (id.includes('node_modules')) {
-              return 'vendor-misc';
-            }
+            // Let Vite handle React and other core dependencies automatically
+            // to prevent dependency graph resolution issues.
           },
         },
       },
