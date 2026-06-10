@@ -198,7 +198,7 @@ export default function Account() {
                   </div>
                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed italic">
                     You have securely documented {orders.length} acquisitions in
-                    your SAHLA DZ. archive.
+                    your SAHLA DZ archive
                   </p>
                 </div>
               </div>

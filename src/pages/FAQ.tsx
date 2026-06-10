@@ -31,7 +31,7 @@ export default function FAQ() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
             <aside className="lg:col-span-4 sticky top-24 h-fit">
               <p className="text-sm text-gray-400 leading-relaxed uppercase tracking-widest font-bold">
-                Everything you need to know about our curated delivery and acquisition protocols.
+                Everything you need to know about our curated delivery and acquisition protocols
               </p>
             </aside>
 
@@ -62,27 +62,8 @@ export default function FAQ() {
                 </div>
 
                 <div className="space-y-px bg-surface-high border border-surface-high">
-                  {/* Video Tutorial Card */}
-                  <div className="bg-primary/5 p-8 md:p-10 border-b border-surface-high">
-                    <h3 className="text-lg font-display font-bold text-gray-900 mb-6 tracking-tight flex items-center gap-3">
-                      <span className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[10px]">
-                        <span className="animate-ping absolute w-8 h-8 rounded-full bg-primary/40 -z-10" />
-                        ▶
-                      </span>
-                      كيف أدفع بالبطاقة الذهبية (شرح فيديو)
-                    </h3>
-                    <div className="aspect-video w-full bg-gray-900 shadow-xl overflow-hidden group relative">
-                      {/* Placeholder for iframe or actual video */}
-                      <video
-                        src="/e-dahabia-tutorial.webm"
-                        className="w-full h-full"
-                        controls
-                        playsInline
-                      />
-                    </div>
-                  </div>
                   {[
-                    { q: "ما هي طرق الدفع المتوفرة؟", a: "نوفر الدفع عند الاستلام (COD) والدفع الإلكتروني عبر البطاقة الذهبية أو CIB." },
+                    { q: "ما هي طرق الدفع المتوفرة؟", a: "نوفر الدفع عند الاستلام (COD) كطريقة دفع أساسية لضمان راحتكم." },
                     { q: "كيف أتأكد من نجاح طلبي؟", a: "ستصلك رسالة تأكيد عبر WhatsApp أو عبر الاتصال الهاتفي خلال 24 ساعة." },
                     { q: "كيف أتتبع شحنتي؟", a: "يمكنك تتبع حالة طلبك من صفحة 'تتبع الطلب' باستخدام رقم طلبك." }
                   ].map((item, i) => (
@@ -97,7 +78,7 @@ export default function FAQ() {
               <div className="p-12 bg-surface-low border border-surface-high text-center">
                 <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 mb-6 font-medium">?Still have inquiries</p>
                 <div className="text-lg font-display font-bold text-gray-900 tracking-tight italic">
-                  Contact our support via WhatsApp for immediate assistance.
+                  .Contact our support via WhatsApp for immediate assistance
                 </div>
               </div>
             </div>

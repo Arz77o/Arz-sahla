@@ -318,7 +318,7 @@ export default function Terms() {
                   </p>
                   <p className="text-gray-400 text-xs uppercase tracking-[0.2em] leading-loose max-w-sm mx-auto">
                     By proceeding, you confirm full adherence to our curated
-                    trading standards and quality service protocols.
+                    trading standards and quality service protocols
                   </p>
                 </div>
                 <div className="mt-20 font-display font-bold text-gray-300 text-xs uppercase tracking-[0.5em]">
