@@ -693,7 +693,7 @@ export default function ProductDetail() {
                   </div>
                 )}
 
-                <div className="space-y-16">
+                <div className="mt-16 pt-12 border-t border-surface-high space-y-16">
                   {product.reviews &&
                     product.reviews.filter((r: any) => r.status === "approved")
                       .length > 0 ? (
