@@ -34,7 +34,7 @@ export default function AdminOrderDetail() {
       const { data, error } = await supabaseAdmin
         .from("orders")
         .select(
-          "*, users(email), order_items(*, products(name_ar, name_en, images, price_dzd))",
+          "*, order_items(*, products(name_ar, name_en, images, price_dzd))",
         )
         .eq("id", id)
         .single();
