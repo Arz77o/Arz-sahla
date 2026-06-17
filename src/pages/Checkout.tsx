@@ -14,6 +14,7 @@ import { useAuthStore } from "../store/authStore";
 import { supabase } from "../lib/supabase";
 import type { Database } from "../types/database.types";
 import { WILAYAS } from "../lib/algeria";
+import { COMMUNES } from "../lib/communes";
 import { formatDZD } from "../lib/pricing";
 import { Button } from "../components/ui/button";
 import { gtm } from "../lib/gtm";
@@ -110,6 +111,25 @@ export default function Checkout() {
   const wilayaName = wilaya ? (isAr ? wilaya.name_ar : wilaya.name_en) : "";
   const paymentMethod = watch("paymentMethod");
   const termsAccepted = watch("termsAccepted");
+
+  // ── تصفية البلديات حسب الولاية المختارة ──
+  const filteredCommunes = useMemo(() => {
+    if (!wilayaCode) return [];
+    return COMMUNES.filter((c) => c.wilaya_code.toString() === wilayaCode)
+      .sort((a, b) => isAr ? a.name_ar.localeCompare(b.name_ar, "ar") : a.name_en.localeCompare(b.name_en));
+  }, [wilayaCode, isAr]);
+
+  // ── معالجة أخطاء إرسال النموذج والانتقال إلى الحقل المعيب ──
+  const onError = (errors: any) => {
+    const firstError = Object.keys(errors)[0];
+    if (firstError) {
+      const element = document.getElementsByName(firstError)[0] || document.querySelector(`[name="${firstError}"]`);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+        (element as HTMLElement).focus();
+      }
+    }
+  };
 
   // ── حساب سعر الشحن ──
   const subtotal = getTotal();
@@ -236,7 +256,7 @@ export default function Checkout() {
 
           <div className="flex flex-col lg:flex-row gap-20 max-w-7xl mx-auto items-start">
             <div className="flex-1 w-full lg:max-w-2xl">
-              <form id="checkout-form" onSubmit={handleSubmit((data) => onSubmit(data))} className="space-y-16 md:space-y-24">
+              <form id="checkout-form" onSubmit={handleSubmit(onSubmit, onError)} className="space-y-16 md:space-y-24">
                 <div className="space-y-12">
                   <div className="space-y-16">
 
@@ -381,16 +401,22 @@ export default function Checkout() {
                             {errors.wilaya && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.wilaya.message}</p>}
                           </div>
 
-                          {/* Commune — Text Input */}
+                          {/* Commune — Select Dropdown */}
                           <div className="space-y-3 relative">
                             <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t("checkout.commune")}</label>
-                            <input
+                            <select
                               {...register("commune")}
                               disabled={!wilayaCode}
                               className={`w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all ${!wilayaCode ? "opacity-50 cursor-not-allowed" : ""
                                 }`}
-                              placeholder={wilayaCode ? "اكتب اسم بلديتك هنا..." : "اختر الولاية أولاً"}
-                            />
+                            >
+                              <option value="">{t("checkout.communePlaceholder")}</option>
+                              {filteredCommunes.map((c) => (
+                                <option key={c.name_en} value={isAr ? c.name_ar : c.name_en}>
+                                  {isAr ? c.name_ar : c.name_en}
+                                </option>
+                              ))}
+                            </select>
                             {errors.commune && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.commune.message}</p>}
                           </div>
                         </div>
@@ -582,7 +608,7 @@ export default function Checkout() {
                   form="checkout-form"
                   size="lg"
                   className="w-full h-20 text-lg font-display font-bold tracking-tight bg-primary hover:bg-primary-dim uppercase tracking-widest"
-                  disabled={!isValid || !termsAccepted || isSubmitting}
+                  disabled={isSubmitting}
                 >
                   {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : t("checkout.pay")}
                 </Button>
