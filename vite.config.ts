@@ -6,17 +6,16 @@ import viteCompression from 'vite-plugin-compression';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
+
   return {
     plugins: [
       react(),
       tailwindcss(),
-      // Brotli compression — highest compression ratio, served by Cloudflare Pages
       viteCompression({
         algorithm: 'brotliCompress',
         ext: '.br',
-        threshold: 1024, // only compress files > 1KB
+        threshold: 1024,
       }),
-      // Gzip as fallback for older browsers/CDNs
       viteCompression({
         algorithm: 'gzip',
         ext: '.gz',
@@ -39,7 +38,6 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
-      // Use terser for smaller output (removes console.log in prod)
       minify: 'terser',
       terserOptions: {
         compress: {
@@ -48,33 +46,37 @@ export default defineConfig(({ mode }) => {
           pure_funcs: ['console.log', 'console.warn'],
         },
       },
-      // Don't inline small assets as base64 — let the browser cache them
       assetsInlineLimit: 0,
-      // Split CSS per chunk for better caching
       cssCodeSplit: true,
       rollupOptions: {
         output: {
-          /**
-           * Manual chunk splitting — key for mobile performance.
-           * Without this, ALL code ships in one big bundle on first load.
-           * With this: homepage loads only homepage code, admin loads only when needed.
-           * Pattern: group by library category so each has its own cache entry.
-           */
           manualChunks(id) {
-            // Admin-only heavy libraries
-            if (id.includes('node_modules/recharts') || id.includes('node_modules/xlsx')) {
+            // xlsx — admin only, very heavy
+            if (id.includes('node_modules/xlsx')) {
               return 'vendor-admin';
             }
             // Supabase
             if (id.includes('node_modules/@supabase')) {
               return 'vendor-supabase';
             }
-            // UI Components (Radix)
+            // Radix UI
             if (id.includes('node_modules/@radix-ui')) {
               return 'vendor-ui';
             }
-            // Let Vite handle React and other core dependencies automatically
-            // to prevent dependency graph resolution issues.
+            // i18next — split out of main bundle
+            if (id.includes('node_modules/i18next') || id.includes('node_modules/react-i18next')) {
+              return 'vendor-i18n';
+            }
+            // react-router
+            if (id.includes('node_modules/react-router')) {
+              return 'vendor-router';
+            }
+            // react-helmet-async
+            if (id.includes('node_modules/react-helmet-async')) {
+              return 'vendor-router';
+            }
+            // communes data — only used in Checkout, keep it there (already lazy)
+            // lucide-react — tree-shaken per page, don't bundle together
           },
         },
       },

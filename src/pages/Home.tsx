@@ -119,9 +119,11 @@ export default function Home() {
               <div className="relative z-10 p-8 md:p-12">
                 <img
                   src="/background.webp"
+                  srcSet="/background-sm.webp 600w, /background.webp 1200w"
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   alt="منتجات سهلة دي زد"
-                  width="800"
-                  height="534"
+                  width="1200"
+                  height="674"
                   fetchPriority="high"
                   loading="eager"
                   decoding="sync"
@@ -189,7 +191,7 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
             {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} priority={featuredProducts.indexOf(product) < 2} />
             ))}
           </div>
         </div>

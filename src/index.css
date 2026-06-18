@@ -1,9 +1,16 @@
+/* Self-hosted fonts — no Google Fonts request, no render blocking */
+@import "@fontsource/inter/latin-400.css";
+@import "@fontsource/inter/latin-500.css";
+@import "@fontsource/inter/latin-600.css";
+@import "@fontsource/inter/latin-700.css";
+@import "@fontsource/outfit/latin-400.css";
+@import "@fontsource/outfit/latin-500.css";
+@import "@fontsource/outfit/latin-600.css";
+@import "@fontsource/outfit/latin-700.css";
+@import "@fontsource/outfit/latin-900.css";
+
 @import "tailwindcss";
 
-/* 
-  ARCHITECTURAL ARCHIVE DESIGN SYSTEM
-  Standard CSS Variables for IDE Compatibility
-*/
 :root {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Outfit", "Inter", sans-serif;
@@ -35,7 +42,7 @@
 @layer base {
   body {
     background-color: var(--color-surface);
-    color: #111827; /* gray-900 */
+    color: #111827;
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -43,24 +50,14 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    letter-spacing: -0.025em; /* tracking-tight */
+    letter-spacing: -0.025em;
   }
 
-  /* 
-    content-visibility: auto — tells the browser to skip rendering off-screen
-    sections until they're about to appear. One of the biggest render performance
-    wins for long pages, especially on mobile.
-    contain-intrinsic-size hints the expected size so no layout shift occurs.
-  */
   section {
     content-visibility: auto;
     contain-intrinsic-size: 0 500px;
   }
 
-  /* 
-    Override for the first section (hero) — it's always visible,
-    so we never want to skip it. Critical for LCP.
-  */
   section:first-of-type {
     content-visibility: visible;
     contain-intrinsic-size: auto;
@@ -94,12 +91,6 @@
     border: none;
     transition-property: background-color;
     transition-duration: 200ms;
-    /* 
-      CSS containment for ProductCard — isolates layout calculation
-      so the browser doesn't repaint the whole page when a card changes.
-    */
     contain: layout style;
   }
-  
 }
-

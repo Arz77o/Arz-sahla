@@ -18,7 +18,7 @@ export const FloatingWhatsApp = () => {
       className="fixed bottom-6 right-6 z-[100] group flex items-center justify-center"
       aria-label="Contact us on WhatsApp"
     >
-      <div className="absolute inset-0 bg-green-500 rounded-full animate-ping opacity-25 group-hover:hidden" />
+      <div className="absolute inset-0 bg-green-500 rounded-full animate-ping opacity-25 group-hover:hidden" style={{ animationDelay: '3s' }} />
       <div className="relative w-14 h-14 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-[0_10px_40px_rgba(37,211,102,0.4)] transition-transform hover:scale-110 active:scale-95 duration-300">
         <MessageCircle className="w-7 h-7 fill-white" />
         
