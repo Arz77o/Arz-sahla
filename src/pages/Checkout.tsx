@@ -4,7 +4,18 @@ import { useTranslation } from "react-i18next";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, AlertCircle, CheckCircle2, ShieldCheck, Phone, MessageSquare, Mail, Send, Building2, Home } from "lucide-react";
+import {
+  Loader2,
+  AlertCircle,
+  CheckCircle2,
+  ShieldCheck,
+  Phone,
+  MessageSquare,
+  Mail,
+  Send,
+  Building2,
+  Home,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { SEOMeta } from "../components/shared/SEOMeta";
@@ -19,14 +30,19 @@ import { formatDZD } from "../lib/pricing";
 import { Button } from "../components/ui/button";
 import { gtm } from "../lib/gtm";
 
-
 // ─── Schema ──────────────────────────────────────────────────────────────────
 const checkoutSchema = z.object({
   fullName: z.string().min(3, "الاسم الكامل مطلوب"),
-  wilaya: z.string().min(1, "يرجى اختيار الولاية").refine((val) => {
-    const w = WILAYAS.find(wil => wil.code.toString() === val);
-    return w && !w.unsupported;
-  }, { message: "نأسف، هذه الولاية غير مدعومة للتوصيل حالياً" }),
+  wilaya: z
+    .string()
+    .min(1, "يرجى اختيار الولاية")
+    .refine(
+      (val) => {
+        const w = WILAYAS.find((wil) => wil.code.toString() === val);
+        return w && !w.unsupported;
+      },
+      { message: "نأسف، هذه الولاية غير مدعومة للتوصيل حالياً" },
+    ),
   commune: z.string().min(2, "اسم البلدية مطلوب"),
   phone: z
     .string()
@@ -67,15 +83,15 @@ export default function Checkout() {
 
   React.useEffect(() => {
     if (items.length > 0) {
-      gtm.ecommerce('begin_checkout', {
-        currency: 'DZD',
+      gtm.ecommerce("begin_checkout", {
+        currency: "DZD",
         value: getTotal(),
-        items: items.map(i => ({
+        items: items.map((i) => ({
           item_id: i.product_id,
           item_name: isAr ? i.name_ar : i.name_en,
           price: i.price_dzd,
-          quantity: i.quantity
-        }))
+          quantity: i.quantity,
+        })),
       });
     }
   }, [items, isAr, getTotal]);
@@ -110,15 +126,21 @@ export default function Checkout() {
   // ── تصفية البلديات حسب الولاية المختارة ──
   const filteredCommunes = useMemo(() => {
     if (!wilayaCode) return [];
-    return COMMUNES.filter((c) => c.wilaya_code.toString() === wilayaCode)
-      .sort((a, b) => isAr ? a.name_ar.localeCompare(b.name_ar, "ar") : a.name_en.localeCompare(b.name_en));
+    return COMMUNES.filter((c) => c.wilaya_code.toString() === wilayaCode).sort(
+      (a, b) =>
+        isAr
+          ? a.name_ar.localeCompare(b.name_ar, "ar")
+          : a.name_en.localeCompare(b.name_en),
+    );
   }, [wilayaCode, isAr]);
 
   // ── معالجة أخطاء إرسال النموذج والانتقال إلى الحقل المعيب ──
   const onError = (errors: any) => {
     const firstError = Object.keys(errors)[0];
     if (firstError) {
-      const element = document.getElementsByName(firstError)[0] || document.querySelector(`[name="${firstError}"]`);
+      const element =
+        document.getElementsByName(firstError)[0] ||
+        document.querySelector(`[name="${firstError}"]`);
       if (element) {
         element.scrollIntoView({ behavior: "smooth", block: "center" });
         (element as HTMLElement).focus();
@@ -130,11 +152,13 @@ export default function Checkout() {
   const subtotal = getTotal();
   const getShippingFee = () => {
     if (!wilayaCode) return deliveryType === "home" ? 1000 : 800;
-    const feeConfig = shippingFeesConfig.find(f => f.wilaya_code.toString() === wilayaCode);
+    const feeConfig = shippingFeesConfig.find(
+      (f) => f.wilaya_code.toString() === wilayaCode,
+    );
     if (!feeConfig) return deliveryType === "home" ? 1000 : 800;
     // إذا كان home_fee موجوداً استخدمه، وإلا أضف 200 دج على desk_fee
     if (deliveryType === "home") {
-      return feeConfig.home_fee ?? (feeConfig.desk_fee + 200);
+      return feeConfig.home_fee ?? feeConfig.desk_fee + 200;
     }
     return feeConfig.desk_fee;
   };
@@ -145,7 +169,9 @@ export default function Checkout() {
   // ── onSubmit ──
   const onSubmit: SubmitHandler<CheckoutFormValues> = async (data) => {
     setIsSubmitting(true);
-    const selectedWilaya = WILAYAS.find(w => w.code.toString() === data.wilaya);
+    const selectedWilaya = WILAYAS.find(
+      (w) => w.code.toString() === data.wilaya,
+    );
     if (selectedWilaya?.unsupported) {
       toast.error("نأسف، هذه الولاية غير مدعومة حالياً");
       setIsSubmitting(false);
@@ -191,18 +217,16 @@ export default function Checkout() {
 
       if (itemsError) throw itemsError;
 
-      gtm.ecommerce('begin_checkout', {
-        currency: 'DZD',
+      gtm.ecommerce("begin_checkout", {
+        currency: "DZD",
         value: finalTotal,
-        items: items.map(i => ({
+        items: items.map((i) => ({
           item_id: i.product_id,
           item_name: isAr ? i.name_ar : i.name_en,
           price: i.price_dzd,
-          quantity: i.quantity
-        }))
+          quantity: i.quantity,
+        })),
       });
-
-
 
       navigate(`/order/success?order_id=${orderId}`);
     } catch (error: any) {
@@ -239,8 +263,12 @@ export default function Checkout() {
               </p>
             </div>
             <div className="text-right hidden md:block">
-              <span className="text-[10px] font-bold text-primary uppercase tracking-widest block mb-1">Items for collection</span>
-              <span className="text-4xl font-display font-bold text-gray-900 tracking-tighter">{getItemCount()}</span>
+              <span className="text-[10px] font-bold text-primary uppercase tracking-widest block mb-1">
+                Items for collection
+              </span>
+              <span className="text-4xl font-display font-bold text-gray-900 tracking-tighter">
+                {getItemCount()}
+              </span>
             </div>
           </div>
 
@@ -250,10 +278,13 @@ export default function Checkout() {
 
           <div className="flex flex-col lg:flex-row gap-20 max-w-7xl mx-auto items-start">
             <div className="flex-1 w-full lg:max-w-2xl">
-              <form id="checkout-form" onSubmit={handleSubmit(onSubmit, onError)} className="space-y-16 md:space-y-24">
+              <form
+                id="checkout-form"
+                onSubmit={handleSubmit(onSubmit, onError)}
+                className="space-y-16 md:space-y-24"
+              >
                 <div className="space-y-12">
                   <div className="space-y-16">
-
                     {/* ── قسم البيانات الشخصية ── */}
                     <div className="space-y-8">
                       <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-gray-900 flex items-center gap-3">
@@ -262,25 +293,38 @@ export default function Checkout() {
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="space-y-3">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t("checkout.fullName")}</label>
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                            {t("checkout.fullName")}
+                          </label>
                           <input
                             {...register("fullName")}
                             className="w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all"
                             placeholder="يرجى إدخال إسمك الكامل"
                           />
-                          {errors.fullName && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.fullName.message}</p>}
+                          {errors.fullName && (
+                            <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">
+                              {errors.fullName.message}
+                            </p>
+                          )}
                         </div>
                         <div className="space-y-3">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t("checkout.phone")}</label>
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                            {t("checkout.phone")}
+                          </label>
                           <input
                             {...register("phone")}
                             className="w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all tracking-tighter"
                             placeholder="0543215868"
                           />
                           <p className="text-[10px] text-amber-600 font-medium leading-relaxed">
-                            الرقم الهاتفي الذي تدخله هو الذي سوف نتصل بك به ونرسل إليك رسالة في الواتساب، لذا يرجى التأكد.
+                            الرقم الهاتفي الذي تدخله هو الذي سوف نتصل بك به
+                            ونرسل إليك رسالة في الواتساب، لذا يرجى التأكد.
                           </p>
-                          {errors.phone && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.phone.message}</p>}
+                          {errors.phone && (
+                            <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">
+                              {errors.phone.message}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -294,10 +338,11 @@ export default function Checkout() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Stop Desk */}
                         <label
-                          className={`flex items-start gap-4 p-5 border cursor-pointer transition-all ${deliveryType === "desk"
-                            ? "border-primary bg-primary/5"
-                            : "border-surface-high bg-white hover:border-gray-300"
-                            }`}
+                          className={`flex items-start gap-4 p-5 border cursor-pointer transition-all ${
+                            deliveryType === "desk"
+                              ? "border-primary bg-primary/5"
+                              : "border-surface-high bg-white hover:border-gray-300"
+                          }`}
                         >
                           <input
                             type="radio"
@@ -307,17 +352,25 @@ export default function Checkout() {
                           />
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <Building2 className={`w-4 h-4 ${deliveryType === "desk" ? "text-primary" : "text-gray-400"}`} />
+                              <Building2
+                                className={`w-4 h-4 ${deliveryType === "desk" ? "text-primary" : "text-gray-400"}`}
+                              />
                               <span className="text-xs font-bold uppercase tracking-widest text-gray-900">
                                 توصيل إلى المكتب
                               </span>
                             </div>
                             <p className="text-[10px] text-gray-400 leading-relaxed">
-                              الاستلام من أقرب مكتب Expedia Chrono في ولايتك (Stop Desk)
+                              الاستلام من أقرب مكتب Expedia Chrono في ولايتك
+                              (Stop Desk)
                             </p>
                             {wilayaCode && (
                               <span className="mt-2 inline-block text-[10px] font-black text-primary">
-                                {formatDZD(shippingFeesConfig.find(f => f.wilaya_code.toString() === wilayaCode)?.desk_fee ?? 800)}
+                                {formatDZD(
+                                  shippingFeesConfig.find(
+                                    (f) =>
+                                      f.wilaya_code.toString() === wilayaCode,
+                                  )?.desk_fee ?? 800,
+                                )}
                               </span>
                             )}
                           </div>
@@ -325,10 +378,11 @@ export default function Checkout() {
 
                         {/* Home Delivery */}
                         <label
-                          className={`flex items-start gap-4 p-5 border cursor-pointer transition-all ${deliveryType === "home"
-                            ? "border-primary bg-primary/5"
-                            : "border-surface-high bg-white hover:border-gray-300"
-                            }`}
+                          className={`flex items-start gap-4 p-5 border cursor-pointer transition-all ${
+                            deliveryType === "home"
+                              ? "border-primary bg-primary/5"
+                              : "border-surface-high bg-white hover:border-gray-300"
+                          }`}
                         >
                           <input
                             type="radio"
@@ -338,7 +392,9 @@ export default function Checkout() {
                           />
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <Home className={`w-4 h-4 ${deliveryType === "home" ? "text-primary" : "text-gray-400"}`} />
+                              <Home
+                                className={`w-4 h-4 ${deliveryType === "home" ? "text-primary" : "text-gray-400"}`}
+                              />
                               <span className="text-xs font-bold uppercase tracking-widest text-gray-900">
                                 توصيل إلى المنزل
                               </span>
@@ -349,15 +405,27 @@ export default function Checkout() {
                             {wilayaCode && (
                               <span className="mt-2 inline-block text-[10px] font-black text-primary">
                                 {(() => {
-                                  const fee = shippingFeesConfig.find(f => f.wilaya_code.toString() === wilayaCode);
-                                  return formatDZD(fee?.home_fee ?? (fee?.desk_fee ? fee.desk_fee + 200 : 1000));
+                                  const fee = shippingFeesConfig.find(
+                                    (f) =>
+                                      f.wilaya_code.toString() === wilayaCode,
+                                  );
+                                  return formatDZD(
+                                    fee?.home_fee ??
+                                      (fee?.desk_fee
+                                        ? fee.desk_fee + 200
+                                        : 1000),
+                                  );
                                 })()}
                               </span>
                             )}
                           </div>
                         </label>
                       </div>
-                      {errors.deliveryType && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.deliveryType.message}</p>}
+                      {errors.deliveryType && (
+                        <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">
+                          {errors.deliveryType.message}
+                        </p>
+                      )}
                     </div>
 
                     {/* ── قسم عنوان التوصيل ── */}
@@ -372,7 +440,9 @@ export default function Checkout() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                           {/* Wilaya */}
                           <div className="space-y-3">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t("checkout.wilaya")}</label>
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                              {t("checkout.wilaya")}
+                            </label>
                             <select
                               {...register("wilaya")}
                               onChange={(e) => {
@@ -382,50 +452,83 @@ export default function Checkout() {
                               }}
                               className="w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all"
                             >
-                              <option value="">{t("checkout.wilayaPlaceholder")}</option>
-                              {WILAYAS.filter(w => !w.unsupported).map((w) => (
-                                <option key={w.code} value={w.code}>{isAr ? w.name_ar : w.name_en}</option>
-                              ))}
+                              <option value="">
+                                {t("checkout.wilayaPlaceholder")}
+                              </option>
+                              {WILAYAS.filter((w) => !w.unsupported).map(
+                                (w) => (
+                                  <option key={w.code} value={w.code}>
+                                    {isAr ? w.name_ar : w.name_en}
+                                  </option>
+                                ),
+                              )}
                             </select>
                             {!wilayaCode && (
                               <p className="text-[10px] text-gray-500 font-medium mt-2 leading-relaxed italic opacity-80">
-                                * {isAr ? "نعتذر، التوصيل متاح حالياً لولايات الشمال فقط (30 ولاية)." : "Notice: Delivery currently restricted to Northern regions only."}
+                                *{" "}
+                                {isAr
+                                  ? "نعتذر، التوصيل متاح حالياً لولايات الشمال فقط (30 ولاية)."
+                                  : "Notice: Delivery currently restricted to Northern regions only."}
                               </p>
                             )}
-                            {errors.wilaya && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.wilaya.message}</p>}
+                            {errors.wilaya && (
+                              <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">
+                                {errors.wilaya.message}
+                              </p>
+                            )}
                           </div>
 
                           {/* Commune — Select Dropdown */}
                           <div className="space-y-3 relative">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t("checkout.commune")}</label>
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                              {t("checkout.commune")}
+                            </label>
                             <select
                               {...register("commune")}
                               disabled={!wilayaCode}
-                              className={`w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all ${!wilayaCode ? "opacity-50 cursor-not-allowed" : ""
-                                }`}
+                              className={`w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all ${
+                                !wilayaCode
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : ""
+                              }`}
                             >
-                              <option value="">{t("checkout.communePlaceholder")}</option>
+                              <option value="">
+                                {t("checkout.communePlaceholder")}
+                              </option>
                               {filteredCommunes.map((c) => (
-                                <option key={c.name_en} value={isAr ? c.name_ar : c.name_en}>
+                                <option
+                                  key={c.name_en}
+                                  value={isAr ? c.name_ar : c.name_en}
+                                >
                                   {isAr ? c.name_ar : c.name_en}
                                 </option>
                               ))}
                             </select>
-                            {errors.commune && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.commune.message}</p>}
+                            {errors.commune && (
+                              <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">
+                                {errors.commune.message}
+                              </p>
+                            )}
                           </div>
                         </div>
 
                         {/* Address — shown only for home delivery */}
                         {deliveryType === "home" && (
                           <div className="space-y-3">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t("checkout.address")}</label>
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                              {t("checkout.address")}
+                            </label>
                             <textarea
                               {...register("address")}
                               rows={3}
                               className="w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all resize-none"
                               placeholder={t("checkout.addressPlaceholder")}
                             />
-                            {errors.address && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.address.message}</p>}
+                            {errors.address && (
+                              <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">
+                                {errors.address.message}
+                              </p>
+                            )}
                           </div>
                         )}
 
@@ -441,7 +544,11 @@ export default function Checkout() {
                               className="w-full bg-surface-low border border-surface-high p-4 text-sm font-medium focus:border-primary outline-none transition-all resize-none"
                               placeholder="اكتب العنوان أو أي ملاحظة إضافية للطلب..."
                             />
-                            {errors.address && <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">{errors.address.message}</p>}
+                            {errors.address && (
+                              <p className="text-red-500 text-[9px] uppercase font-bold tracking-widest">
+                                {errors.address.message}
+                              </p>
+                            )}
                           </div>
                         )}
                       </div>
@@ -455,10 +562,11 @@ export default function Checkout() {
                       </h3>
                       <div className="space-y-4">
                         <label
-                          className={`flex flex-col md:flex-row items-center gap-6 p-6 border transition-all ${watch("paymentMethod") === "cod"
-                            ? "border-primary bg-primary/5 shadow-inner"
-                            : "border-surface-high bg-white hover:border-gray-300"
-                            } cursor-pointer`}
+                          className={`flex flex-col md:flex-row items-center gap-6 p-6 border transition-all ${
+                            watch("paymentMethod") === "cod"
+                              ? "border-primary bg-primary/5 shadow-inner"
+                              : "border-surface-high bg-white hover:border-gray-300"
+                          } cursor-pointer`}
                         >
                           <input
                             type="radio"
@@ -475,7 +583,6 @@ export default function Checkout() {
                             </div>
                           </div>
                         </label>
-
                       </div>
                     </div>
 
@@ -487,8 +594,16 @@ export default function Checkout() {
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-surface-high border border-surface-high">
                         {[
-                          { id: "phone", icon: Phone, label: t("checkout.phoneCall") },
-                          { id: "whatsapp", icon: MessageSquare, label: t("checkout.whatsapp") },
+                          {
+                            id: "phone",
+                            icon: Phone,
+                            label: t("checkout.phoneCall"),
+                          },
+                          {
+                            id: "whatsapp",
+                            icon: MessageSquare,
+                            label: t("checkout.whatsapp"),
+                          },
                         ].map((item) => (
                           <label
                             key={item.id}
@@ -500,16 +615,18 @@ export default function Checkout() {
                               value={item.id}
                               className="sr-only"
                             />
-                            <item.icon className={`w-5 h-5 ${watch("contactPreference") === item.id ? "text-white" : "text-gray-400"}`} />
-                            <span className="text-[10px] font-bold uppercase tracking-widest">{item.label}</span>
+                            <item.icon
+                              className={`w-5 h-5 ${watch("contactPreference") === item.id ? "text-white" : "text-gray-400"}`}
+                            />
+                            <span className="text-[10px] font-bold uppercase tracking-widest">
+                              {item.label}
+                            </span>
                           </label>
                         ))}
                       </div>
                     </div>
                   </div>
                 </div>
-
-
               </form>
             </div>
 
@@ -528,7 +645,10 @@ export default function Checkout() {
                     >
                       <div className="w-20 h-20 overflow-hidden bg-white border border-surface-high shrink-0">
                         <img
-                          src={item.image || "https://picsum.photos/seed/sahla/100/100"}
+                          src={
+                            item.image ||
+                            "https://picsum.photos/seed/sahla/100/100"
+                          }
                           alt=""
                           className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-500"
                         />
@@ -547,18 +667,26 @@ export default function Checkout() {
 
                 <div className="space-y-4 mb-10 pt-10 border-t border-surface-high">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="font-bold uppercase tracking-widest text-gray-400 text-[10px]">{t("cart.total")} (Items)</span>
+                    <span className="font-bold uppercase tracking-widest text-gray-400 text-[10px]">
+                      {t("cart.total")} (Items)
+                    </span>
                     <span className="font-bold">{formatDZD(subtotal)}</span>
                   </div>
                   <div className="flex justify-between items-center text-xs">
                     <span className="font-bold uppercase tracking-widest text-primary text-[10px]">
                       الشحن — {deliveryType === "home" ? "🏠 منزل" : "🏢 مكتب"}
                     </span>
-                    <span className="font-bold text-primary">{formatDZD(displayShippingFee)}</span>
+                    <span className="font-bold text-primary">
+                      {formatDZD(displayShippingFee)}
+                    </span>
                   </div>
                   <div className="pt-10 border-t border-surface-high flex justify-between items-end">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">الإجمالي</span>
-                    <span className="text-4xl font-display font-bold text-primary tracking-tighter">{formatDZD(finalTotal)}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">
+                      الإجمالي
+                    </span>
+                    <span className="text-4xl font-display font-bold text-primary tracking-tighter">
+                      {formatDZD(finalTotal)}
+                    </span>
                   </div>
                 </div>
 
@@ -569,7 +697,11 @@ export default function Checkout() {
                   className="w-full h-20 text-lg font-display font-bold tracking-tight bg-primary hover:bg-primary-dim uppercase tracking-widest"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : t("checkout.pay")}
+                  {isSubmitting ? (
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                  ) : (
+                    t("checkout.pay")
+                  )}
                 </Button>
 
                 <div className="flex items-center justify-center gap-4 text-[10px] font-bold uppercase tracking-widest text-gray-400 mt-6 md:mt-10">
@@ -581,8 +713,6 @@ export default function Checkout() {
           </div>
         </div>
       </div>
-
-
     </>
   );
 }

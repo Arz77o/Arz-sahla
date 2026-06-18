@@ -92,12 +92,12 @@ function App() {
       try {
         // Prefetch categories
         queryClient.prefetchQuery({
-          queryKey: ['categories'],
+          queryKey: ["categories"],
           queryFn: async () => {
             const { data } = await supabase
-              .from('categories')
-              .select('*')
-              .order('name_ar');
+              .from("categories")
+              .select("*")
+              .order("name_ar");
             return data || [];
           },
           staleTime: 1000 * 60 * 10, // 10 minutes
@@ -105,19 +105,19 @@ function App() {
 
         // Prefetch products (no category filter = all products)
         queryClient.prefetchQuery({
-          queryKey: ['products', undefined],
+          queryKey: ["products", undefined],
           queryFn: async () => {
             const { data } = await supabase
-              .from('products')
-              .select('*')
-              .eq('active', true)
-              .order('created_at', { ascending: false });
+              .from("products")
+              .select("*")
+              .eq("active", true)
+              .order("created_at", { ascending: false });
             return data || [];
           },
           staleTime: 1000 * 60 * 5, // 5 minutes
         });
       } catch (err) {
-        console.warn('Prefetch failed:', err);
+        console.warn("Prefetch failed:", err);
       }
     };
 
