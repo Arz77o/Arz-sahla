@@ -77,7 +77,7 @@ export const ProductCard = React.memo<ProductCardProps>(({
   );
 
   return (
-    <Reveal width="100%" y={priority ? 0 : 10} delay={priority ? 0 : 0.1}>
+    <Reveal width="100%" y={priority ? 0 : 10} delay={priority ? 0 : 0.1} priority={priority}>
       <Link
         to={`/products/${product.id}`}
         className="group block tonal-card hover:bg-surface-low transition-all duration-300 overflow-hidden"
@@ -94,7 +94,7 @@ export const ProductCard = React.memo<ProductCardProps>(({
             // fetchpriority tells browser to fetch above-fold images first
             {...(priority ? { fetchPriority: "high" } : {})}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover w-full h-full grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
+            className="object-cover w-full h-full"
           />
           {product.stock_quantity <= 0 && (
             <div className="absolute inset-0 bg-white/60 flex items-center justify-center backdrop-blur-[2px]">

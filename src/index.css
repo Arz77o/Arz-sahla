@@ -64,6 +64,17 @@
   }
 }
 
+@keyframes reveal-fade-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @layer components {
   .btn-sharp {
     border-radius: 0;
@@ -81,8 +92,6 @@
     top: 0;
     z-index: 50;
     background-color: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
     border: none;
   }
   
@@ -92,5 +101,9 @@
     transition-property: background-color;
     transition-duration: 200ms;
     contain: layout style;
+  }
+  
+  .reveal-animate {
+    animation: reveal-fade-slide-up 0.5s cubic-bezier(0.33, 1, 0.68, 1) forwards;
   }
 }

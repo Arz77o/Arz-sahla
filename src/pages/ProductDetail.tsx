@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -24,7 +24,6 @@ import {
   useCreateReview,
   useDeleteReview,
 } from "../hooks/useProducts";
-import { useCategories } from "../hooks/useCategories";
 import { gtm } from "../lib/gtm";
 
 export default function ProductDetail() {
@@ -78,6 +77,33 @@ export default function ProductDetail() {
   const priceDZD = product?.price_dzd ?? 0;
   const inCart = product ? isInCart(product.id) : false;
   const outOfStock = product ? product.stock_quantity <= 0 : false;
+
+  // Memoize original price calculation
+  const priceInfo = useMemo(() => {
+    const originalPrice = Math.round((priceDZD * 1.30) / 100) * 100;
+    const discountPercent = Math.round(((originalPrice - priceDZD) / originalPrice) * 100);
+    return { originalPrice, discountPercent };
+  }, [priceDZD]);
+
+  // Memoize image URL builder for performance
+  const getOptimizedImageUrl = useMemo(
+    () => (imgUrl: string, width: number = 800) => {
+      if (!imgUrl) return imgUrl;
+      try {
+        if (imgUrl.includes('supabase.co/storage')) {
+          const url = new URL(imgUrl);
+          url.searchParams.set('width', String(width));
+          url.searchParams.set('quality', '80');
+          url.searchParams.set('format', 'webp');
+          return url.toString();
+        }
+      } catch {
+        return imgUrl;
+      }
+      return imgUrl;
+    },
+    []
+  );
 
   const lastTrackedProductId = useRef<string | null>(null);
 
@@ -262,16 +288,20 @@ export default function ProductDetail() {
                   onClick={() => setZoomedImage(selectedImage)}
                 >
                   <img
-                    src={
-                      selectedImage ||
-                      "https://picsum.photos/seed/sahla/800/800"
-                    }
+                    src={getOptimizedImageUrl(selectedImage || "", 800)}
                     alt={name}
                     width={800}
                     height={800}
                     fetchPriority="high"
                     loading="eager"
-                    className="w-full h-full object-cover grayscale-[10%] hover:grayscale-0 transition-all duration-700"
+                    decoding="async"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    srcSet={`
+                      ${getOptimizedImageUrl(selectedImage || "", 400)} 400w,
+                      ${getOptimizedImageUrl(selectedImage || "", 800)} 800w,
+                      ${getOptimizedImageUrl(selectedImage || "", 1200)} 1200w
+                    `}
+                    className="w-full h-full object-cover grayscale-10"
                   />
                 </div>
                 {product.images && product.images.length > 1 && (
@@ -280,17 +310,18 @@ export default function ProductDetail() {
                       <button
                         key={idx}
                         onClick={() => setSelectedImage(img)}
-                        className={`w-24 h-24 border transition-all flex-shrink-0 ${selectedImage === img
+                        className={`w-24 h-24 border shrink-0 ${selectedImage === img
                           ? "border-primary ring-1 ring-primary"
-                          : "border-surface-high hover:border-gray-400"
+                          : "border-surface-high"
                           }`}
                       >
                         <img
-                          src={img}
+                          src={getOptimizedImageUrl(img, 96)}
                           alt=""
                           width={96}
                           height={96}
                           loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover"
                         />
                       </button>
@@ -327,33 +358,28 @@ export default function ProductDetail() {
                   </h1>
 
                   {/* ─── Price Comparison Block ─── */}
-                  {priceDZD > 0 && (() => {
-                    // Calculate the original price: 30% higher, rounded to nearest 100 DZD
-                    const originalPrice = Math.round((priceDZD * 1.30) / 100) * 100;
-                    const discountPercent = Math.round(((originalPrice - priceDZD) / originalPrice) * 100);
-                    return (
-                      <div className="mb-8 space-y-3">
-                        {/* Badge + Original Price row */}
-                        <div className="flex items-center gap-3 flex-wrap">
-                          <span className="inline-flex items-center px-3 py-1 bg-red-600 text-white text-[11px] font-black uppercase tracking-widest">
-                            {t("product.saveAmount").replace("{percent}", discountPercent.toString())}
+                  {priceDZD > 0 && (
+                    <div className="mb-8 space-y-3">
+                      {/* Badge + Original Price row */}
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <span className="inline-flex items-center px-3 py-1 bg-red-600 text-white text-[11px] font-black uppercase tracking-widest">
+                          {t("product.saveAmount").replace("{percent}", priceInfo.discountPercent.toString())}
+                        </span>
+                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                          <span className="text-[10px] font-bold uppercase tracking-widest">
+                            {t("product.wasPrice")}
                           </span>
-                          <div className="flex items-center gap-2 text-sm text-gray-400">
-                            <span className="text-[10px] font-bold uppercase tracking-widest">
-                              {t("product.wasPrice")}
-                            </span>
-                            <span className="line-through font-display font-bold text-gray-400 text-xl">
-                              {formatDZD(originalPrice)}
-                            </span>
-                          </div>
-                        </div>
-                        {/* Current price — big and bold */}
-                        <div className="text-5xl font-display font-bold text-primary tracking-tighter">
-                          {formatDZD(priceDZD)}
+                          <span className="line-through font-display font-bold text-gray-400 text-xl">
+                            {formatDZD(priceInfo.originalPrice)}
+                          </span>
                         </div>
                       </div>
-                    );
-                  })()}
+                      {/* Current price — big and bold */}
+                      <div className="text-5xl font-display font-bold text-primary tracking-tighter">
+                        {formatDZD(priceDZD)}
+                      </div>
+                    </div>
+                  )}
 
                   {/* ScarcityUrgency Suite */}
                   {!outOfStock && (
@@ -386,9 +412,9 @@ export default function ProductDetail() {
                                       option: opt,
                                     })
                                   }
-                                  className={`flex-grow px-6 py-3 text-xs font-bold uppercase tracking-widest transition-all ${active
+                                  className={`grow px-6 py-3 text-xs font-bold uppercase tracking-widest ${active
                                     ? "bg-primary text-white"
-                                    : "bg-white text-gray-500 hover:text-gray-900 hover:bg-surface-low"
+                                    : "bg-white text-gray-500"
                                     }`}
                                 >
                                   {opt}
@@ -410,7 +436,7 @@ export default function ProductDetail() {
                       <div className="flex items-center gap-px bg-surface-high border border-surface-high w-fit">
                         <button
                           onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                          className="w-14 h-14 bg-white hover:bg-surface-low transition-colors font-bold text-lg"
+                          className="w-14 h-14 bg-white font-bold text-lg"
                         >
                           -
                         </button>
@@ -423,7 +449,7 @@ export default function ProductDetail() {
                               Math.min(product.stock_quantity, quantity + 1),
                             )
                           }
-                          className="w-14 h-14 bg-white hover:bg-surface-low transition-colors font-bold text-lg"
+                          className="w-14 h-14 bg-white font-bold text-lg"
                         >
                           +
                         </button>
@@ -520,7 +546,7 @@ export default function ProductDetail() {
 
                 {/* ✅ نموذج التقييم الجديد */}
                 {!user ? (
-                  <div className="py-12 text-center border border-surface-high rounded-[1.75rem] bg-surface-low/50 transition-colors">
+                  <div className="py-12 text-center border border-surface-high rounded-[1.75rem] bg-surface-low/50">
                     <p className="text-gray-500 font-semibold mb-4">
                       {isAr ? "يجب تسجيل الدخول لإضافة تقييم" : "You must log in to add a review"}
                     </p>
@@ -538,7 +564,7 @@ export default function ProductDetail() {
                   </div>
                 ) : !showReviewForm ? (
                   <div
-                    className="py-12 text-center border border-surface-high rounded-[1.75rem] bg-surface-low transition-colors hover:border-primary cursor-pointer"
+                    className="py-12 text-center border border-surface-high rounded-[1.75rem] bg-surface-low cursor-pointer"
                     onClick={() => setShowReviewForm(true)}
                   >
                     <p className="text-gray-500 font-semibold mb-3">
@@ -549,7 +575,7 @@ export default function ProductDetail() {
                     </Button>
                   </div>
                 ) : (
-                  <div className="bg-white border border-surface-high rounded-[2rem] p-8 md:p-10 shadow-sm animate-in fade-in">
+                  <div className="bg-white border border-surface-high rounded-[2rem] p-8 md:p-10 shadow-sm">
                     <div className="flex flex-col gap-2 mb-6">
                       <h3 className="text-2xl font-display font-bold text-gray-900">
                         اكتب تقييمك
@@ -570,7 +596,7 @@ export default function ProductDetail() {
                             key={star}
                             type="button"
                             onClick={() => setReviewRating(star)}
-                            className="focus:outline-none transition-transform hover:scale-110"
+                            className="focus:outline-none"
                             aria-label={`${star} نجوم`}
                           >
                             <Star
@@ -621,7 +647,7 @@ export default function ProductDetail() {
                         />
                         <label
                           htmlFor="review-images-input"
-                          className={`flex items-center justify-center gap-2 py-4 px-3 rounded-[1.5rem] cursor-pointer transition-colors ${reviewImages.length >= 3
+                          className={`flex items-center justify-center gap-2 py-4 px-3 rounded-[1.5rem] cursor-pointer ${reviewImages.length >= 3
                             ? "opacity-50 cursor-not-allowed"
                             : "hover:bg-surface-high"
                             }`}
@@ -648,7 +674,7 @@ export default function ProductDetail() {
                               <button
                                 type="button"
                                 onClick={() => removeImage(index)}
-                                className="absolute top-2 right-2 bg-white/90 text-gray-800 p-1 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="absolute top-2 right-2 bg-white/90 text-gray-800 p-1 rounded-full shadow-sm opacity-0 group-hover:opacity-100\"
                               >
                                 <X className="w-3 h-3" />
                               </button>
@@ -745,7 +771,7 @@ export default function ProductDetail() {
                                   <img
                                     src={img}
                                     alt=""
-                                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                                    className="w-full h-full object-cover grayscale\"
                                   />
                                 </div>
                               ))}
@@ -824,16 +850,16 @@ export default function ProductDetail() {
       {/* Lightbox */}
       {zoomedImage && (
         <div
-          className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-xl flex items-center justify-center p-8 animate-in fade-in duration-300"
+          className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-xl flex items-center justify-center p-8"
           onClick={() => setZoomedImage(null)}
         >
-          <button className="absolute top-10 right-10 text-white/50 hover:text-white transition-colors">
+          <button className="absolute top-10 right-10 text-white/50 hover:text-white">
             <X className="w-10 h-10 stroke-1" />
           </button>
           <img
             src={zoomedImage}
             alt="Zoomed"
-            className="max-w-full max-h-full shadow-2xl animate-in zoom-in-95 duration-500 shadow-white/5"
+            className="max-w-full max-h-full shadow-2xl shadow-white/5"
             onClick={(e) => e.stopPropagation()}
           />
         </div>

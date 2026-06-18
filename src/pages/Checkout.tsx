@@ -41,9 +41,6 @@ const checkoutSchema = z.object({
   contactPreference: z.enum(["phone", "whatsapp"], {
     message: "يرجى اختيار طريقة التواصل المفضلة",
   }),
-  termsAccepted: z.boolean().refine((val) => val === true, {
-    message: "يجب الموافقة على الشروط والأحكام",
-  }),
 });
 
 type CheckoutFormValues = z.infer<typeof checkoutSchema>;
@@ -101,7 +98,6 @@ export default function Checkout() {
       deliveryType: "desk",
       paymentMethod: "cod",
       contactPreference: "phone",
-      termsAccepted: false,
     },
   });
 
@@ -110,7 +106,6 @@ export default function Checkout() {
   const wilaya = WILAYAS.find((w) => w.code.toString() === wilayaCode);
   const wilayaName = wilaya ? (isAr ? wilaya.name_ar : wilaya.name_en) : "";
   const paymentMethod = watch("paymentMethod");
-  const termsAccepted = watch("termsAccepted");
 
   // ── تصفية البلديات حسب الولاية المختارة ──
   const filteredCommunes = useMemo(() => {
@@ -172,7 +167,6 @@ export default function Checkout() {
           contact_preference: data.contactPreference,
           status: "pending",
           admin_note: null,
-          terms_accepted: data.termsAccepted,
           delivery_type: data.deliveryType,
         } as any)
         .select()
@@ -515,42 +509,7 @@ export default function Checkout() {
                   </div>
                 </div>
 
-                {/* ── الشروط والأحكام ── */}
-                <div className="mt-12 bg-surface-low border border-surface-high p-8 flex items-start gap-6">
-                  <div className="flex items-center mt-1">
-                    <input
-                      id="termsAccepted"
-                      type="checkbox"
-                      {...register("termsAccepted")}
-                      className="w-6 h-6 border-surface-high text-primary focus:ring-primary accent-primary"
-                    />
-                  </div>
-                  <div className="flex flex-col">
-                    <label
-                      htmlFor="termsAccepted"
-                      className="text-xs font-bold uppercase tracking-widest text-gray-900 cursor-pointer mb-2"
-                    >
-                      أوافق على{" "}
-                      <Link
-                        to="/terms"
-                        target="_blank"
-                        className="underline decoration-2 underline-offset-4 hover:text-primary transition-colors"
-                      >
-                        الشروط والأحكام
-                      </Link>{" "}
-                      الخاصة بمتجر Sahla
-                    </label>
-                    <p className="text-xs text-gray-400 leading-relaxed uppercase tracking-wider font-medium">
-                      أؤكد أن معلومات التواصل صحيحة وأنني مستعد لاستقبال المنتج
-                      في غضون 2-5 أيام عمل.
-                    </p>
-                    {errors.termsAccepted && (
-                      <p className="text-red-500 text-[10px] font-bold uppercase tracking-widest mt-3 px-1">
-                        {errors.termsAccepted.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
+
               </form>
             </div>
 

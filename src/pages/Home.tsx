@@ -127,7 +127,7 @@ export default function Home() {
                   fetchPriority="high"
                   loading="eager"
                   decoding="sync"
-                  className="w-full h-auto object-cover shadow-2xl grayscale-[30%] hover:grayscale-0 transition-all duration-700"
+                  className="w-full h-auto object-cover"
                 />
               </div>
               <div className="absolute top-0 right-0 w-2/3 h-full bg-surface-low -z-0 translate-x-12 translate-y-12" />

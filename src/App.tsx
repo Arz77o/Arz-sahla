@@ -1,9 +1,11 @@
-import React, { lazy, Suspense } from "react";
+import React, { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuthInit } from "./hooks/useAuthInit";
 import { PageLoader } from "./components/shared/PageLoader";
+import { supabase } from "./lib/supabase";
 
 // Store Components
 import { Header } from "./components/store/Header";
@@ -82,6 +84,46 @@ function App() {
   // Bootstrap auth: reads existing session + listens for auth changes
   useAuthInit();
 
+  const queryClient = useQueryClient();
+
+  // Prefetch products & categories on app load to speed up /products page
+  useEffect(() => {
+    const prefetchData = async () => {
+      try {
+        // Prefetch categories
+        queryClient.prefetchQuery({
+          queryKey: ['categories'],
+          queryFn: async () => {
+            const { data } = await supabase
+              .from('categories')
+              .select('*')
+              .order('name_ar');
+            return data || [];
+          },
+          staleTime: 1000 * 60 * 10, // 10 minutes
+        });
+
+        // Prefetch products (no category filter = all products)
+        queryClient.prefetchQuery({
+          queryKey: ['products', undefined],
+          queryFn: async () => {
+            const { data } = await supabase
+              .from('products')
+              .select('*')
+              .eq('active', true)
+              .order('created_at', { ascending: false });
+            return data || [];
+          },
+          staleTime: 1000 * 60 * 5, // 5 minutes
+        });
+      } catch (err) {
+        console.warn('Prefetch failed:', err);
+      }
+    };
+
+    prefetchData();
+  }, [queryClient]);
+
   return (
     <HelmetProvider>
       <BrowserRouter>
@@ -137,7 +179,7 @@ function App() {
             <Route path="pricing-calculator" element={<PricingCalculator />} />
           </Route>
         </Routes>
-        <Toaster position="top-center" richColors />
+        <Toaster position="bottom-right" richColors />
       </BrowserRouter>
     </HelmetProvider>
   );
