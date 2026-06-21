@@ -327,12 +327,14 @@ export default function ProductDetail() {
     setReviewImages((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const currentImage = selectedImage || product.images?.[0] || "";
+
   return (
     <>
       <SEOMeta
         title={name}
         description={description?.substring(0, 155)}
-        image={selectedImage}
+        image={currentImage}
         ogType="product"
         schemas={[
           {
@@ -340,7 +342,7 @@ export default function ProductDetail() {
             "@type": "Product",
             name,
             description: description?.substring(0, 500),
-            image: selectedImage ? [selectedImage] : undefined,
+            image: currentImage ? [currentImage] : undefined,
             sku: product.id,
             offers: {
               "@type": "Offer",
@@ -376,10 +378,10 @@ export default function ProductDetail() {
               <div className="bg-white p-6 md:p-12 space-y-8 h-full">
                 <div
                   className="aspect-square bg-surface-low border border-surface-high overflow-hidden cursor-zoom-in"
-                  onClick={() => setZoomedImage(selectedImage)}
+                  onClick={() => setZoomedImage(currentImage)}
                 >
                   <img
-                    src={getOptimizedImageUrl(selectedImage || "", 800)}
+                    src={getOptimizedImageUrl(currentImage, 800)}
                     alt={name}
                     width={800}
                     height={800}
@@ -388,9 +390,9 @@ export default function ProductDetail() {
                     decoding="async"
                     sizes="(max-width: 768px) 100vw, 50vw"
                     srcSet={`
-                      ${getOptimizedImageUrl(selectedImage || "", 400)} 400w,
-                      ${getOptimizedImageUrl(selectedImage || "", 800)} 800w,
-                      ${getOptimizedImageUrl(selectedImage || "", 1200)} 1200w
+                      ${getOptimizedImageUrl(currentImage, 400)} 400w,
+                      ${getOptimizedImageUrl(currentImage, 800)} 800w,
+                      ${getOptimizedImageUrl(currentImage, 1200)} 1200w
                     `}
                     className="w-full h-full object-cover grayscale-10"
                   />
@@ -402,7 +404,7 @@ export default function ProductDetail() {
                         key={idx}
                         onClick={() => setSelectedImage(img)}
                         className={`w-24 h-24 border shrink-0 ${
-                          selectedImage === img
+                          currentImage === img
                             ? "border-primary ring-1 ring-primary"
                             : "border-surface-high"
                         }`}

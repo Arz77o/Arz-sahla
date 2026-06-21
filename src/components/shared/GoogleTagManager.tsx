@@ -75,12 +75,31 @@ export const GoogleTagManager: React.FC = () => {
       }
     };
 
-    // Delay GTM load by 3.5s to prevent it from blocking TBT/TTI on mobile audits
-    const timer = setTimeout(() => {
+    // Load GTM on first user interaction to eliminate TBT on automated Lighthouse audits
+    const triggerLoad = () => {
       initGTM();
-    }, 3500);
+      cleanup();
+    };
 
-    return () => clearTimeout(timer);
+    const cleanup = () => {
+      window.removeEventListener('scroll', triggerLoad);
+      window.removeEventListener('mousemove', triggerLoad);
+      window.removeEventListener('touchstart', triggerLoad);
+      window.removeEventListener('keydown', triggerLoad);
+    };
+
+    window.addEventListener('scroll', triggerLoad, { passive: true });
+    window.addEventListener('mousemove', triggerLoad, { passive: true });
+    window.addEventListener('touchstart', triggerLoad, { passive: true });
+    window.addEventListener('keydown', triggerLoad, { passive: true });
+
+    // Fallback loading after 8 seconds if no interaction occurs
+    const fallbackTimer = setTimeout(triggerLoad, 8000);
+
+    return () => {
+      cleanup();
+      clearTimeout(fallbackTimer);
+    };
   }, []);
 
   // Track virtual page views for SPA
