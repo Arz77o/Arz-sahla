@@ -26,6 +26,91 @@ import {
 } from "../hooks/useProducts";
 import { gtm } from "../lib/gtm";
 
+function ProductDetailSkeleton() {
+  return (
+    <div className="container mx-auto px-4 py-12 md:py-20 lg:py-32 animate-pulse">
+      {/* Main Product Info Card */}
+      <div className="bg-white border border-surface-high overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-surface-high">
+          {/* Gallery Column */}
+          <div className="bg-white p-6 md:p-12 space-y-8">
+            <div className="aspect-square bg-surface-low border border-surface-high" />
+            <div className="flex gap-4">
+              <div className="w-24 h-24 bg-surface-low border border-surface-high" />
+              <div className="w-24 h-24 bg-surface-low border border-surface-high" />
+              <div className="w-24 h-24 bg-surface-low border border-surface-high" />
+            </div>
+          </div>
+
+          {/* Content Column */}
+          <div className="bg-white p-6 md:p-12 flex flex-col justify-between">
+            <div className="space-y-8">
+              {/* Product Meta */}
+              <div className="flex items-center gap-6">
+                <div className="w-24 h-6 bg-surface-low" />
+                <div className="w-12 h-4 bg-surface-low ml-auto" />
+              </div>
+
+              {/* Title */}
+              <div className="space-y-3">
+                <div className="w-3/4 h-10 md:h-14 bg-surface-low" />
+                <div className="w-1/2 h-10 md:h-14 bg-surface-low" />
+              </div>
+
+              {/* Price */}
+              <div className="space-y-2">
+                <div className="w-32 h-4 bg-surface-low" />
+                <div className="w-48 h-12 bg-surface-low" />
+              </div>
+
+              {/* Progress bar scarcity indicator */}
+              <div className="space-y-2">
+                <div className="w-full h-2 bg-surface-low rounded-full" />
+                <div className="w-1/3 h-3 bg-surface-low" />
+              </div>
+
+              {/* Variants */}
+              <div className="space-y-4">
+                <div className="w-20 h-3 bg-surface-low" />
+                <div className="flex gap-2">
+                  <div className="w-24 h-10 bg-surface-low" />
+                  <div className="w-24 h-10 bg-surface-low" />
+                </div>
+              </div>
+            </div>
+
+            {/* Action button */}
+            <div className="mt-12 pt-12 border-t border-surface-high">
+              <div className="w-full h-20 bg-surface-low" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Details Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-12">
+        {/* Left Block */}
+        <div className="lg:col-span-8 space-y-12">
+          <div className="bg-white border border-surface-high p-8 md:p-14 space-y-6">
+            <div className="w-40 h-6 bg-surface-low" />
+            <div className="space-y-3">
+              <div className="w-full h-4 bg-surface-low" />
+              <div className="w-full h-4 bg-surface-low" />
+              <div className="w-5/6 h-4 bg-surface-low" />
+              <div className="w-2/3 h-4 bg-surface-low" />
+            </div>
+          </div>
+        </div>
+
+        {/* Right Block */}
+        <div className="lg:col-span-4">
+          <div className="bg-surface-low p-10 h-80" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -71,6 +156,7 @@ export default function ProductDetail() {
       navigate("/products");
     }
   }, [loading, product, navigate]);
+
   const name = product ? product.name_ar : "";
   const description = product ? product.description_ar : "";
   const problemSolved = product ? product.problem_solved_ar : "";
@@ -129,7 +215,9 @@ export default function ProductDetail() {
     }
   }, [product, name, priceDZD]);
 
-  if (!product) return null;
+  if (loading || !product) {
+    return <ProductDetailSkeleton />;
+  }
 
   const handleAddToCart = () => {
     const imageUrl = product.images?.[0] || "";

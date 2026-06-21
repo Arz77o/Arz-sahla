@@ -87,6 +87,7 @@ function App() {
   const queryClient = useQueryClient();
 
   // Prefetch products & categories on app load to speed up /products page
+  // Defer fetching until browser is idle to avoid bandwidth competition with critical initial page requests
   useEffect(() => {
     const prefetchData = async () => {
       try {
@@ -107,10 +108,10 @@ function App() {
         queryClient.prefetchQuery({
           queryKey: ["products", undefined],
           queryFn: async () => {
-            const { data } = await supabase
+            const { data } = await (supabase
               .from("products")
-              .select("*")
-              .eq("active", true)
+              .select("*") as any)
+              .eq("is_published", true)
               .order("created_at", { ascending: false });
             return data || [];
           },
@@ -121,7 +122,17 @@ function App() {
       }
     };
 
-    prefetchData();
+    // Use requestIdleCallback with a setTimeout fallback to defer execution until main thread is free
+    const idleCallback = (window as any).requestIdleCallback || ((cb: any) => setTimeout(cb, 4000));
+    const handle = idleCallback(() => prefetchData());
+
+    return () => {
+      if ((window as any).cancelIdleCallback) {
+        (window as any).cancelIdleCallback(handle);
+      } else {
+        clearTimeout(handle);
+      }
+    };
   }, [queryClient]);
 
   return (
