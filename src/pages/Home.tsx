@@ -12,6 +12,7 @@ import {
   Headphones,
   CarFront,
 } from "lucide-react";
+import * as LucideIcons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { SEOMeta } from "../components/shared/SEOMeta";
 import { ProductCard } from "../components/store/ProductCard";
@@ -37,6 +38,15 @@ const slugIconMap: Record<string, string> = {
   auto: "CarFront",
   automotive: "CarFront",
   accessories: "CarFront",
+  shirt: "Shirt",
+  shirts: "Shirt",
+  clothing: "Shirt",
+  clothes: "Shirt",
+  apparel: "Shirt",
+  fashion: "Shirt",
+  tshirt: "Shirt",
+  tShirt: "Shirt",
+  tee: "Shirt",
 };
 
 const toPascalCase = (value: string): string =>
@@ -45,21 +55,26 @@ const toPascalCase = (value: string): string =>
     .replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ""))
     .replace(/^(.)/, (c) => c.toUpperCase());
 
-const iconByName: Record<string, LucideIcon> = {
-  ShoppingBag,
-  Watch,
-  Smartphone,
-  Laptop,
-  Headphones,
-  CarFront,
+const lucideIconLookup = LucideIcons as unknown as Record<string, LucideIcon>;
+
+const resolveIconByName = (name?: string | null): LucideIcon | undefined => {
+  if (!name) return undefined;
+
+  const candidates = [
+    name,
+    toPascalCase(name),
+    name.toLowerCase(),
+    toPascalCase(name.toLowerCase()),
+  ];
+
+  return candidates.map((candidate) => lucideIconLookup[candidate]).find(Boolean);
 };
 
 const getCategoryIcon = (iconName?: string | null, slug?: string): LucideIcon => {
   const preferred = iconName?.trim() || (slug ? slugIconMap[slug.toLowerCase()] : undefined);
   if (!preferred) return ShoppingBag;
 
-  const normalized = toPascalCase(preferred);
-  return iconByName[normalized] || ShoppingBag;
+  return resolveIconByName(preferred) || ShoppingBag;
 };
 
 export default function Home() {
