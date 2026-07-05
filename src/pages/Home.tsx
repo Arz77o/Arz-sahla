@@ -67,11 +67,17 @@ const resolveIconByName = (name?: string | null): LucideIcon | undefined => {
     toPascalCase(name.toLowerCase()),
   ];
 
-  return candidates.map((candidate) => lucideIconLookup[candidate]).find(Boolean);
+  return candidates
+    .map((candidate) => lucideIconLookup[candidate])
+    .find(Boolean);
 };
 
-const getCategoryIcon = (iconName?: string | null, slug?: string): LucideIcon => {
-  const preferred = iconName?.trim() || (slug ? slugIconMap[slug.toLowerCase()] : undefined);
+const getCategoryIcon = (
+  iconName?: string | null,
+  slug?: string,
+): LucideIcon => {
+  const preferred =
+    iconName?.trim() || (slug ? slugIconMap[slug.toLowerCase()] : undefined);
   if (!preferred) return ShoppingBag;
 
   return resolveIconByName(preferred) || ShoppingBag;
@@ -106,7 +112,8 @@ export default function Home() {
               </Reveal>
               <Reveal delay={0.3}>
                 <p className="text-lg md:text-xl text-gray-500 mb-10 leading-relaxed max-w-xl ml-auto">
-                  نكتشف لك الحلول المبتكرة التي تحل مشاكلك اليومية وتوفر لك الراحة التي تستحقها، لتصلك أينما كنت بكل سهولة.
+                  نكتشف لك الحلول المبتكرة التي تحل مشاكلك اليومية وتوفر لك
+                  الراحة التي تستحقها، لتصلك أينما كنت بكل سهولة.
                 </p>
               </Reveal>
               <Reveal delay={0.4}>
@@ -206,7 +213,11 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
             {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} priority={featuredProducts.indexOf(product) < 2} />
+              <ProductCard
+                key={product.id}
+                product={product}
+                priority={featuredProducts.indexOf(product) < 2}
+              />
             ))}
           </div>
         </div>
@@ -238,8 +249,8 @@ export default function Home() {
                   توصيل Stop Desk
                 </h3>
                 <p className="text-sm text-gray-500 leading-relaxed">
-                  نشحن طلبك إلى أقرب مكتب Expedia Chrono في ولايتك للتوصيل السريع
-                  والمضمون في 48-72 ساعة.
+                  نشحن طلبك إلى أقرب مكتب Expedia Chrono في ولايتك للتوصيل
+                  السريع والمضمون في 48-72 ساعة.
                 </p>
               </div>
             </Reveal>
