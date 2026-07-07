@@ -43,27 +43,31 @@ serve(async (req) => {
       );
     }
 
+    const paymentLabel = order.payment_method === "cod" ? "الدفع عند الاستلام" : order.payment_method ?? "-";
+    const deliveryLabel = order.delivery_type === "home" ? "توصيل للبيت" : order.delivery_type === "desk" ? "استلام من المكتب" : order.delivery_type ?? "-";
+    const totalLabel = `${Number(order.total_dzd ?? 0).toLocaleString("ar-DZ")} د.ج`;
+
     const messageLines = [
-      "🛍️ طلب جديد",
+      "🛍️ طلب جديد", 
       "",
-      `رقم الطلب: #${order.id ?? "-"}`,
-      `العميل: ${order.full_name ?? "-"}`,
-      `الهاتف: ${order.phone ?? "-"}`,
-      `الولاية: ${order.wilaya ?? "-"}`,
-      `البلدية: ${order.commune ?? "-"}`,
-      `العنوان: ${order.address ?? "-"}`,
-      `طريقة الدفع: ${order.payment_method ?? "-"}`,
-      `نوع التوصيل: ${order.delivery_type ?? "-"}`,
-      `الإجمالي: ${Number(order.total_dzd ?? 0).toLocaleString("ar-DZ")} د.ج`,
+      `📦 رقم الطلب: #${order.id ?? "-"}`,
+      `👤 العميل: ${order.full_name ?? "-"}`,
+      `📱 الهاتف: ${order.phone ?? "-"}`,
+      `🏙️ الولاية: ${order.wilaya ?? "-"}`,
+      `🏘️ البلدية: ${order.commune ?? "-"}`,
+      `📍 العنوان: ${order.address ?? "-"}`,
+      `💳 طريقة الدفع: ${paymentLabel}`,
+      `🚚 نوع التوصيل: ${deliveryLabel}`,
+      `💰 الإجمالي: ${totalLabel}`,
     ];
 
     if (items.length > 0) {
-      messageLines.push("", "المنتجات:");
+      messageLines.push("", "🧾 تفاصيل المنتجات:");
       items.forEach((item: any, index: number) => {
         const label = item?.name ?? `المنتج ${index + 1}`;
         const quantity = item?.quantity ?? 1;
         const price = Number(item?.price_dzd ?? 0).toLocaleString("ar-DZ");
-        messageLines.push(`- ${label} × ${quantity} — ${price} د.ج`);
+        messageLines.push(`• ${label} × ${quantity} — ${price} د.ج`);
       });
     }
 
