@@ -217,8 +217,8 @@ export default function Checkout() {
 
       if (itemsError) throw itemsError;
 
-      const telegramFunctionUrl = import.meta.env.VITE_SUPABASE_URL
-        ? `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/telegram-order-notify`
+      const telegramFunctionUrl = (supabase as any).supabaseUrl
+        ? `${(supabase as any).supabaseUrl}/functions/v1/telegram-order-notify`
         : null;
 
       if (telegramFunctionUrl) {
