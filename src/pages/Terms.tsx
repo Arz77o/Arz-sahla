@@ -140,9 +140,9 @@ export default function Terms() {
                           Expedia Chrono
                         </span>{" "}
                         بخيارين للتوصيل:{" "}
-                        <span className="italic">توصيل إلى المكتب</span>{" "}
-                        أو <span className="italic">توصيل إلى المنزل</span>.
-                        يختار الزبون الطريقة المناسبة له عند إتمام الطلبية.
+                        <span className="italic">توصيل إلى المكتب</span> أو{" "}
+                        <span className="italic">توصيل إلى المنزل</span>. يختار
+                        الزبون الطريقة المناسبة له عند إتمام الطلبية.
                       </p>
                     </div>
                   </div>
@@ -171,7 +171,6 @@ export default function Terms() {
                   </h2>
                 </div>
                 <div className="space-y-10 text-gray-700">
-
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-l-2 border-gray-100 pl-8">
                     <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900">
                       الدفع عند الاستلام
@@ -271,7 +270,10 @@ export default function Terms() {
                           action: "استبدال أو استرجاع كامل",
                         },
                         { title: "منتج مختلف تماماً", action: "تصحيح فوري" },
-                        { title: "ضمان تشغيل", action: "صلاحية 5 أيام" },
+                        {
+                          title: "ضمان تشغيل",
+                          action: "صلاحية 3 أيام بعد الإستلام",
+                        },
                       ].map((item, i) => (
                         <div key={i} className="bg-white p-6">
                           <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-1">
@@ -292,7 +294,7 @@ export default function Terms() {
                     </h3>
                     <div className="space-y-4">
                       {[
-                        "تجاوز فترة 5 أيام",
+                        "تجاوز فترة 3 أيام بعد الإستلام",
                         "فتح العلبة الأصلية أو إتلافها",
                         "تغيير الرأي الشخصي",
                         "كسر ناتج عن سوء الاستخدام",
