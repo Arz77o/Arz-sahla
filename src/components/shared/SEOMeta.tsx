@@ -1,12 +1,15 @@
-import React from 'react';
-import { Helmet } from 'react-helmet-async';
+import React from "react";
+import { Helmet } from "react-helmet-async";
 
-const SITE_NAME = 'Sahla DZ';
-const SITE_URL = (import.meta.env.VITE_SITE_URL || 'https://sahladz.store').replace(/\/$/, '');
+const SITE_NAME = "Sahla DZ";
+const SITE_URL = (
+  import.meta.env.VITE_SITE_URL || "https://sahladz.store"
+).replace(/\/$/, "");
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 const DEFAULT_DESCRIPTION =
-  'متجركم الأول للإلكترونيات والإكسسوارات في الجزائر — أسعار تنافسية، جودة عالية، وتوصيل سريع ل30 ولاية جزائرية.';
-const DEFAULT_KEYWORDS = 'تسوق, الجزائر, إلكترونيات, إكسسوارات, متجر إلكتروني, Sahla DZ, sahladz, sahla dz';
+  "متجركم الأول للإلكترونيات والإكسسوارات في الجزائر — أسعار تنافسية، جودة عالية، وتوصيل سريع ل30 ولاية جزائرية.";
+const DEFAULT_KEYWORDS =
+  "تسوق, الجزائر, إلكترونيات, إكسسوارات, متجر إلكتروني, Sahla DZ, sahladz, sahla dz";
 
 interface SEOMetaProps {
   /** Page title — will be appended with " | Sahla DZ" */
@@ -17,7 +20,7 @@ interface SEOMetaProps {
   /** Canonical URL for this page */
   url?: string;
   /** Set to "article" for product/blog pages */
-  ogType?: 'website' | 'article' | 'product';
+  ogType?: "website" | "article" | "product";
   /** Extra JSON-LD schemas (e.g. Product, BreadcrumbList) */
   schemas?: object[];
 }
@@ -27,48 +30,55 @@ export const SEOMeta: React.FC<SEOMetaProps> = ({
   description = DEFAULT_DESCRIPTION,
   image = DEFAULT_OG_IMAGE,
   url,
-  ogType = 'website',
+  ogType = "website",
   schemas = [],
 }) => {
   // Build full page title
-  const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} — تسوق بسهولة في الجزائر`;
+  const fullTitle = title
+    ? `${title} | ${SITE_NAME}`
+    : `${SITE_NAME} — تسوق بسهولة في الجزائر`;
 
-  const currentPath = typeof window !== 'undefined'
-    ? `${window.location.pathname}${window.location.search}${window.location.hash}`
-    : '/';
-  const canonicalUrl = url || `${SITE_URL}${currentPath.startsWith('/') ? currentPath : `/${currentPath}`}`;
+  const currentPath =
+    typeof window !== "undefined"
+      ? `${window.location.pathname}${window.location.search}${window.location.hash}`
+      : "/";
+  const canonicalUrl =
+    url ||
+    `${SITE_URL}${currentPath.startsWith("/") ? currentPath : `/${currentPath}`}`;
 
   // Ensure image is absolute
-  const absoluteImage = image.startsWith('http') ? image : `${SITE_URL}${image}`;
+  const absoluteImage = image.startsWith("http")
+    ? image
+    : `${SITE_URL}${image}`;
 
   // Organization JSON-LD (always present)
   const organizationSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
+    "@context": "https://schema.org",
+    "@type": "Organization",
     name: SITE_NAME,
     url: SITE_URL,
     logo: `${SITE_URL}/favicon.png`,
     sameAs: [],
     contactPoint: {
-      '@type': 'ContactPoint',
-      contactType: 'customer service',
-      availableLanguage: ['Arabic', 'French'],
+      "@type": "ContactPoint",
+      contactType: "customer service",
+      availableLanguage: ["Arabic", "French"],
     },
   };
 
   // WebSite JSON-LD with SearchAction (enables Google Sitelinks Search Box)
   const websiteSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
+    "@context": "https://schema.org",
+    "@type": "WebSite",
     name: SITE_NAME,
     url: SITE_URL,
     potentialAction: {
-      '@type': 'SearchAction',
+      "@type": "SearchAction",
       target: {
-        '@type': 'EntryPoint',
+        "@type": "EntryPoint",
         urlTemplate: `${SITE_URL}/products?q={search_term_string}`,
       },
-      'query-input': 'required name=search_term_string',
+      "query-input": "required name=search_term_string",
     },
   };
 
