@@ -43,12 +43,20 @@ serve(async (req) => {
       );
     }
 
-    const paymentLabel = order.payment_method === "cod" ? "الدفع عند الاستلام" : order.payment_method ?? "-";
-    const deliveryLabel = order.delivery_type === "home" ? "توصيل للبيت" : order.delivery_type === "desk" ? "استلام من المكتب" : order.delivery_type ?? "-";
+    const paymentLabel =
+      order.payment_method === "cod"
+        ? "الدفع عند الاستلام"
+        : (order.payment_method ?? "-");
+    const deliveryLabel =
+      order.delivery_type === "home"
+        ? "توصيل للبيت"
+        : order.delivery_type === "desk"
+          ? "استلام من المكتب"
+          : (order.delivery_type ?? "-");
     const totalLabel = `${Number(order.total_dzd ?? 0).toLocaleString("ar-DZ")} د.ج`;
 
     const messageLines = [
-      "🛍️ طلب جديد", 
+      "🛍️ طلب جديد",
       "",
       `📦 رقم الطلب: #${order.id ?? "-"}`,
       `👤 العميل: ${order.full_name ?? "-"}`,
