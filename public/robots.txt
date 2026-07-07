@@ -1,4 +1,4 @@
-# robots.txt for Sahla DZ (https://arz-sahla.pages.dev)
+# robots.txt for Sahla DZ (https://sahladz.store)
 # Generated: 2026-03-24
 
 # ── Allow all crawlers ──────────────────────────────────────────────────────
@@ -14,4 +14,4 @@ Disallow: /login
 Disallow: /register
 
 # ── Sitemap location ─────────────────────────────────────────────────────────
-Sitemap: https://arz-sahla.pages.dev/sitemap.xml
+Sitemap: https://sahladz.store/sitemap.xml

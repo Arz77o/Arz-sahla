@@ -6,14 +6,14 @@
 
   <!-- ── Core / High-priority pages ── -->
   <url>
-    <loc>https://arz-sahla.pages.dev/</loc>
+    <loc>https://sahladz.store/</loc>
     <lastmod>2026-03-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://arz-sahla.pages.dev/products</loc>
+    <loc>https://sahladz.store/products</loc>
     <lastmod>2026-03-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
@@ -21,21 +21,21 @@
 
   <!-- ── Support / Informational pages ── -->
   <url>
-    <loc>https://arz-sahla.pages.dev/faq</loc>
+    <loc>https://sahladz.store/faq</loc>
     <lastmod>2026-03-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://arz-sahla.pages.dev/terms</loc>
+    <loc>https://sahladz.store/terms</loc>
     <lastmod>2026-03-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://arz-sahla.pages.dev/order/track</loc>
+    <loc>https://sahladz.store/order/track</loc>
     <lastmod>2026-03-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

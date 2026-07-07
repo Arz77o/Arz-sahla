@@ -2,7 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
 const SITE_NAME = 'Sahla DZ';
-const SITE_URL = 'https://sahladz.store';
+const SITE_URL = (import.meta.env.VITE_SITE_URL || 'https://sahladz.store').replace(/\/$/, '');
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 const DEFAULT_DESCRIPTION =
   'متجركم الأول للإلكترونيات والإكسسوارات في الجزائر — أسعار تنافسية، جودة عالية، وتوصيل سريع ل30 ولاية جزائرية.';
@@ -26,12 +26,17 @@ export const SEOMeta: React.FC<SEOMetaProps> = ({
   title,
   description = DEFAULT_DESCRIPTION,
   image = DEFAULT_OG_IMAGE,
-  url = typeof window !== 'undefined' ? window.location.href : SITE_URL,
+  url,
   ogType = 'website',
   schemas = [],
 }) => {
   // Build full page title
   const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} — تسوق بسهولة في الجزائر`;
+
+  const currentPath = typeof window !== 'undefined'
+    ? `${window.location.pathname}${window.location.search}${window.location.hash}`
+    : '/';
+  const canonicalUrl = url || `${SITE_URL}${currentPath.startsWith('/') ? currentPath : `/${currentPath}`}`;
 
   // Ensure image is absolute
   const absoluteImage = image.startsWith('http') ? image : `${SITE_URL}${image}`;
@@ -78,7 +83,7 @@ export const SEOMeta: React.FC<SEOMetaProps> = ({
       <meta name="robots" content="index, follow" />
       <meta name="keywords" content={DEFAULT_KEYWORDS} />
       <meta name="author" content="ARz Studio" />
-      <link rel="canonical" href={url} />
+      <link rel="canonical" href={canonicalUrl} />
 
       {/* ── Open Graph ── */}
       <meta property="og:type" content={ogType} />
@@ -88,7 +93,7 @@ export const SEOMeta: React.FC<SEOMetaProps> = ({
       <meta property="og:image" content={absoluteImage} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
-      <meta property="og:url" content={url} />
+      <meta property="og:url" content={canonicalUrl} />
       <meta property="og:locale" content="ar_DZ" />
 
       {/* ── Twitter Cards ── */}

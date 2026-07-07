@@ -1,1 +1,7 @@
-/*    /index.html   200
+# SPA fallback for client-side routes
+/* /index.html 200
+
+# Canonical domain redirects
+https://www.sahladz.store/* https://sahladz.store/:splat 301!
+https://www.arz-sahla.pages.dev/* https://sahladz.store/:splat 301!
+https://arz-sahla.pages.dev/* https://sahladz.store/:splat 301!
