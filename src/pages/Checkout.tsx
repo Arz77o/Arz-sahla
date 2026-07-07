@@ -217,6 +217,36 @@ export default function Checkout() {
 
       if (itemsError) throw itemsError;
 
+      const telegramFunctionUrl = import.meta.env.VITE_SUPABASE_URL
+        ? `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/telegram-order-notify`
+        : null;
+
+      if (telegramFunctionUrl) {
+        try {
+          await fetch(telegramFunctionUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || ""}`,
+            },
+            body: JSON.stringify({
+              order: {
+                ...order,
+                payment_method: data.paymentMethod,
+                delivery_type: data.deliveryType,
+              },
+              items: items.map((item) => ({
+                name: isAr ? item.name_ar : item.name_en,
+                quantity: item.quantity,
+                price_dzd: item.price_dzd,
+              })),
+            }),
+          });
+        } catch (telegramError) {
+          console.error("Telegram notification failed", telegramError);
+        }
+      }
+
       gtm.ecommerce("begin_checkout", {
         currency: "DZD",
         value: finalTotal,
