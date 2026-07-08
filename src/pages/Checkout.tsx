@@ -29,6 +29,8 @@ import { COMMUNES } from "../lib/communes";
 import { formatDZD } from "../lib/pricing";
 import { Button } from "../components/ui/button";
 import { gtm } from "../lib/gtm";
+import { metaPixel } from "../lib/metaPixel";
+import { sendServerEvent } from "../lib/metaCapi";
 
 // ─── Schema ──────────────────────────────────────────────────────────────────
 const checkoutSchema = z.object({
@@ -81,6 +83,7 @@ export default function Checkout() {
     fetchData();
   }, []);
 
+  const initiatedRef = React.useRef(false);
   React.useEffect(() => {
     if (items.length > 0) {
       gtm.ecommerce("begin_checkout", {
@@ -93,8 +96,30 @@ export default function Checkout() {
           quantity: i.quantity,
         })),
       });
+
+      if (!initiatedRef.current) {
+        initiatedRef.current = true;
+        const value = getTotal();
+        const metaEventId = metaPixel.initiateCheckout({
+          content_ids: items.map((i) => i.product_id),
+          value: value,
+          currency: "DZD",
+          num_items: getItemCount(),
+        });
+        if (metaEventId) {
+          sendServerEvent("InitiateCheckout", metaEventId, {
+            content_ids: items.map((i) => i.product_id),
+            value: value,
+            currency: "DZD",
+            num_items: getItemCount(),
+          }, {
+            fullName: user?.user_metadata?.full_name || undefined,
+            phone: user?.user_metadata?.phone || undefined,
+          });
+        }
+      }
     }
-  }, [items, isAr, getTotal]);
+  }, [items, isAr, getTotal, getItemCount, user]);
 
   const {
     register,

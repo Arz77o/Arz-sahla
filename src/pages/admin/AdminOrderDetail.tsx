@@ -14,6 +14,8 @@ import { supabaseAdmin } from "../../lib/supabase";
 import { formatDZD } from "../../lib/pricing";
 import { Button } from "../../components/ui/button";
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader";
+import { metaPixel } from "../../lib/metaPixel";
+import { sendServerEvent } from "../../lib/metaCapi";
 
 export default function AdminOrderDetail() {
   const { id } = useParams<{ id: string }>();
@@ -90,6 +92,31 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk
         .eq("id", id);
 
       if (error) throw error;
+
+      const isConfirmingOrder = status === "confirmed" && order?.status !== "confirmed";
+      if (isConfirmingOrder) {
+        const orderItems = order?.order_items || [];
+        const metaEventId = metaPixel.purchase({
+          content_ids: orderItems.map((item: any) => item.product_id) || [],
+          content_type: "product",
+          value: Number(order?.total_dzd || 0),
+          currency: "DZD",
+          num_items: orderItems.reduce((acc: number, item: any) => acc + (item.quantity || 1), 0) || 1,
+        });
+
+        if (metaEventId) {
+          sendServerEvent("Purchase", metaEventId, {
+            content_ids: orderItems.map((item: any) => item.product_id) || [],
+            content_type: "product",
+            value: Number(order?.total_dzd || 0),
+            currency: "DZD",
+            num_items: orderItems.reduce((acc: number, item: any) => acc + (item.quantity || 1), 0) || 1,
+          }, {
+            fullName: order?.full_name || undefined,
+            phone: order?.phone || undefined,
+          });
+        }
+      }
 
       toast.success("تم حفظ التغييرات بنجاح");
       setOrder({ ...order, ...updates });

@@ -7,6 +7,8 @@ import { supabase } from "../lib/supabase";
 import { formatDZD } from "../lib/pricing";
 import { Button } from "../components/ui/button";
 import { gtm } from "../lib/gtm";
+import { metaPixel } from "../lib/metaPixel";
+import { sendServerEvent } from "../lib/metaCapi";
 import { useAuthStore } from "../store/authStore";
 import { UserPlus, Sparkles } from "lucide-react";
 
@@ -37,8 +39,8 @@ export default function OrderSuccess() {
         if (data) {
           setOrder(data);
 
-          // Track Purchase for GA4
-          const shouldTrack = data.payment_method === 'cod';
+          // Track purchase for GA4
+          const shouldTrack = Boolean(data);
 
           if (shouldTrack && lastTrackedOrderId.current !== orderId) {
             gtm.ecommerce('purchase', {
@@ -52,6 +54,30 @@ export default function OrderSuccess() {
                 price: item.unit_price_dzd || 0,
               })) || [],
             });
+
+            // Track a Lead for the order-completion step (customer has submitted the order, but not yet confirmed as purchased)
+            const metaEventId = metaPixel.lead({
+              content_ids: (data as any).order_items?.map((item: any) => item.product_id) || [],
+              content_type: 'product',
+              value: data.total_dzd,
+              currency: 'DZD',
+              num_items: (data as any).order_items?.reduce((acc: number, item: any) => acc + (item.quantity || 1), 0) || 1,
+            });
+
+            // Forward to Conversions API
+            if (metaEventId) {
+              sendServerEvent('Lead', metaEventId, {
+                content_ids: (data as any).order_items?.map((item: any) => item.product_id) || [],
+                content_type: 'product',
+                value: data.total_dzd,
+                currency: 'DZD',
+                num_items: (data as any).order_items?.reduce((acc: number, item: any) => acc + (item.quantity || 1), 0) || 1,
+              }, {
+                fullName: data.full_name || undefined,
+                phone: data.phone || undefined,
+              });
+            }
+
             lastTrackedOrderId.current = orderId;
           }
         }

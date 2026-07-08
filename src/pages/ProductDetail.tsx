@@ -25,6 +25,8 @@ import {
   useDeleteReview,
 } from "../hooks/useProducts";
 import { gtm } from "../lib/gtm";
+import { metaPixel } from "../lib/metaPixel";
+import { sendServerEvent } from "../lib/metaCapi";
 
 function ProductDetailSkeleton() {
   return (
@@ -211,6 +213,27 @@ export default function ProductDetail() {
           },
         ],
       });
+
+      // Track ViewContent for Meta Pixel
+      const metaEventId = metaPixel.viewContent({
+        content_ids: [product.id],
+        content_name: name,
+        content_type: "product",
+        value: priceDZD,
+        currency: "DZD",
+      });
+
+      // Forward to Conversions API
+      if (metaEventId) {
+        sendServerEvent("ViewContent", metaEventId, {
+          content_ids: [product.id],
+          content_name: name,
+          content_type: "product",
+          value: priceDZD,
+          currency: "DZD",
+        });
+      }
+
       lastTrackedProductId.current = product.id;
     }
   }, [product, name, priceDZD]);
@@ -250,6 +273,26 @@ export default function ProductDetail() {
         },
       ],
     });
+
+    // Track AddToCart for Meta Pixel
+    const metaEventId = metaPixel.addToCart({
+      content_ids: [product.id],
+      content_name: name,
+      content_type: "product",
+      value: priceDZD * quantity,
+      currency: "DZD",
+    });
+
+    // Forward to Conversions API
+    if (metaEventId) {
+      sendServerEvent("AddToCart", metaEventId, {
+        content_ids: [product.id],
+        content_name: name,
+        content_type: "product",
+        value: priceDZD * quantity,
+        currency: "DZD",
+      });
+    }
   };
 
   const handleCreateReview = () => {

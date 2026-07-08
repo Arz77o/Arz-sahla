@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { toast } from 'sonner';
 import { gtm } from '../lib/gtm';
+import { metaPixel } from '../lib/metaPixel';
+import { sendServerEvent } from '../lib/metaCapi';
 
 export interface CartItem {
   product_id: string;
@@ -67,6 +69,26 @@ export const useCartStore = create<CartState>()(
               quantity: item.quantity
             }]
           });
+
+          // Track AddToCart for Meta Pixel
+          const metaEventId = metaPixel.addToCart({
+            content_ids: [item.product_id],
+            content_name: item.name_en,
+            content_type: 'product',
+            value: item.price_dzd * item.quantity,
+            currency: 'DZD',
+          });
+
+          // Forward to Conversions API
+          if (metaEventId) {
+            sendServerEvent('AddToCart', metaEventId, {
+              content_ids: [item.product_id],
+              content_name: item.name_en,
+              content_type: 'product',
+              value: item.price_dzd * item.quantity,
+              currency: 'DZD',
+            });
+          }
         }
       },
       updateQuantity: (product_id, quantity) => {
