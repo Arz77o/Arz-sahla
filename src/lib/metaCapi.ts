@@ -12,14 +12,14 @@
  * so Meta can deduplicate between Pixel and CAPI.
  */
 
-import { supabase } from './supabase';
+import { supabase } from "./supabase";
 
 /**
  * Read the _fbp (Facebook Browser ID) cookie.
  * Meta uses this to match browser sessions to ad clicks.
  */
 function getFbp(): string | null {
-  if (typeof document === 'undefined') return null;
+  if (typeof document === "undefined") return null;
   const match = document.cookie.match(/(?:^|;\s*)_fbp=([^;]*)/);
   return match ? decodeURIComponent(match[1]) : null;
 }
@@ -29,7 +29,7 @@ function getFbp(): string | null {
  * Set when a user arrives via a Facebook ad click (?fbclid=...).
  */
 function getFbc(): string | null {
-  if (typeof document === 'undefined') return null;
+  if (typeof document === "undefined") return null;
   const match = document.cookie.match(/(?:^|;\s*)_fbc=([^;]*)/);
   return match ? decodeURIComponent(match[1]) : null;
 }
@@ -43,8 +43,8 @@ interface CAPIEventPayload {
     client_user_agent: string;
     fbp?: string | null;
     fbc?: string | null;
-    ph?: string | null;    // Hashed phone (SHA-256 done server-side)
-    fn?: string | null;    // Hashed first name (SHA-256 done server-side)
+    ph?: string | null; // Hashed phone (SHA-256 done server-side)
+    fn?: string | null; // Hashed first name (SHA-256 done server-side)
   };
   custom_data?: Record<string, any>;
 }
@@ -64,13 +64,13 @@ export async function sendServerEvent(
   eventName: string,
   eventId: string,
   customData?: Record<string, any>,
-  userData?: { phone?: string; fullName?: string }
+  userData?: { phone?: string; fullName?: string },
 ): Promise<void> {
   try {
     // Build the Supabase Edge Function URL
     const supabaseUrl = (supabase as any).supabaseUrl;
     if (!supabaseUrl) {
-      console.warn('[Meta CAPI] Supabase URL not available');
+      console.warn("[Meta CAPI] Supabase URL not available");
       return;
     }
 
@@ -78,9 +78,13 @@ export async function sendServerEvent(
 
     const normalizedCustomData = customData ? { ...customData } : undefined;
 
-    if (normalizedCustomData?.value !== undefined && normalizedCustomData?.value !== null) {
+    if (
+      normalizedCustomData?.value !== undefined &&
+      normalizedCustomData?.value !== null
+    ) {
       const numericValue = Number(normalizedCustomData.value);
-      normalizedCustomData.value = Number.isFinite(numericValue) && numericValue > 0 ? numericValue : 0;
+      normalizedCustomData.value =
+        Number.isFinite(numericValue) && numericValue > 0 ? numericValue : 0;
     }
 
     const payload: CAPIEventPayload = {
@@ -99,24 +103,28 @@ export async function sendServerEvent(
 
     // Fire-and-forget: we don't await or block UI
     fetch(functionUrl, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || ''}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || ""}`,
       },
       body: JSON.stringify(payload),
     })
       .then((res) => {
         if (!res.ok) {
-          console.warn(`[Meta CAPI] ⚠️ ${eventName} failed with status ${res.status}`);
+          console.warn(
+            `[Meta CAPI] ⚠️ ${eventName} failed with status ${res.status}`,
+          );
         } else {
-          console.log(`[Meta CAPI] ✅ ${eventName} sent (event_id: ${eventId})`);
+          console.log(
+            `[Meta CAPI] ✅ ${eventName} sent (event_id: ${eventId})`,
+          );
         }
       })
       .catch((err) => {
         console.warn(`[Meta CAPI] ⚠️ ${eventName} network error:`, err);
       });
   } catch (err) {
-    console.warn('[Meta CAPI] Unexpected error:', err);
+    console.warn("[Meta CAPI] Unexpected error:", err);
   }
 }
