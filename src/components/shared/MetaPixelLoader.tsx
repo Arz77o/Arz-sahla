@@ -96,12 +96,20 @@ export const MetaPixelLoader: React.FC = () => {
     // Don't fire until Pixel is loaded, and avoid duplicate tracking
     if (!pixelId || lastTrackedPath.current === currentPath) return;
 
-    const eventId = metaPixel.pageView();
+    const eventId = metaPixel.pageView({
+      content_type: 'page',
+      value: 0,
+      currency: 'DZD',
+    });
     lastTrackedPath.current = currentPath;
 
     // Also send server-side for reliability
     if (eventId) {
-      sendServerEvent('PageView', eventId);
+      sendServerEvent('PageView', eventId, {
+        content_type: 'page',
+        value: 0,
+        currency: 'DZD',
+      });
     }
   }, [location.pathname, location.search, pixelId]);
 

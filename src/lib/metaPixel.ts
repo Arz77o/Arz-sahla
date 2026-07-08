@@ -40,6 +40,35 @@ function isPixelReady(): boolean {
   return typeof window !== "undefined" && typeof window.fbq === "function";
 }
 
+type PendingMetaEvent = {
+  eventName: string;
+  data: Record<string, any>;
+  eventId: string;
+};
+
+const pendingMetaEvents: PendingMetaEvent[] = [];
+
+function queueMetaEvent(eventName: string, data: Record<string, any>, eventId: string) {
+  pendingMetaEvents.push({ eventName, data, eventId });
+}
+
+function flushPendingMetaEvents() {
+  if (!isPixelReady()) return;
+
+  while (pendingMetaEvents.length > 0) {
+    const pendingEvent = pendingMetaEvents.shift();
+    if (!pendingEvent) break;
+
+    window.fbq("track", pendingEvent.eventName, pendingEvent.data, {
+      eventID: pendingEvent.eventId,
+    });
+    console.log(`[Meta Pixel] ⏳ Flushed ${pendingEvent.eventName}`, {
+      ...pendingEvent.data,
+      eventId: pendingEvent.eventId,
+    });
+  }
+}
+
 export const metaPixel = {
   /**
    * Initialize the Meta Pixel with the given ID.
@@ -67,19 +96,25 @@ export const metaPixel = {
 
     // Initialize with the pixel ID
     window.fbq("init", pixelId);
+    flushPendingMetaEvents();
     console.log(`[Meta Pixel] ✅ Initialized with ID: ${pixelId}`);
   },
 
   /**
    * Track PageView — fired on every route change.
+   * Accepts optional custom data such as value/currency for advanced setups.
    * Returns the event_id for server-side deduplication.
    */
-  pageView: (): string | null => {
+  pageView: (data: Record<string, any> = {}): string | null => {
     const eventId = generateEventId();
-    if (!isPixelReady()) return null;
+    if (!isPixelReady()) {
+      queueMetaEvent("PageView", data, eventId);
+      console.log("[Meta Pixel] ⏳ Queued PageView", { ...data, eventId });
+      return eventId;
+    }
 
-    window.fbq("track", "PageView", {}, { eventID: eventId });
-    console.log("[Meta Pixel] 📄 PageView", { eventId });
+    window.fbq("track", "PageView", data, { eventID: eventId });
+    console.log("[Meta Pixel] 📄 PageView", { ...data, eventId });
     return eventId;
   },
 
@@ -95,7 +130,11 @@ export const metaPixel = {
     currency: string;
   }): string | null => {
     const eventId = generateEventId();
-    if (!isPixelReady()) return null;
+    if (!isPixelReady()) {
+      queueMetaEvent("ViewContent", data, eventId);
+      console.log("[Meta Pixel] ⏳ Queued ViewContent", { ...data, eventId });
+      return eventId;
+    }
 
     window.fbq("track", "ViewContent", data, { eventID: eventId });
     console.log("[Meta Pixel] 👁️ ViewContent", { ...data, eventId });
@@ -113,7 +152,11 @@ export const metaPixel = {
     currency: string;
   }): string | null => {
     const eventId = generateEventId();
-    if (!isPixelReady()) return null;
+    if (!isPixelReady()) {
+      queueMetaEvent("AddToCart", data, eventId);
+      console.log("[Meta Pixel] ⏳ Queued AddToCart", { ...data, eventId });
+      return eventId;
+    }
 
     window.fbq("track", "AddToCart", data, { eventID: eventId });
     console.log("[Meta Pixel] 🛒 AddToCart", { ...data, eventId });
@@ -130,7 +173,11 @@ export const metaPixel = {
     num_items: number;
   }): string | null => {
     const eventId = generateEventId();
-    if (!isPixelReady()) return null;
+    if (!isPixelReady()) {
+      queueMetaEvent("InitiateCheckout", data, eventId);
+      console.log("[Meta Pixel] ⏳ Queued InitiateCheckout", { ...data, eventId });
+      return eventId;
+    }
 
     window.fbq("track", "InitiateCheckout", data, { eventID: eventId });
     console.log("[Meta Pixel] 🛍️ InitiateCheckout", { ...data, eventId });
@@ -149,7 +196,11 @@ export const metaPixel = {
     num_items: number;
   }): string | null => {
     const eventId = generateEventId();
-    if (!isPixelReady()) return null;
+    if (!isPixelReady()) {
+      queueMetaEvent("Lead", data, eventId);
+      console.log("[Meta Pixel] ⏳ Queued Lead", { ...data, eventId });
+      return eventId;
+    }
 
     window.fbq("track", "Lead", data, { eventID: eventId });
     console.log("[Meta Pixel] 📞 Lead", { ...data, eventId });
@@ -168,7 +219,11 @@ export const metaPixel = {
     num_items: number;
   }): string | null => {
     const eventId = generateEventId();
-    if (!isPixelReady()) return null;
+    if (!isPixelReady()) {
+      queueMetaEvent("Purchase", data, eventId);
+      console.log("[Meta Pixel] ⏳ Queued Purchase", { ...data, eventId });
+      return eventId;
+    }
 
     window.fbq("track", "Purchase", data, { eventID: eventId });
     console.log("[Meta Pixel] 💰 Purchase", { ...data, eventId });
