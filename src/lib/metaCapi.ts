@@ -76,6 +76,13 @@ export async function sendServerEvent(
 
     const functionUrl = `${supabaseUrl}/functions/v1/meta-capi-event`;
 
+    const normalizedCustomData = customData ? { ...customData } : undefined;
+
+    if (normalizedCustomData?.value !== undefined && normalizedCustomData?.value !== null) {
+      const numericValue = Number(normalizedCustomData.value);
+      normalizedCustomData.value = Number.isFinite(numericValue) && numericValue > 0 ? numericValue : 0;
+    }
+
     const payload: CAPIEventPayload = {
       event_name: eventName,
       event_id: eventId,
@@ -87,7 +94,7 @@ export async function sendServerEvent(
         ph: userData?.phone || null,
         fn: userData?.fullName || null,
       },
-      custom_data: customData,
+      custom_data: normalizedCustomData,
     };
 
     // Fire-and-forget: we don't await or block UI
