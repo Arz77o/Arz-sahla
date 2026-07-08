@@ -48,7 +48,11 @@ type PendingMetaEvent = {
 
 const pendingMetaEvents: PendingMetaEvent[] = [];
 
-function queueMetaEvent(eventName: string, data: Record<string, any>, eventId: string) {
+function queueMetaEvent(
+  eventName: string,
+  data: Record<string, any>,
+  eventId: string,
+) {
   pendingMetaEvents.push({ eventName, data, eventId });
 }
 
@@ -175,7 +179,10 @@ export const metaPixel = {
     const eventId = generateEventId();
     if (!isPixelReady()) {
       queueMetaEvent("InitiateCheckout", data, eventId);
-      console.log("[Meta Pixel] ⏳ Queued InitiateCheckout", { ...data, eventId });
+      console.log("[Meta Pixel] ⏳ Queued InitiateCheckout", {
+        ...data,
+        eventId,
+      });
       return eventId;
     }
 
