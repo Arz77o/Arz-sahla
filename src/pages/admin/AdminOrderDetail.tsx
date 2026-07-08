@@ -68,8 +68,7 @@ export default function AdminOrderDetail() {
 الهاتف: ${order.phone}
 طريقة التواصل: ${order.contact_preference === "whatsapp" ? "واتساب" : order.contact_preference === "email" ? "إيميل" : "إتصال هاتف"}
 العنوان: ${order.address}، ${order.commune}، ${order.wilaya}
-${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk
-        }` : ""}`;
+${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk}` : ""}`;
 
     navigator.clipboard
       .writeText(addressText)
@@ -93,7 +92,8 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk
 
       if (error) throw error;
 
-      const isConfirmingOrder = status === "confirmed" && order?.status !== "confirmed";
+      const isConfirmingOrder =
+        status === "confirmed" && order?.status !== "confirmed";
       if (isConfirmingOrder) {
         const orderItems = order?.order_items || [];
         const metaEventId = metaPixel.purchase({
@@ -101,20 +101,33 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk
           content_type: "product",
           value: Number(order?.total_dzd || 0),
           currency: "DZD",
-          num_items: orderItems.reduce((acc: number, item: any) => acc + (item.quantity || 1), 0) || 1,
+          num_items:
+            orderItems.reduce(
+              (acc: number, item: any) => acc + (item.quantity || 1),
+              0,
+            ) || 1,
         });
 
         if (metaEventId) {
-          sendServerEvent("Purchase", metaEventId, {
-            content_ids: orderItems.map((item: any) => item.product_id) || [],
-            content_type: "product",
-            value: Number(order?.total_dzd || 0),
-            currency: "DZD",
-            num_items: orderItems.reduce((acc: number, item: any) => acc + (item.quantity || 1), 0) || 1,
-          }, {
-            fullName: order?.full_name || undefined,
-            phone: order?.phone || undefined,
-          });
+          sendServerEvent(
+            "Purchase",
+            metaEventId,
+            {
+              content_ids: orderItems.map((item: any) => item.product_id) || [],
+              content_type: "product",
+              value: Number(order?.total_dzd || 0),
+              currency: "DZD",
+              num_items:
+                orderItems.reduce(
+                  (acc: number, item: any) => acc + (item.quantity || 1),
+                  0,
+                ) || 1,
+            },
+            {
+              fullName: order?.full_name || undefined,
+              phone: order?.phone || undefined,
+            },
+          );
         }
       }
 
@@ -204,19 +217,20 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk
         actions={
           <div className="flex items-center gap-2">
             <div
-              className={`px-4 py-2 rounded-full text-sm font-bold ${order.status === "delivered"
-                ? "bg-green-100 text-green-800"
-                : order.status === "shipped"
-                  ? "bg-blue-100 text-blue-800"
-                  : order.status === "not_received" ||
-                    order.status === "cancelled"
-                    ? "bg-red-100 text-red-800"
-                    : order.status === "confirmed"
-                      ? "bg-emerald-100 text-emerald-800"
-                      : order.status === "processing"
-                        ? "bg-indigo-100 text-indigo-800"
-                        : "bg-gray-100 text-gray-800"
-                }`}
+              className={`px-4 py-2 rounded-full text-sm font-bold ${
+                order.status === "delivered"
+                  ? "bg-green-100 text-green-800"
+                  : order.status === "shipped"
+                    ? "bg-blue-100 text-blue-800"
+                    : order.status === "not_received" ||
+                        order.status === "cancelled"
+                      ? "bg-red-100 text-red-800"
+                      : order.status === "confirmed"
+                        ? "bg-emerald-100 text-emerald-800"
+                        : order.status === "processing"
+                          ? "bg-indigo-100 text-indigo-800"
+                          : "bg-gray-100 text-gray-800"
+              }`}
             >
               {order.status === "pending"
                 ? "⭐ إنتظار التأكيد"
@@ -235,10 +249,11 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk
                             : order.status}
             </div>
             <div
-              className={`px-4 py-2 rounded-full text-sm font-bold ${order.payment_method === "cod"
-                ? "bg-amber-100 text-amber-800"
-                : "bg-blue-100 text-blue-800"
-                }`}
+              className={`px-4 py-2 rounded-full text-sm font-bold ${
+                order.payment_method === "cod"
+                  ? "bg-amber-100 text-amber-800"
+                  : "bg-blue-100 text-blue-800"
+              }`}
             >
               {order.payment_method === "cod"
                 ? "الدفع عند الاستلام (COD)"
@@ -294,14 +309,15 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk
                   طريقة التأكيد المفضلة
                 </div>
                 <div
-                  className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-sm font-bold ${order.contact_preference === "whatsapp"
-                    ? "bg-green-100 text-green-800"
-                    : order.contact_preference === "telegram"
-                      ? "bg-blue-100 text-blue-800"
-                      : order.contact_preference === "email"
-                        ? "bg-red-100 text-red-800"
-                        : "bg-amber-100 text-amber-800"
-                    }`}
+                  className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-sm font-bold ${
+                    order.contact_preference === "whatsapp"
+                      ? "bg-green-100 text-green-800"
+                      : order.contact_preference === "telegram"
+                        ? "bg-blue-100 text-blue-800"
+                        : order.contact_preference === "email"
+                          ? "bg-red-100 text-red-800"
+                          : "bg-amber-100 text-amber-800"
+                  }`}
                 >
                   {order.contact_preference === "whatsapp"
                     ? "✅ واتساب (WhatsApp)"
@@ -324,10 +340,11 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk
               <div>
                 <div className="text-sm text-gray-500 mb-1">نوع التوصيل</div>
                 <div
-                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-bold ${order.delivery_type === "home"
-                    ? "bg-orange-100 text-orange-800"
-                    : "bg-blue-100 text-blue-800"
-                    }`}
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-bold ${
+                    order.delivery_type === "home"
+                      ? "bg-orange-100 text-orange-800"
+                      : "bg-blue-100 text-blue-800"
+                  }`}
                 >
                   {order.delivery_type === "home"
                     ? "توصيل إلى المنزل"
@@ -421,10 +438,13 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-500 flex items-center gap-2">
                   🚚 رسوم الشحن
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${order.delivery_type === "home"
-                    ? "bg-orange-100 text-orange-700"
-                    : "bg-gray-100 text-gray-600"
-                    }`}>
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded-full ${
+                      order.delivery_type === "home"
+                        ? "bg-orange-100 text-orange-700"
+                        : "bg-gray-100 text-gray-600"
+                    }`}
+                  >
                     {order.delivery_type === "home" ? "🏠 منزل" : "🏢 مكتب"}
                   </span>
                 </span>
@@ -497,7 +517,8 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk
                   </a>
                 ) : (
                   <p className="text-xs text-gray-400">
-                    أضف رقم التتبع المقدم من Expedia Chrono ليتمكن الزبون من التتبع.
+                    أضف رقم التتبع المقدم من Expedia Chrono ليتمكن الزبون من
+                    التتبع.
                   </p>
                 )}
               </div>
@@ -514,8 +535,6 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
                 />
               </div>
-
-
 
               <Button
                 onClick={handleSave}
