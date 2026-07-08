@@ -62,6 +62,8 @@ export default function OrderSuccess() {
                 })) || [],
             });
 
+            const normalizedValue = Number(data.total_dzd || 0);
+
             // Track a Lead for the order-completion step (customer has submitted the order, but not yet confirmed as purchased)
             const metaEventId = metaPixel.lead({
               content_ids:
@@ -69,7 +71,7 @@ export default function OrderSuccess() {
                   (item: any) => item.product_id,
                 ) || [],
               content_type: "product",
-              value: data.total_dzd,
+              value: normalizedValue,
               currency: "DZD",
               num_items:
                 (data as any).order_items?.reduce(
@@ -89,7 +91,7 @@ export default function OrderSuccess() {
                       (item: any) => item.product_id,
                     ) || [],
                   content_type: "product",
-                  value: data.total_dzd,
+                  value: normalizedValue,
                   currency: "DZD",
                   num_items:
                     (data as any).order_items?.reduce(

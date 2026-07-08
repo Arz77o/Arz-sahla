@@ -96,10 +96,11 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk}` : ""}`;
         status === "confirmed" && order?.status !== "confirmed";
       if (isConfirmingOrder) {
         const orderItems = order?.order_items || [];
+        const normalizedValue = Number(order?.total_dzd || 0);
         const metaEventId = metaPixel.purchase({
           content_ids: orderItems.map((item: any) => item.product_id) || [],
           content_type: "product",
-          value: Number(order?.total_dzd || 0),
+          value: normalizedValue,
           currency: "DZD",
           num_items:
             orderItems.reduce(
@@ -115,7 +116,7 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk}` : ""}`;
             {
               content_ids: orderItems.map((item: any) => item.product_id) || [],
               content_type: "product",
-              value: Number(order?.total_dzd || 0),
+              value: normalizedValue,
               currency: "DZD",
               num_items:
                 orderItems.reduce(
