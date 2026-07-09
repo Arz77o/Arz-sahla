@@ -217,7 +217,9 @@ export default function AdminOrders() {
                         <span
                           className={`px-2 py-1 rounded text-xs font-medium w-fit ${order.payment_method === "cod" ? "bg-amber-100 text-amber-800" : "bg-blue-100 text-blue-800"}`}
                         >
-                          {order.payment_method === "cod" ? "COD" : order.payment_method}
+                          {order.payment_method === "cod"
+                            ? "COD"
+                            : order.payment_method}
                         </span>
                       </div>
                     </td>
