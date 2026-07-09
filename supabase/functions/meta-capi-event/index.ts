@@ -90,14 +90,22 @@ serve(async (req) => {
 
     // ── Build the Conversions API payload ──
     // Docs: https://developers.facebook.com/docs/marketing-api/conversions-api/parameters
+    const clientIpAddress =
+      req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+      req.headers.get("x-real-ip") ||
+      req.headers.get("cf-connecting-ip") ||
+      undefined;
+
     const eventPayload: Record<string, any> = {
       event_name,
-      event_id,       // Must match the Pixel's eventID for deduplication
+      event_id, // Must match the Pixel's eventID for deduplication
       event_time: Math.floor(Date.now() / 1000), // Unix timestamp in seconds
       action_source: "website",
       event_source_url: event_source_url || undefined,
       user_data: {
-        client_user_agent: user_data.client_user_agent || undefined,
+        client_user_agent:
+          user_data.client_user_agent || req.headers.get("user-agent") || undefined,
+        client_ip_address: clientIpAddress,
         fbp: user_data.fbp || undefined, // _fbp cookie (browser ID)
         fbc: user_data.fbc || undefined, // _fbc cookie (click ID from ads)
         ...(hashedPhone ? { ph: [hashedPhone] } : {}),

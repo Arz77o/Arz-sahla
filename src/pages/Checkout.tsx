@@ -30,7 +30,7 @@ import { formatDZD } from "../lib/pricing";
 import { Button } from "../components/ui/button";
 import { gtm } from "../lib/gtm";
 import { metaPixel } from "../lib/metaPixel";
-import { sendServerEvent } from "../lib/metaCapi";
+import { sendServerEvent, getFbp, getFbc } from "../lib/metaCapi";
 
 // ─── Schema ──────────────────────────────────────────────────────────────────
 const checkoutSchema = z.object({
@@ -219,6 +219,9 @@ export default function Checkout() {
           status: "pending",
           admin_note: null,
           delivery_type: data.deliveryType,
+          fbp: getFbp(),
+          fbc: getFbc(),
+          client_user_agent: navigator.userAgent,
         } as any)
         .select()
         .single();

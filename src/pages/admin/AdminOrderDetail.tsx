@@ -14,7 +14,6 @@ import { supabaseAdmin } from "../../lib/supabase";
 import { formatDZD } from "../../lib/pricing";
 import { Button } from "../../components/ui/button";
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader";
-import { metaPixel } from "../../lib/metaPixel";
 import { sendServerEvent } from "../../lib/metaCapi";
 
 export default function AdminOrderDetail() {
@@ -32,13 +31,19 @@ export default function AdminOrderDetail() {
 
   useEffect(() => {
     const fetchOrder = async () => {
+      if (!id) {
+        setLoading(false);
+        return;
+      }
+
+      const orderId = id;
       setLoading(true);
       const { data, error } = await supabaseAdmin
         .from("orders")
         .select(
           "*, order_items(*, products(name_ar, name_en, images, price_dzd))",
         )
-        .eq("id", id)
+        .eq("id", orderId)
         .single();
 
       const { data: settingsData } = await supabaseAdmin
@@ -77,6 +82,12 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk}` : ""}`;
   };
 
   const handleSave = async () => {
+    if (!id) {
+      toast.error("معرف الطلب غير صالح");
+      return;
+    }
+
+    const orderId = id;
     setIsSaving(true);
     try {
       const updates: any = {
@@ -88,48 +99,59 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk}` : ""}`;
       const { error } = await (supabaseAdmin as any)
         .from("orders")
         .update(updates)
-        .eq("id", id);
+        .eq("id", orderId);
 
       if (error) throw error;
 
-      const isConfirmingOrder =
-        status === "confirmed" && order?.status !== "confirmed";
-      if (isConfirmingOrder) {
-        const orderItems = order?.order_items || [];
-        const normalizedValue = Number(order?.total_dzd || 0);
-        const metaEventId = metaPixel.purchase({
-          content_ids: orderItems.map((item: any) => item.product_id) || [],
-          content_type: "product",
-          value: normalizedValue,
-          currency: "DZD",
-          num_items:
-            orderItems.reduce(
-              (acc: number, item: any) => acc + (item.quantity || 1),
-              0,
-            ) || 1,
-        });
+      const orderItems = order?.order_items || [];
+      const normalizedValue = Number(order?.total_dzd || 0);
+      const contentNames = orderItems
+        .map((item: any) =>
+          item?.products?.name_en || item?.products?.name_ar || item?.product_id,
+        )
+        .filter(Boolean);
+      const contentName =
+        contentNames.length === 1
+          ? contentNames[0]
+          : contentNames.length > 1
+          ? contentNames.join(", ")
+          : undefined;
+      const quantity =
+        orderItems.reduce(
+          (acc: number, item: any) => acc + (item.quantity || 1),
+          0,
+        ) || 1;
 
-        if (metaEventId) {
-          sendServerEvent(
-            "Purchase",
-            metaEventId,
-            {
-              content_ids: orderItems.map((item: any) => item.product_id) || [],
-              content_type: "product",
-              value: normalizedValue,
-              currency: "DZD",
-              num_items:
-                orderItems.reduce(
-                  (acc: number, item: any) => acc + (item.quantity || 1),
-                  0,
-                ) || 1,
-            },
-            {
-              fullName: order?.full_name || undefined,
-              phone: order?.phone || undefined,
-            },
-          );
-        }
+      const metaCustomData = {
+        content_ids: orderItems.map((item: any) => item.product_id) || [],
+        content_type: "product",
+        ...(contentName ? { content_name: contentName } : {}),
+        value: normalizedValue,
+        currency: "DZD",
+        num_items: quantity,
+      };
+
+      const orderConfirmed =
+        status === "confirmed" && order?.status !== "confirmed";
+      const orderDelivered =
+        status === "delivered" && order?.status !== "delivered";
+
+      if (orderConfirmed || orderDelivered) {
+        const eventName = orderDelivered ? "Purchase" : "OrderConfirmed";
+        const eventId = `${order?.id}-${eventName}`;
+
+        sendServerEvent(
+          eventName,
+          eventId,
+          metaCustomData,
+          {
+            fullName: order?.full_name || undefined,
+            phone: order?.phone || undefined,
+            clientUserAgent: order?.client_user_agent || undefined,
+            fbp: order?.fbp || undefined,
+            fbc: order?.fbc || undefined,
+          },
+        );
       }
 
       toast.success("تم حفظ التغييرات بنجاح");
@@ -142,6 +164,12 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk}` : ""}`;
   };
 
   const handleDelete = async () => {
+    if (!id) {
+      toast.error("معرف الطلب غير صالح");
+      return;
+    }
+
+    const orderId = id;
     if (
       !window.confirm(
         "هل أنت متأكد من حذف هذا الطلب نهائياً؟ لا يمكن التراجع عن هذا الإجراء.",
@@ -157,7 +185,7 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk}` : ""}`;
       const { error } = await supabaseAdmin
         .from("orders")
         .delete()
-        .eq("id", id);
+        .eq("id", orderId);
 
       if (error) throw error;
 

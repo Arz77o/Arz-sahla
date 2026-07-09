@@ -18,7 +18,7 @@ import { supabase } from "./supabase";
  * Read the _fbp (Facebook Browser ID) cookie.
  * Meta uses this to match browser sessions to ad clicks.
  */
-function getFbp(): string | null {
+export function getFbp(): string | null {
   if (typeof document === "undefined") return null;
   const match = document.cookie.match(/(?:^|;\s*)_fbp=([^;]*)/);
   return match ? decodeURIComponent(match[1]) : null;
@@ -28,7 +28,7 @@ function getFbp(): string | null {
  * Read the _fbc (Facebook Click ID) cookie.
  * Set when a user arrives via a Facebook ad click (?fbclid=...).
  */
-function getFbc(): string | null {
+export function getFbc(): string | null {
   if (typeof document === "undefined") return null;
   const match = document.cookie.match(/(?:^|;\s*)_fbc=([^;]*)/);
   return match ? decodeURIComponent(match[1]) : null;
@@ -64,7 +64,13 @@ export async function sendServerEvent(
   eventName: string,
   eventId: string,
   customData?: Record<string, any>,
-  userData?: { phone?: string; fullName?: string },
+  userData?: {
+    phone?: string;
+    fullName?: string;
+    clientUserAgent?: string;
+    fbp?: string | null;
+    fbc?: string | null;
+  },
 ): Promise<void> {
   try {
     // Build the Supabase Edge Function URL
@@ -92,9 +98,10 @@ export async function sendServerEvent(
       event_id: eventId,
       event_source_url: window.location.href,
       user_data: {
-        client_user_agent: navigator.userAgent,
-        fbp: getFbp(),
-        fbc: getFbc(),
+        client_user_agent:
+          userData?.clientUserAgent || navigator.userAgent,
+        fbp: userData?.fbp || getFbp(),
+        fbc: userData?.fbc || getFbc(),
         ph: userData?.phone || null,
         fn: userData?.fullName || null,
       },

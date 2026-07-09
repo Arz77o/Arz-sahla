@@ -115,6 +115,9 @@ export type Database = {
           wilaya: string;
           "maystro_desk": string | null;
           contact_preference: string;
+          fbp: string | null;
+          fbc: string | null;
+          client_user_agent: string | null;
         };
 Insert: {
   address: string;
@@ -134,6 +137,9 @@ Insert: {
   tracking_number ?: string | null;
   user_id: string;
   wilaya: string;
+  fbp ?: string | null;
+  fbc ?: string | null;
+  client_user_agent ?: string | null;
           "maystro_desk" ?: string | null;
   contact_preference ?: string;
 };
@@ -155,6 +161,9 @@ Update: {
   tracking_number ?: string | null;
   user_id ?: string;
   wilaya ?: string;
+  fbp ?: string | null;
+  fbc ?: string | null;
+  client_user_agent ?: string | null;
           "maystro_desk" ?: string | null;
   contact_preference ?: string;
 };
