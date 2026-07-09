@@ -9,9 +9,19 @@ import { Button } from "../../components/ui/button";
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader";
 
 export default function AdminOrders() {
+  type OrderStatus =
+    | "all"
+    | "pending"
+    | "confirmed"
+    | "processing"
+    | "shipped"
+    | "delivered"
+    | "not_received"
+    | "cancelled";
+
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<OrderStatus>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
   const fetchOrders = async () => {
@@ -22,7 +32,7 @@ export default function AdminOrders() {
       .order("created_at", { ascending: false });
 
     if (statusFilter !== "all") {
-      query = query.eq("status", statusFilter);
+      query = query.eq("status", statusFilter as Exclude<OrderStatus, "all">);
     }
 
     if (searchQuery) {
@@ -73,7 +83,7 @@ export default function AdminOrders() {
     }
   };
 
-  const tabs = [
+  const tabs: { id: OrderStatus; label: string }[] = [
     { id: "all", label: "الكل" },
     { id: "pending", label: "⏳ إنتظار التأكيد" },
     { id: "confirmed", label: "✅ تم التأكيد" },
@@ -84,7 +94,7 @@ export default function AdminOrders() {
     { id: "cancelled", label: "❌ ملغى" },
   ];
 
-  const statusColor: Record<string, string> = {
+  const statusColor: Record<Exclude<OrderStatus, "all">, string> = {
     pending: "bg-gray-100 text-gray-700",
     confirmed: "bg-emerald-100 text-emerald-800",
     processing: "bg-indigo-100 text-indigo-800",

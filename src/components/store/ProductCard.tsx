@@ -7,6 +7,7 @@ import { Reveal } from "../shared/Reveal";
 import { useCartStore } from "../../store/cartStore";
 import { Plus } from "lucide-react";
 import { Button } from "../ui/button";
+import { Product } from "../../hooks/useProducts";
 
 function getOptimizedImageUrl(src: string, width: number): string {
   if (!src) return src;
@@ -32,15 +33,7 @@ function getOptimizedImageUrl(src: string, width: number): string {
 }
 
 interface ProductCardProps {
-  product: {
-    id: string;
-    name_ar: string;
-    name_en: string;
-    price_dzd: number;
-    images: string[];
-    avg_rating: number;
-    stock_quantity: number;
-  };
+  product: Product;
   showQuickAdd?: boolean;
   // priority=true on first 4 cards: eager load + fetchpriority=high for LCP
   priority?: boolean;
@@ -55,6 +48,8 @@ export const ProductCard = React.memo<ProductCardProps>(({
   const { addItem } = useCartStore();
   const name = product.name_ar;
   const priceDZD = product.price_dzd ?? 0;
+  const displayNameEn = product.name_en ?? product.name_ar;
+  const stockQuantity = product.stock_quantity ?? 0;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -62,12 +57,12 @@ export const ProductCard = React.memo<ProductCardProps>(({
     addItem({
       product_id: product.id,
       name_ar: product.name_ar,
-      name_en: product.name_en,
+      name_en: displayNameEn,
       price_dzd: priceDZD,
       image: product.images?.[0] || "",
       variant: null,
       quantity: 1,
-      stock_limit: product.stock_quantity,
+      stock_limit: stockQuantity,
     });
   };
 
@@ -96,7 +91,7 @@ export const ProductCard = React.memo<ProductCardProps>(({
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover w-full h-full"
           />
-          {product.stock_quantity <= 0 && (
+          {(stockQuantity <= 0) && (
             <div className="absolute inset-0 bg-white/60 flex items-center justify-center backdrop-blur-[2px]">
               <span className="bg-gray-900 text-white px-6 py-2 font-bold text-xs uppercase tracking-widest">
                 نفدت الكمية
@@ -104,7 +99,7 @@ export const ProductCard = React.memo<ProductCardProps>(({
             </div>
           )}
 
-          {showQuickAdd && product.stock_quantity > 0 && (
+          {showQuickAdd && stockQuantity > 0 && (
             <div className="absolute bottom-4 left-4 right-4 translate-y-12 group-hover:translate-y-0 transition-transform duration-300 z-10 hidden md:block">
               <Button
                 onClick={handleAddToCart}
@@ -125,7 +120,7 @@ export const ProductCard = React.memo<ProductCardProps>(({
             <h3 className="font-display font-semibold text-gray-900 line-clamp-2 mb-2 text-sm leading-snug flex-grow">
               {name}
             </h3>
-            {showQuickAdd && product.stock_quantity > 0 && (
+            {showQuickAdd && stockQuantity > 0 && (
               <button
                 onClick={handleAddToCart}
                 className="md:hidden w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 hover:bg-primary hover:text-white transition-colors"

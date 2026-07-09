@@ -2,10 +2,11 @@ import React, { useRef, useEffect } from 'react';
 
 interface RevealProps {
   children: React.ReactNode;
-  width?: "fit-content" | "100%";
+  width?: "fit-content" | "100%" | "auto";
   fullHeight?: boolean;
   delay?: number;
   priority?: boolean;
+  y?: number;
 }
 
 /**
@@ -24,6 +25,7 @@ export const Reveal: React.FC<RevealProps> = ({
   fullHeight = false,
   delay = 0,
   priority = false,
+  y = 0,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -55,19 +57,22 @@ export const Reveal: React.FC<RevealProps> = ({
   }, [priority]);
 
   // Priority cards: no wrapper, no overflow:hidden, no animation
+  const baseStyle: React.CSSProperties = {
+    width,
+    height: fullHeight ? '100%' : 'auto',
+    animationDelay: `${delay}s`,
+    transform: y ? `translateY(${y}px)` : undefined,
+  };
+
   if (priority) {
-    return <div style={{ width, height: fullHeight ? '100%' : 'auto' }}>{children}</div>;
+    return <div style={baseStyle}>{children}</div>;
   }
 
   // Non-priority cards: CSS animation via class
   return (
     <div
       ref={ref}
-      style={{
-        width,
-        height: fullHeight ? '100%' : 'auto',
-        animationDelay: `${delay}s`,
-      }}
+      style={baseStyle}
     >
       {children}
     </div>

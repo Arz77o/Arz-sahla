@@ -164,7 +164,7 @@ export default function ProductDetail() {
   const problemSolved = product ? product.problem_solved_ar : "";
   const priceDZD = product?.price_dzd ?? 0;
   const inCart = product ? isInCart(product.id) : false;
-  const outOfStock = product ? product.stock_quantity <= 0 : false;
+  const outOfStock = product ? (product.stock_quantity ?? 0) <= 0 : false;
 
   // Memoize original price calculation
   const priceInfo = useMemo(() => {
@@ -248,16 +248,19 @@ export default function ProductDetail() {
       ? imageUrl
       : `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/products/${imageUrl}`;
 
+    const cartItemNameEn = product.name_en ?? product.name_ar ?? "";
+    const stockLimit = product.stock_quantity ?? 0;
+
     addItem({
       product_id: product.id,
       name_ar: product.name_ar,
-      name_en: product.name_en,
+      name_en: cartItemNameEn,
       price_dzd: priceDZD,
 
       image: absoluteImageUrl,
       variant: selectedVariant,
       quantity: quantity,
-      stock_limit: product.stock_quantity,
+      stock_limit: stockLimit,
     });
 
     // Track add_to_cart via GTM dataLayer
@@ -273,26 +276,6 @@ export default function ProductDetail() {
         },
       ],
     });
-
-    // Track AddToCart for Meta Pixel
-    const metaEventId = metaPixel.addToCart({
-      content_ids: [product.id],
-      content_name: name,
-      content_type: "product",
-      value: priceDZD * quantity,
-      currency: "DZD",
-    });
-
-    // Forward to Conversions API
-    if (metaEventId) {
-      sendServerEvent("AddToCart", metaEventId, {
-        content_ids: [product.id],
-        content_name: name,
-        content_type: "product",
-        value: priceDZD * quantity,
-        currency: "DZD",
-      });
-    }
   };
 
   const handleCreateReview = () => {
@@ -393,7 +376,7 @@ export default function ProductDetail() {
               priceCurrency: "DZD",
               price: priceDZD,
               availability:
-                product.stock_quantity > 0
+                (product.stock_quantity ?? 0) > 0
                   ? "https://schema.org/InStock"
                   : "https://schema.org/OutOfStock",
               seller: { "@type": "Organization", name: "SAHLA DZ." },
@@ -525,7 +508,7 @@ export default function ProductDetail() {
                   {/* ScarcityUrgency Suite */}
                   {!outOfStock && (
                     <div className="mb-10">
-                      <StockProgressBar stock={product.stock_quantity} />
+                      <StockProgressBar stock={product.stock_quantity ?? 0} />
                     </div>
                   )}
 
@@ -586,7 +569,10 @@ export default function ProductDetail() {
                         <button
                           onClick={() =>
                             setQuantity(
-                              Math.min(product.stock_quantity, quantity + 1),
+                              Math.min(
+                                product.stock_quantity ?? quantity + 1,
+                                quantity + 1,
+                              ),
                             )
                           }
                           className="w-14 h-14 bg-white font-bold text-lg"
