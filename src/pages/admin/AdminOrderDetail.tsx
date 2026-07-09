@@ -14,6 +14,7 @@ import { supabaseAdmin } from "../../lib/supabase";
 import { formatDZD } from "../../lib/pricing";
 import { Button } from "../../components/ui/button";
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader";
+import { sendServerEvent } from "../../lib/metaCapi";
 
 export default function AdminOrderDetail() {
   const { id } = useParams<{ id: string }>();
@@ -131,7 +132,24 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk}` : ""}`;
         value: normalizedValue,
         currency: "DZD",
         num_items: quantity,
+        order_id: orderId,
       };
+
+      // If status changed to delivered, it's a confirmed Purchase!
+      if (order.status !== "delivered" && status === "delivered") {
+        sendServerEvent({
+          event_name: "Purchase",
+          event_id: `purchase_${orderId}`,
+          event_source_url: `https://sahladz.store/product`, // A generic URL since this is admin side
+          user_data: {
+            // Very important: Use the customer's data saved during checkout, NOT the admin's browser cookies!
+            fbp: order.fbp,
+            fbc: order.fbc,
+            client_user_agent: order.client_user_agent,
+          },
+          custom_data: metaCustomData,
+        });
+      }
 
       toast.success("تم حفظ التغييرات بنجاح");
       setOrder({ ...order, ...updates });
@@ -249,7 +267,7 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk}` : ""}`;
                     : order.status === "shipped"
                       ? "🚚 تم الشحن"
                       : order.status === "delivered"
-                        ? "🎁 جاهز للاستلام"
+                        ? "🎁 مستلم"
                         : order.status === "not_received"
                           ? "❌ غير مستلم"
                           : order.status === "cancelled"
@@ -496,7 +514,7 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk}` : ""}`;
                   <option value="confirmed">تم التأكيد</option>
                   <option value="processing">قيد التنفيذ</option>
                   <option value="shipped">تم الشحن</option>
-                  <option value="delivered">جاهز للاستلام</option>
+                  <option value="delivered">مستلم</option>
                   <option value="not_received">غير مستلم</option>
                   <option value="cancelled">ملغى</option>
                 </select>

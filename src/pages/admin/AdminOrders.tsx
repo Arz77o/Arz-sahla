@@ -89,7 +89,7 @@ export default function AdminOrders() {
     { id: "confirmed", label: "✅ تم التأكيد" },
     { id: "processing", label: "⚙️ تنفيذ" },
     { id: "shipped", label: "🚚 شحن" },
-    { id: "delivered", label: "🎁 جاهز للاستلام" },
+    { id: "delivered", label: "🎁 مستلم" },
     { id: "not_received", label: "🚨 غير مستلم" },
     { id: "cancelled", label: "❌ ملغى" },
   ];

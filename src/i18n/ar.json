@@ -46,7 +46,7 @@
     "confirmed": "تم التأكيد",
     "processing": "قيد التنفيذ",
     "shipped": "تم الشحن",
-    "delivered": "جاهز للاستلام",
+    "delivered": "مستلم",
     "not_received": "غير مستلم",
     "cancelled": "ملغى"
   },

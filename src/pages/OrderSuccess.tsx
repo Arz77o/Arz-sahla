@@ -66,19 +66,15 @@ export default function OrderSuccess() {
                 })) || [],
             });
 
-            // 2️⃣ Meta Pixel via GTM dataLayer (fb_Purchase event)
-            metaPixel.purchase({
-              content_ids: contentIds,
-              content_type: "product",
+            // 2️⃣ Meta Pixel via GTM dataLayer (fb_Lead event)
+            metaPixel.lead({
               value: data.total_dzd,
               currency: "DZD",
-              num_items: numItems,
-              order_id: data.id,
             });
 
             // 3️⃣ CAPI server-side event (bypasses ad blockers)
             sendServerEvent({
-              event_name: "Purchase",
+              event_name: "Lead",
               event_id: eventId,
               event_source_url: window.location.href,
               user_data: {

@@ -105,7 +105,7 @@ export default function OrderTracking() {
     confirmed: "تم التأكيد",
     processing: "قيد التنفيذ",
     shipped: "تم الشحن",
-    delivered: "جاهز للاستلام",
+    delivered: "مستلم",
     not_received: "غير مستلم",
     cancelled: "ملغى",
   };
@@ -394,7 +394,7 @@ export default function OrderTracking() {
                 </div>
                 <div className="text-right">
                   <h4 className="text-sm font-bold text-gray-900 uppercase tracking-widest">
-                    جاهز للاستلام
+                    مستلم
                   </h4>
                   <p className="text-sm text-gray-500 mt-2">
                     {order.delivery_type === "home"
