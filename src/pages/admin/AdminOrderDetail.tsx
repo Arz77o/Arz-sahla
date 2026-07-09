@@ -106,16 +106,19 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk}` : ""}`;
       const orderItems = order?.order_items || [];
       const normalizedValue = Number(order?.total_dzd || 0);
       const contentNames = orderItems
-        .map((item: any) =>
-          item?.products?.name_en || item?.products?.name_ar || item?.product_id,
+        .map(
+          (item: any) =>
+            item?.products?.name_en ||
+            item?.products?.name_ar ||
+            item?.product_id,
         )
         .filter(Boolean);
       const contentName =
         contentNames.length === 1
           ? contentNames[0]
           : contentNames.length > 1
-          ? contentNames.join(", ")
-          : undefined;
+            ? contentNames.join(", ")
+            : undefined;
       const quantity =
         orderItems.reduce(
           (acc: number, item: any) => acc + (item.quantity || 1),
@@ -140,18 +143,13 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk}` : ""}`;
         const eventName = orderDelivered ? "Purchase" : "OrderConfirmed";
         const eventId = `${order?.id}-${eventName}`;
 
-        sendServerEvent(
-          eventName,
-          eventId,
-          metaCustomData,
-          {
-            fullName: order?.full_name || undefined,
-            phone: order?.phone || undefined,
-            clientUserAgent: order?.client_user_agent || undefined,
-            fbp: order?.fbp || undefined,
-            fbc: order?.fbc || undefined,
-          },
-        );
+        sendServerEvent(eventName, eventId, metaCustomData, {
+          fullName: order?.full_name || undefined,
+          phone: order?.phone || undefined,
+          clientUserAgent: order?.client_user_agent || undefined,
+          fbp: order?.fbp || undefined,
+          fbc: order?.fbc || undefined,
+        });
       }
 
       toast.success("تم حفظ التغييرات بنجاح");

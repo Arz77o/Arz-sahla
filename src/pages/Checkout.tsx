@@ -107,15 +107,20 @@ export default function Checkout() {
           num_items: getItemCount(),
         });
         if (metaEventId) {
-          sendServerEvent("InitiateCheckout", metaEventId, {
-            content_ids: items.map((i) => i.product_id),
-            value: value,
-            currency: "DZD",
-            num_items: getItemCount(),
-          }, {
-            fullName: user?.user_metadata?.full_name || undefined,
-            phone: user?.user_metadata?.phone || undefined,
-          });
+          sendServerEvent(
+            "InitiateCheckout",
+            metaEventId,
+            {
+              content_ids: items.map((i) => i.product_id),
+              value: value,
+              currency: "DZD",
+              num_items: getItemCount(),
+            },
+            {
+              fullName: user?.user_metadata?.full_name || undefined,
+              phone: user?.user_metadata?.phone || undefined,
+            },
+          );
         }
       }
     }

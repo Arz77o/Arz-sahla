@@ -29,7 +29,9 @@ const CORS_HEADERS = {
  * Hash a string using SHA-256 (Meta requires hashed PII).
  * Returns lowercase hex digest, or null if input is empty.
  */
-async function hashSHA256(value: string | null | undefined): Promise<string | null> {
+async function hashSHA256(
+  value: string | null | undefined,
+): Promise<string | null> {
   if (!value || value.trim() === "") return null;
 
   // Normalize: lowercase, trim whitespace
@@ -51,18 +53,23 @@ serve(async (req) => {
   }
 
   if (req.method !== "POST") {
-    return new Response(
-      JSON.stringify({ error: "Method not allowed" }),
-      { status: 405, headers: { "Content-Type": "application/json", ...CORS_HEADERS } }
-    );
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { "Content-Type": "application/json", ...CORS_HEADERS },
+    });
   }
 
   // ── Validate configuration ──
   if (!META_PIXEL_ID || !META_CAPI_ACCESS_TOKEN) {
-    console.error("[Meta CAPI] Missing META_PIXEL_ID or META_CAPI_ACCESS_TOKEN secrets");
+    console.error(
+      "[Meta CAPI] Missing META_PIXEL_ID or META_CAPI_ACCESS_TOKEN secrets",
+    );
     return new Response(
       JSON.stringify({ error: "Meta CAPI configuration is missing" }),
-      { status: 500, headers: { "Content-Type": "application/json", ...CORS_HEADERS } }
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json", ...CORS_HEADERS },
+      },
     );
   }
 
@@ -80,7 +87,10 @@ serve(async (req) => {
     if (!event_name || !event_id) {
       return new Response(
         JSON.stringify({ error: "event_name and event_id are required" }),
-        { status: 400, headers: { "Content-Type": "application/json", ...CORS_HEADERS } }
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...CORS_HEADERS },
+        },
       );
     }
 
@@ -104,7 +114,9 @@ serve(async (req) => {
       event_source_url: event_source_url || undefined,
       user_data: {
         client_user_agent:
-          user_data.client_user_agent || req.headers.get("user-agent") || undefined,
+          user_data.client_user_agent ||
+          req.headers.get("user-agent") ||
+          undefined,
         client_ip_address: clientIpAddress,
         fbp: user_data.fbp || undefined, // _fbp cookie (browser ID)
         fbc: user_data.fbc || undefined, // _fbc cookie (click ID from ads)
@@ -146,21 +158,35 @@ serve(async (req) => {
           success: false,
           error: metaResult?.error?.message || "Meta API error",
         }),
-        { status: metaResponse.status, headers: { "Content-Type": "application/json", ...CORS_HEADERS } }
+        {
+          status: metaResponse.status,
+          headers: { "Content-Type": "application/json", ...CORS_HEADERS },
+        },
       );
     }
 
-    console.log(`[Meta CAPI] ✅ ${event_name} sent — events_received: ${metaResult.events_received}`);
+    console.log(
+      `[Meta CAPI] ✅ ${event_name} sent — events_received: ${metaResult.events_received}`,
+    );
 
     return new Response(
-      JSON.stringify({ success: true, events_received: metaResult.events_received }),
-      { status: 200, headers: { "Content-Type": "application/json", ...CORS_HEADERS } }
+      JSON.stringify({
+        success: true,
+        events_received: metaResult.events_received,
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json", ...CORS_HEADERS },
+      },
     );
   } catch (error) {
     console.error("[Meta CAPI] Unexpected error:", error);
     return new Response(
       JSON.stringify({ success: false, error: (error as Error).message }),
-      { status: 500, headers: { "Content-Type": "application/json", ...CORS_HEADERS } }
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json", ...CORS_HEADERS },
+      },
     );
   }
 });

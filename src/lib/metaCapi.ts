@@ -98,8 +98,7 @@ export async function sendServerEvent(
       event_id: eventId,
       event_source_url: window.location.href,
       user_data: {
-        client_user_agent:
-          userData?.clientUserAgent || navigator.userAgent,
+        client_user_agent: userData?.clientUserAgent || navigator.userAgent,
         fbp: userData?.fbp || getFbp(),
         fbc: userData?.fbc || getFbc(),
         ph: userData?.phone || null,
