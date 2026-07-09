@@ -3,7 +3,7 @@
  *
  * This utility pushes events to the GTM dataLayer.
  * You should configure your GTM container to listen for these events
- * and trigger GA4, Meta Pixel, etc. accordingly.
+ * and trigger GA4 or other analytics providers accordingly.
  */
 
 declare global {

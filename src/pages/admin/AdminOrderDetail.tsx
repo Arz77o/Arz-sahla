@@ -14,7 +14,6 @@ import { supabaseAdmin } from "../../lib/supabase";
 import { formatDZD } from "../../lib/pricing";
 import { Button } from "../../components/ui/button";
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader";
-import { sendServerEvent } from "../../lib/metaCapi";
 
 export default function AdminOrderDetail() {
   const { id } = useParams<{ id: string }>();
@@ -133,24 +132,6 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk}` : ""}`;
         currency: "DZD",
         num_items: quantity,
       };
-
-      const orderConfirmed =
-        status === "confirmed" && order?.status !== "confirmed";
-      const orderDelivered =
-        status === "delivered" && order?.status !== "delivered";
-
-      if (orderConfirmed || orderDelivered) {
-        const eventName = orderDelivered ? "Purchase" : "OrderConfirmed";
-        const eventId = `${order?.id}-${eventName}`;
-
-        sendServerEvent(eventName, eventId, metaCustomData, {
-          fullName: order?.full_name || undefined,
-          phone: order?.phone || undefined,
-          clientUserAgent: order?.client_user_agent || undefined,
-          fbp: order?.fbp || undefined,
-          fbc: order?.fbc || undefined,
-        });
-      }
 
       toast.success("تم حفظ التغييرات بنجاح");
       setOrder({ ...order, ...updates });

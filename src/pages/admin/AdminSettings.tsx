@@ -68,7 +68,6 @@ export default function AdminSettings() {
       // Create a copy of paymentMethods and remove old tracking IDs
       const updatedPaymentMethods = { ...paymentMethods, ...settings };
       delete (updatedPaymentMethods as any).ga_id;
-      delete (updatedPaymentMethods as any).pixel_id;
 
       const { error } = await (supabaseAdmin as any)
         .from("settings")

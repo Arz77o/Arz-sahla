@@ -86,6 +86,9 @@ export default function Checkout() {
   const initiatedRef = React.useRef(false);
   React.useEffect(() => {
     if (items.length > 0) {
+      const contentIds = items.map((i) => i.product_id);
+
+      // GA4 / GTM ecommerce
       gtm.ecommerce("begin_checkout", {
         currency: "DZD",
         value: getTotal(),
@@ -97,31 +100,28 @@ export default function Checkout() {
         })),
       });
 
+      // Meta Pixel InitiateCheckout via GTM dataLayer
+      metaPixel.initiateCheckout({
+        content_ids: contentIds,
+        num_items: getItemCount(),
+        value: getTotal(),
+        currency: "DZD",
+      });
+
+      // CAPI server-side
+      sendServerEvent({
+        event_name: "InitiateCheckout",
+        event_id: `checkout_${Date.now()}`,
+        custom_data: {
+          content_ids: contentIds,
+          num_items: getItemCount(),
+          value: getTotal(),
+          currency: "DZD",
+        },
+      });
+
       if (!initiatedRef.current) {
         initiatedRef.current = true;
-        const value = getTotal();
-        const metaEventId = metaPixel.initiateCheckout({
-          content_ids: items.map((i) => i.product_id),
-          value: value,
-          currency: "DZD",
-          num_items: getItemCount(),
-        });
-        if (metaEventId) {
-          sendServerEvent(
-            "InitiateCheckout",
-            metaEventId,
-            {
-              content_ids: items.map((i) => i.product_id),
-              value: value,
-              currency: "DZD",
-              num_items: getItemCount(),
-            },
-            {
-              fullName: user?.user_metadata?.full_name || undefined,
-              phone: user?.user_metadata?.phone || undefined,
-            },
-          );
-        }
       }
     }
   }, [items, isAr, getTotal, getItemCount, user]);

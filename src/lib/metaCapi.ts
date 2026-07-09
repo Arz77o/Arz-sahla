@@ -1,136 +1,101 @@
 /**
- * Meta Conversions API (CAPI) — Client-Side Helper
+ * Meta Conversions API (CAPI) — Server-Side Event Sender
  *
- * Sends events to the `meta-capi-event` Supabase Edge Function,
- * which forwards them to Meta's server-side Conversions API.
+ * Sends events to our Supabase Edge Function which proxies them
+ * to the Meta Graph API Conversions API endpoint.
  *
- * Why server-side? Browser ad-blockers can block the Pixel script,
- * but server-to-server calls always reach Meta. This ensures your
- * Purchase events are never lost.
- *
- * The `event_id` parameter is the same UUID returned by metaPixel.*()
- * so Meta can deduplicate between Pixel and CAPI.
+ * This runs server-side (via Supabase), so it works even with
+ * ad blockers, and provides deduplication with browser Pixel events.
  */
 
-import { supabase } from "./supabase";
+import { supabase } from './supabase';
+
+// ─── Browser Cookie Helpers ───────────────────────────────────────────────────
 
 /**
- * Read the _fbp (Facebook Browser ID) cookie.
- * Meta uses this to match browser sessions to ad clicks.
+ * Read the _fbp cookie set by the Meta Pixel base code (via GTM).
+ * Used for deduplication and audience matching.
  */
 export function getFbp(): string | null {
-  if (typeof document === "undefined") return null;
-  const match = document.cookie.match(/(?:^|;\s*)_fbp=([^;]*)/);
-  return match ? decodeURIComponent(match[1]) : null;
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(/(^|;\s*)_fbp=([^;]+)/);
+  return match ? match[2] : null;
 }
 
 /**
- * Read the _fbc (Facebook Click ID) cookie.
- * Set when a user arrives via a Facebook ad click (?fbclid=...).
+ * Read the _fbc cookie (Facebook Click ID from ad clicks).
+ * Alternatively, parse 'fbclid' from the URL query string.
  */
 export function getFbc(): string | null {
-  if (typeof document === "undefined") return null;
-  const match = document.cookie.match(/(?:^|;\s*)_fbc=([^;]*)/);
-  return match ? decodeURIComponent(match[1]) : null;
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(/(^|;\s*)_fbc=([^;]+)/);
+  if (match) return match[2];
+
+  // Fallback: build fbc from fbclid URL param if present
+  const fbclid = new URLSearchParams(window.location.search).get('fbclid');
+  if (fbclid) {
+    const ts = Math.floor(Date.now() / 1000);
+    return `fb.1.${ts}.${fbclid}`;
+  }
+  return null;
 }
 
-// Define the shape of event data we send to the edge function
-interface CAPIEventPayload {
+// ─── Event Payload ────────────────────────────────────────────────────────────
+
+export interface CapiEventData {
   event_name: string;
-  event_id: string;
-  event_source_url: string;
-  user_data: {
-    client_user_agent: string;
+  event_time?: number;
+  event_source_url?: string;
+  user_data?: {
+    ph?: string;     // hashed phone
     fbp?: string | null;
     fbc?: string | null;
-    ph?: string | null; // Hashed phone (SHA-256 done server-side)
-    fn?: string | null; // Hashed first name (SHA-256 done server-side)
+    client_user_agent?: string;
+    client_ip_address?: string;
   };
-  custom_data?: Record<string, any>;
+  custom_data?: Record<string, unknown>;
+  event_id?: string; // For deduplication with browser Pixel
 }
 
 /**
- * Send a server-side event to Meta Conversions API via our edge function.
+ * Send a server-side event to Meta Conversions API via Supabase Edge Function.
  *
- * This is fire-and-forget — it never blocks the user flow.
- * If it fails, we log it silently without affecting UX.
- *
- * @param eventName  Standard Meta event name (e.g., 'Purchase', 'ViewContent')
- * @param eventId    The same UUID used for the client-side Pixel event
- * @param customData Optional event-specific data (value, currency, content_ids, etc.)
- * @param userData   Optional user identifiers (phone, name — will be hashed server-side)
+ * Best practice: send this alongside every metaPixel.X() call
+ * so Meta can deduplicate browser + server events using event_id.
  */
-export async function sendServerEvent(
-  eventName: string,
-  eventId: string,
-  customData?: Record<string, any>,
-  userData?: {
-    phone?: string;
-    fullName?: string;
-    clientUserAgent?: string;
-    fbp?: string | null;
-    fbc?: string | null;
-  },
-): Promise<void> {
+export async function sendServerEvent(payload: CapiEventData): Promise<void> {
   try {
-    // Build the Supabase Edge Function URL
-    const supabaseUrl = (supabase as any).supabaseUrl;
+    const supabaseUrl = (supabase as any).supabaseUrl as string | undefined;
     if (!supabaseUrl) {
-      console.warn("[Meta CAPI] Supabase URL not available");
+      console.warn('[CAPI] supabaseUrl not available — skipping server event.');
       return;
     }
 
     const functionUrl = `${supabaseUrl}/functions/v1/meta-capi-event`;
+    const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
-    const normalizedCustomData = customData ? { ...customData } : undefined;
-
-    if (
-      normalizedCustomData?.value !== undefined &&
-      normalizedCustomData?.value !== null
-    ) {
-      const numericValue = Number(normalizedCustomData.value);
-      normalizedCustomData.value =
-        Number.isFinite(numericValue) && numericValue > 0 ? numericValue : 0;
-    }
-
-    const payload: CAPIEventPayload = {
-      event_name: eventName,
-      event_id: eventId,
-      event_source_url: window.location.href,
+    const body: CapiEventData = {
+      ...payload,
+      event_time: payload.event_time ?? Math.floor(Date.now() / 1000),
+      event_source_url: payload.event_source_url ?? window.location.href,
       user_data: {
-        client_user_agent: userData?.clientUserAgent || navigator.userAgent,
-        fbp: userData?.fbp || getFbp(),
-        fbc: userData?.fbc || getFbc(),
-        ph: userData?.phone || null,
-        fn: userData?.fullName || null,
+        fbp: getFbp(),
+        fbc: getFbc(),
+        client_user_agent: navigator.userAgent,
+        ...payload.user_data,
       },
-      custom_data: normalizedCustomData,
     };
 
-    // Fire-and-forget: we don't await or block UI
+    // Fire-and-forget — we don't block the UI for server events
     fetch(functionUrl, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || ""}`,
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${anonKey}`,
       },
-      body: JSON.stringify(payload),
-    })
-      .then((res) => {
-        if (!res.ok) {
-          console.warn(
-            `[Meta CAPI] ⚠️ ${eventName} failed with status ${res.status}`,
-          );
-        } else {
-          console.log(
-            `[Meta CAPI] ✅ ${eventName} sent (event_id: ${eventId})`,
-          );
-        }
-      })
-      .catch((err) => {
-        console.warn(`[Meta CAPI] ⚠️ ${eventName} network error:`, err);
-      });
+      body: JSON.stringify(body),
+    }).catch((err) => console.error('[CAPI] Fetch error:', err));
   } catch (err) {
-    console.warn("[Meta CAPI] Unexpected error:", err);
+    console.error('[CAPI] sendServerEvent error:', err);
   }
 }

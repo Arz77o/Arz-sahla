@@ -18,7 +18,6 @@ import { AdminSidebar } from "./components/admin/AdminSidebar";
 import { ProtectedRoute } from "./components/shared/ProtectedRoute";
 import { AdminRoute } from "./components/shared/AdminRoute";
 import { GoogleTagManager } from "./components/shared/GoogleTagManager";
-import { MetaPixelLoader } from "./components/shared/MetaPixelLoader";
 import { TopBanner } from "./components/shared/TopBanner";
 import { FloatingWhatsApp } from "./components/shared/FloatingWhatsApp";
 
@@ -140,7 +139,6 @@ function App() {
     <HelmetProvider>
       <BrowserRouter>
         <GoogleTagManager />
-        <MetaPixelLoader />
         <Routes>
           {/* Public Store Routes */}
           <Route element={<StoreLayout />}>

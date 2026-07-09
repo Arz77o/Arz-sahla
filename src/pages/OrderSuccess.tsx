@@ -14,7 +14,7 @@ import { formatDZD } from "../lib/pricing";
 import { Button } from "../components/ui/button";
 import { gtm } from "../lib/gtm";
 import { metaPixel } from "../lib/metaPixel";
-import { sendServerEvent } from "../lib/metaCapi";
+import { sendServerEvent, getFbp, getFbc } from "../lib/metaCapi";
 import { useAuthStore } from "../store/authStore";
 import { UserPlus, Sparkles } from "lucide-react";
 
@@ -45,10 +45,14 @@ export default function OrderSuccess() {
         if (data) {
           setOrder(data);
 
-          // Track purchase for GA4
-          const shouldTrack = Boolean(data);
+          // Track purchase — browser Pixel via GTM + server-side CAPI
+          if (lastTrackedOrderId.current !== orderId) {
+            // Unique event_id used for browser ↔ server deduplication
+            const eventId = `purchase_${data.id}`;
+            const contentIds = (data as any).order_items?.map((i: any) => i.product_id) ?? [];
+            const numItems = (data as any).order_items?.length ?? 1;
 
-          if (shouldTrack && lastTrackedOrderId.current !== orderId) {
+            // 1️⃣ GA4 / GTM ecommerce event
             gtm.ecommerce("purchase", {
               transaction_id: data.id,
               value: data.total_dzd,
@@ -62,49 +66,35 @@ export default function OrderSuccess() {
                 })) || [],
             });
 
-            const normalizedValue = Number(data.total_dzd || 0);
-
-            // Track a Lead for the order-completion step (customer has submitted the order, but not yet confirmed as purchased)
-            const metaEventId = metaPixel.lead({
-              content_ids:
-                (data as any).order_items?.map(
-                  (item: any) => item.product_id,
-                ) || [],
+            // 2️⃣ Meta Pixel via GTM dataLayer (fb_Purchase event)
+            metaPixel.purchase({
+              content_ids: contentIds,
               content_type: "product",
-              value: normalizedValue,
+              value: data.total_dzd,
               currency: "DZD",
-              num_items:
-                (data as any).order_items?.reduce(
-                  (acc: number, item: any) => acc + (item.quantity || 1),
-                  0,
-                ) || 1,
+              num_items: numItems,
+              order_id: data.id,
             });
 
-            // Forward to Conversions API
-            if (metaEventId) {
-              sendServerEvent(
-                "Lead",
-                metaEventId,
-                {
-                  content_ids:
-                    (data as any).order_items?.map(
-                      (item: any) => item.product_id,
-                    ) || [],
-                  content_type: "product",
-                  value: normalizedValue,
-                  currency: "DZD",
-                  num_items:
-                    (data as any).order_items?.reduce(
-                      (acc: number, item: any) => acc + (item.quantity || 1),
-                      0,
-                    ) || 1,
-                },
-                {
-                  fullName: data.full_name || undefined,
-                  phone: data.phone || undefined,
-                },
-              );
-            }
+            // 3️⃣ CAPI server-side event (bypasses ad blockers)
+            sendServerEvent({
+              event_name: "Purchase",
+              event_id: eventId,
+              event_source_url: window.location.href,
+              user_data: {
+                fbp: getFbp(),
+                fbc: getFbc(),
+                client_user_agent: navigator.userAgent,
+              },
+              custom_data: {
+                value: data.total_dzd,
+                currency: "DZD",
+                content_ids: contentIds,
+                content_type: "product",
+                num_items: numItems,
+                order_id: data.id,
+              },
+            });
 
             lastTrackedOrderId.current = orderId;
           }
