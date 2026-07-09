@@ -14,16 +14,24 @@ import { sendServerEvent } from "../../lib/metaCapi";
  *
  * Place this component alongside <GoogleTagManager /> in App.tsx.
  */
+declare global {
+  interface Window {
+    metaPixelInitialized?: boolean;
+  }
+}
+
+// Module-level variable survives component remounts to prevent duplicate page views
+let lastTrackedPath: string | null = null;
+
 export const MetaPixelLoader: React.FC = () => {
   const location = useLocation();
   const [pixelId, setPixelId] = useState<string | null>(null);
   const isInitialized = useRef(false);
-  const lastTrackedPath = useRef<string | null>(null);
 
   // ── Step 1: Fetch Pixel ID from settings and initialize the SDK ──
   useEffect(() => {
     const initPixel = async () => {
-      if (isInitialized.current) return;
+      if (isInitialized.current || window.metaPixelInitialized) return;
       isInitialized.current = true;
 
       try {
@@ -41,6 +49,13 @@ export const MetaPixelLoader: React.FC = () => {
           return;
         }
 
+        // Avoid initializing if another script injection already ran
+        if (window.metaPixelInitialized || document.querySelector('script[src*="fbevents.js"]')) {
+          window.metaPixelInitialized = true;
+          setPixelId(id);
+          return;
+        }
+
         // Initialize the Pixel SDK (in-memory queue)
         metaPixel.init(id);
 
@@ -50,16 +65,7 @@ export const MetaPixelLoader: React.FC = () => {
         script.src = "https://connect.facebook.net/en_US/fbevents.js";
         document.head.appendChild(script);
 
-        // Add noscript fallback image
-        const noscript = document.createElement("noscript");
-        const img = document.createElement("img");
-        img.height = 1;
-        img.width = 1;
-        img.style.display = "none";
-        img.src = `https://www.facebook.com/tr?id=${id}&ev=PageView&noscript=1`;
-        noscript.appendChild(img);
-        document.body.appendChild(noscript);
-
+        window.metaPixelInitialized = true;
         setPixelId(id);
         console.log("[Meta Pixel] ✅ Script injected");
       } catch (err) {
@@ -99,14 +105,14 @@ export const MetaPixelLoader: React.FC = () => {
     const currentPath = location.pathname + location.search;
 
     // Don't fire until Pixel is loaded, and avoid duplicate tracking
-    if (!pixelId || lastTrackedPath.current === currentPath) return;
+    if (!pixelId || lastTrackedPath === currentPath) return;
 
     const eventId = metaPixel.pageView({
       content_type: "page",
       value: 0,
       currency: "DZD",
     });
-    lastTrackedPath.current = currentPath;
+    lastTrackedPath = currentPath;
 
     // Also send server-side for reliability
     if (eventId) {

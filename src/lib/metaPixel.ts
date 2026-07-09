@@ -14,6 +14,7 @@ declare global {
   interface Window {
     fbq: (...args: any[]) => void;
     _fbq: any;
+    fbqInitializedPixels?: string[];
   }
 }
 
@@ -80,6 +81,15 @@ export const metaPixel = {
    */
   init: (pixelId: string) => {
     if (typeof window === "undefined") return;
+
+    // Track initialized pixel IDs globally to prevent duplicate init calls
+    window.fbqInitializedPixels = window.fbqInitializedPixels || [];
+    if (window.fbqInitializedPixels.includes(pixelId)) {
+      console.log(`[Meta Pixel] Already initialized for ID: ${pixelId}`);
+      return;
+    }
+    window.fbqInitializedPixels.push(pixelId);
+
     if (typeof window.fbq === "function") {
       // Already initialized — just ensure this pixel ID is tracked
       window.fbq("init", pixelId);
