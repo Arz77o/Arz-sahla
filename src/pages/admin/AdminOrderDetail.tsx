@@ -14,7 +14,7 @@ import { supabaseAdmin } from "../../lib/supabase";
 import { formatDZD } from "../../lib/pricing";
 import { Button } from "../../components/ui/button";
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader";
-import { sendServerEvent } from "../../lib/metaCapi";
+import { sendServerEvent, hashData } from "../../lib/metaCapi";
 
 export default function AdminOrderDetail() {
   const { id } = useParams<{ id: string }>();
@@ -137,12 +137,17 @@ ${order.maystro_desk ? `مكتب Expedia Chrono: ${order.maystro_desk}` : ""}`;
 
       // If status changed to delivered, it's a confirmed Purchase!
       if (order.status !== "delivered" && status === "delivered") {
+        const ph = order.phone ? await hashData(order.phone) : undefined;
+        const em = order.users?.email ? await hashData(order.users.email) : undefined;
+
         sendServerEvent({
           event_name: "Purchase",
           event_id: `purchase_${orderId}`,
           event_source_url: `https://sahladz.store/product`, // A generic URL since this is admin side
           user_data: {
             // Very important: Use the customer's data saved during checkout, NOT the admin's browser cookies!
+            em,
+            ph,
             fbp: order.fbp,
             fbc: order.fbc,
             client_user_agent: order.client_user_agent,

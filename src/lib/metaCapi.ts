@@ -10,6 +10,20 @@
 
 import { supabase } from './supabase';
 
+// ─── Utilities ────────────────────────────────────────────────────────────────
+
+/**
+ * Hash a string to SHA-256 hex string as required by Meta CAPI.
+ * Removes leading/trailing spaces and converts to lowercase.
+ */
+export async function hashData(value: string): Promise<string> {
+  const normalized = value.trim().toLowerCase();
+  const msgBuffer = new TextEncoder().encode(normalized);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 // ─── Browser Cookie Helpers ───────────────────────────────────────────────────
 
 /**
@@ -47,6 +61,7 @@ export interface CapiEventData {
   event_time?: number;
   event_source_url?: string;
   user_data?: {
+    em?: string;     // hashed email
     ph?: string;     // hashed phone
     fbp?: string | null;
     fbc?: string | null;
