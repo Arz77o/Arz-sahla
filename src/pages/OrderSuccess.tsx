@@ -68,9 +68,9 @@ export default function OrderSuccess() {
 
             // 2️⃣ Meta Pixel via GTM dataLayer (fb_Lead event)
             metaPixel.lead({
-              value: data.total_dzd,
+              value: Number(data.total_dzd),
               currency: "DZD",
-            });
+            }, eventId);
 
             // 3️⃣ CAPI server-side event (bypasses ad blockers)
             sendServerEvent({
@@ -83,7 +83,7 @@ export default function OrderSuccess() {
                 client_user_agent: navigator.userAgent,
               },
               custom_data: {
-                value: data.total_dzd,
+                value: Number(data.total_dzd),
                 currency: "DZD",
                 content_ids: contentIds,
                 content_type: "product",

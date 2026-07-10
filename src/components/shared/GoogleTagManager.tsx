@@ -109,10 +109,27 @@ export const GoogleTagManager: React.FC = () => {
     // Avoid double tracking in StrictMode or same path re-renders
     if (!gtmId || !window.dataLayer || lastTrackedPath.current === currentPath) return;
 
+    const eventId = `pageview_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
     window.dataLayer.push({
       event: 'page_view',
       page_path: currentPath,
-      page_title: document.title
+      page_title: document.title,
+      event_id: eventId
+    });
+
+    // Fire CAPI PageView
+    import('../../lib/metaCapi').then(({ sendServerEvent, getFbp, getFbc }) => {
+      sendServerEvent({
+        event_name: 'PageView',
+        event_id: eventId,
+        event_source_url: window.location.href,
+        user_data: {
+          fbp: getFbp(),
+          fbc: getFbc(),
+          client_user_agent: navigator.userAgent
+        }
+      });
     });
     
     lastTrackedPath.current = currentPath;

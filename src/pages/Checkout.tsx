@@ -100,18 +100,20 @@ export default function Checkout() {
         })),
       });
 
+      const eventId = `checkout_${Date.now()}`;
+
       // Meta Pixel InitiateCheckout via GTM dataLayer
       metaPixel.initiateCheckout({
         content_ids: contentIds,
         num_items: getItemCount(),
         value: getTotal(),
         currency: "DZD",
-      });
+      }, eventId);
 
       // CAPI server-side
       sendServerEvent({
         event_name: "InitiateCheckout",
-        event_id: `checkout_${Date.now()}`,
+        event_id: eventId,
         custom_data: {
           content_ids: contentIds,
           num_items: getItemCount(),

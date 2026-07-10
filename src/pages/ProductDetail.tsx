@@ -214,6 +214,8 @@ export default function ProductDetail() {
         ],
       });
 
+      const eventId = `view_${product.id}`;
+
       // Meta Pixel ViewContent via GTM dataLayer
       metaPixel.viewContent({
         content_ids: [product.id],
@@ -221,12 +223,12 @@ export default function ProductDetail() {
         content_type: "product",
         value: priceDZD,
         currency: "DZD",
-      });
+      }, eventId);
 
       // CAPI server-side
       sendServerEvent({
         event_name: "ViewContent",
-        event_id: `view_${product.id}`,
+        event_id: eventId,
         custom_data: {
           content_ids: [product.id],
           content_name: name,
@@ -279,6 +281,8 @@ export default function ProductDetail() {
       ],
     });
 
+    const eventId = `atc_${product.id}_${Date.now()}`;
+
     // Meta Pixel AddToCart via GTM dataLayer
     metaPixel.addToCart({
       content_ids: [product.id],
@@ -286,12 +290,12 @@ export default function ProductDetail() {
       content_type: "product",
       value: priceDZD * quantity,
       currency: "DZD",
-    });
+    }, eventId);
 
     // CAPI server-side
     sendServerEvent({
       event_name: "AddToCart",
-      event_id: `atc_${product.id}_${Date.now()}`,
+      event_id: eventId,
       custom_data: {
         content_ids: [product.id],
         content_name: name,
